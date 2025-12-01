@@ -437,12 +437,14 @@ npm-debug.log
 yarn-error.log
 .pnpm-store/
 
-# Publish directories
-/backend/bin/
-/backend/obj/
-/frontend/bin/
-/frontend/obj/
-/publish/
+bin/
+obj/
+*.user
+*.rsuser
+.idea/
+*.suo
+*.cache
+*.tmp
 
 
 

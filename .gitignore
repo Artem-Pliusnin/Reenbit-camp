@@ -416,3 +416,33 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Rider
+.idea/
+*.sln.iml
+
+# Environment files
+.env.local
+.env.development
+.env.production
+
+# Blazor WebAssembly
+wwwroot/css/
+wwwroot/js/
+wwwroot/*.map
+
+# Node tooling
+dist/
+npm-debug.log
+yarn-error.log
+.pnpm-store/
+
+# Publish directories
+/backend/bin/
+/backend/obj/
+/frontend/bin/
+/frontend/obj/
+/publish/
+
+
+

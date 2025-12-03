@@ -1,7 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Persistence;
+namespace Persistence.Database;
 
 public class TrelloAppDbContext : DbContext
 {

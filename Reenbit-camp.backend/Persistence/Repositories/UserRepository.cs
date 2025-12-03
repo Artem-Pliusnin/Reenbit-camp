@@ -6,7 +6,8 @@ namespace Persistence.Repositories;
 
 public class UserRepository : BaseRepository<User, int>, IUserRepository
 {
+
     public UserRepository(TrelloAppDbContext context)
-    : base(context)
+        : base(context)
     {}
 }

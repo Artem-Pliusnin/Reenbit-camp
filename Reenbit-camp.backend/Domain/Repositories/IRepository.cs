@@ -1,6 +1,6 @@
 namespace Domain.Repositories;
 
-public interface IRepository<TEntity, TId>
+public interface IRepository<TEntity, TId> : IBaseRepository
 {
     Task<TEntity?> GetByIdAsync(TId id);
     

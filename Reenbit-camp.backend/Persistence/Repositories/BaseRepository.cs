@@ -7,15 +7,18 @@ namespace Persistence.Repositories;
 public class BaseRepository<TEntity, TId> : IRepository<TEntity, TId>
     where TEntity : class
 {
-    protected readonly TrelloAppDbContext _context;
-    protected readonly DbSet<TEntity> _dbSet;
+    protected DbSet<TEntity> _dbSet;
 
-    public BaseRepository(TrelloAppDbContext context)
+    public BaseRepository(DbContext context)
     {
-        _context = context;
+        SetContext(context);
+    }
+
+    public void SetContext(DbContext context)
+    {
         _dbSet = context.Set<TEntity>();
     }
-    
+
     public async Task<TEntity?> GetByIdAsync(TId id) => 
         await _dbSet.FindAsync(id);
 

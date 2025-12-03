@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="dbup-postgresql" Version="6.1.5" />
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
     </ItemGroup>
 
 </Project>

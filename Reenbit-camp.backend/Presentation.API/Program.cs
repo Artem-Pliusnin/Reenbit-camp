@@ -1,3 +1,5 @@
+using Database;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,7 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDatabase(builder.Configuration);
+
+var r = builder.Configuration;
+
 var app = builder.Build();
+
+var initializer = app.Services.GetRequiredService<DatabaseInitializer>();
+await initializer.InitializeAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -25,6 +25,10 @@ public class DatabaseInitializer
         if (upgrader.IsUpgradeRequired())
         {
             var result = upgrader.PerformUpgrade();
+            if (!result.Successful)
+            {
+                throw new Exception("Database upgrade failed");
+            }
         }
     }
 }

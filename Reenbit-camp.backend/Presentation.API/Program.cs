@@ -1,4 +1,5 @@
 using Database;
+using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddPersistence(builder.Configuration)
+    .AddDatabase(builder.Configuration);
 
 var r = builder.Configuration;
 

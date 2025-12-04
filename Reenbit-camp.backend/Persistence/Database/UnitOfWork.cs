@@ -10,15 +10,15 @@ public class UnitOfWork : IUnitOfWork
     private readonly TrelloAppDbContext _context;
     private readonly IDictionary<string, object> _repositories = new Dictionary<string, object>();
     
-    public UnitOfWork(IServiceProvider serviceProvider, string connectionString)
+    public UnitOfWork(IServiceProvider serviceProvider, TrelloAppDbContext context)
     {
         _serviceProvider = serviceProvider;
-        _context = CreateContext(connectionString);
+        _context = context;
     }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return _context.SaveChangesAsync(cancellationToken);
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 
     public T GetRepository<T>() where T : class, IBaseRepository
@@ -49,15 +49,6 @@ public class UnitOfWork : IUnitOfWork
     public void Rollback()
     {
         _context.RollbackTransaction();
-    }
-
-    private TrelloAppDbContext CreateContext(string connectionString)
-    {
-        var optionsBuilder = new DbContextOptionsBuilder<TrelloAppDbContext>()
-            .UseNpgsql(connectionString)
-            .Options;
-        
-        return new TrelloAppDbContext(optionsBuilder);
     }
     
     public void Dispose()

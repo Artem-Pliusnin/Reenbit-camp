@@ -19,11 +19,13 @@ public class BaseRepository<TEntity, TId> : IRepository<TEntity, TId>
         _dbSet = context.Set<TEntity>();
     }
 
-    public async Task<TEntity?> GetByIdAsync(TId id) => 
-        await _dbSet.FindAsync(id);
+    public async Task<TEntity?> GetByIdAsync(TId id, 
+        CancellationToken cancellationToken = default) => 
+        await _dbSet.FindAsync(id, cancellationToken);
 
-    public async Task<List<TEntity>> GetAllAsync() => 
-        await _dbSet.ToListAsync();
+    public async Task<List<TEntity>> GetAllAsync(
+        CancellationToken cancellationToken = default) => 
+        await _dbSet.ToListAsync(cancellationToken);
 
     public void Add(TEntity entity) => 
         _dbSet.Add(entity);

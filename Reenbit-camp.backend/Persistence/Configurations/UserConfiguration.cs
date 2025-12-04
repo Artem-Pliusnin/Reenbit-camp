@@ -41,12 +41,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("password")
             .HasMaxLength(255)
             .IsRequired();
-
-        builder.Property(u => u.RefreshToken)
-            .HasColumnName("refreshtoken")
-            .HasMaxLength(255);
-
-        builder.Property(u => u.RefreshTokenExpireTime)
-            .HasColumnName("refreshtokenexpiretime");
+        
+        builder.Property(u => u.Role)
+            .HasColumnName("roleid")
+            .HasConversion<int>();
     }
 }

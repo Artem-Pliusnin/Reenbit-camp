@@ -13,7 +13,7 @@ public abstract class ApiController : ControllerBase
 
     protected IActionResult HandleFailure(Result result)
     {
-        if (result.IsFailure)
+        if (result.IsSuccess)
         {
             throw new InvalidOperationException();
         }

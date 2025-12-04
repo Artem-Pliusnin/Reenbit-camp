@@ -15,7 +15,7 @@ public class AuthController : ApiController
     {
     }
     
-    [HttpPost]
+    [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(
         [FromBody] RegisterUserRequest request,
         CancellationToken cancellationToken)

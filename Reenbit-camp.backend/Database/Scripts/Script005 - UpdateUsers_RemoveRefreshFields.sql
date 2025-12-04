@@ -1,0 +1,5 @@
+ALTER TABLE "User"
+DROP COLUMN IF EXISTS RefreshToken;
+
+ALTER TABLE "User"
+DROP COLUMN IF EXISTS RefreshTokenExpireTime;

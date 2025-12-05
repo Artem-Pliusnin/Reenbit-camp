@@ -12,7 +12,7 @@ public class SessionRepository
     : base(context)
     {}
 
-    public async Task<Session?> GetSessionByRefreshToken(
+    public async Task<Session?> GetSessionByRefreshTokenAsync(
         string refreshToken,
         CancellationToken cancellationToken = default)
     {

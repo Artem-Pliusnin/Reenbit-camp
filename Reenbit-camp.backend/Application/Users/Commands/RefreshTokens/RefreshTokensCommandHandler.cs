@@ -27,7 +27,7 @@ public class RefreshTokensCommandHandler : ICommandHandler<RefreshTokensCommand,
         var sessionRepository = _unitOfWork.GetRepository<ISessionRepository>();
         
         var session = await sessionRepository
-            .GetSessionByRefreshToken(request.RefreshToken, cancellationToken);
+            .GetSessionByRefreshTokenAsync(request.RefreshToken, cancellationToken);
 
         if (session == null || session.ExpiresOn <= DateTime.UtcNow)
         {

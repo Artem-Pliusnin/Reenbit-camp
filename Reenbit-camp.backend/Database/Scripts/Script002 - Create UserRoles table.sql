@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS "Roles"(
+    Id INT PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO "Roles" (Id, Name) VALUES
+(1, 'User'),
+(2, 'Admin')
+ON CONFLICT DO NOTHING;

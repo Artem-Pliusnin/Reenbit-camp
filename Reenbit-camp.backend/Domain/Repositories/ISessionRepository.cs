@@ -4,4 +4,5 @@ namespace Domain.Repositories;
 
 public interface ISessionRepository : IRepository<Session, int>
 {
+    Task<Session?> GetSessionByRefreshToken(string refreshToken, CancellationToken cancellationToken = default);
 }

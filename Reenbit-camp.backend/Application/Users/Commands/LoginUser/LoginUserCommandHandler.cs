@@ -9,7 +9,7 @@ using Domain.Shared;
 namespace Application.Users.Commands.LoginUser;
 
 public class LoginUserCommandHandler 
-    : ICommandHandler<LoginUserCommand, LoginResponseDto>
+    : ICommandHandler<LoginUserCommand, TokensResponseDto>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenProvider _tokenProvider;
@@ -25,7 +25,7 @@ public class LoginUserCommandHandler
         _passwordHasher = passwordHasher;
     }
     
-    public async Task<Result<LoginResponseDto>> Handle(
+    public async Task<Result<TokensResponseDto>> Handle(
         LoginUserCommand request,
         CancellationToken cancellationToken)
     {
@@ -37,14 +37,14 @@ public class LoginUserCommandHandler
         
         if (user is null)
         {
-            return Result.Failure<LoginResponseDto>(UserErrors.NotFoundByEmail);
+            return Result.Failure<TokensResponseDto>(UserErrors.NotFoundByEmail);
         }
         
         var verified = _passwordHasher.Verify(request.Password, user.Password);
 
         if (!verified)
         {
-            return Result.Failure<LoginResponseDto>(UserErrors.NotFoundByEmail);
+            return Result.Failure<TokensResponseDto>(UserErrors.InvalidPassword);
         }
         
         var accessToken = _tokenProvider.CreateToken(user);
@@ -59,8 +59,10 @@ public class LoginUserCommandHandler
         };
         
         sessionRepository.Add(session);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var response = new LoginResponseDto()
+        var response = new TokensResponseDto()
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,

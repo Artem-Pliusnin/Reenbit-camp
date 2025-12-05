@@ -1,4 +1,5 @@
 using Application.Users.Commands.LoginUser;
+using Application.Users.Commands.RefreshTokens;
 using Application.Users.Commands.RegisterUser;
 using Domain.DTOs.Authorization;
 using Domain.Shared;
@@ -47,12 +48,31 @@ public class AuthController : ApiController
             request.Email,
             request.Password);
         
-        Result<LoginResponseDto> result =
+        Result<TokensResponseDto> result =
             await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
             return Unauthorized("Invalid credentials");
+        }
+        
+        return Ok(result.Value);
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshTokens(
+        [FromBody] RefreshTokensRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RefreshTokensCommand(
+            request.RefreshToken);
+        
+        Result<TokensResponseDto> result = 
+            await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return Unauthorized(result.Error.Message);
         }
         
         return Ok(result.Value);

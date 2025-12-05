@@ -1,6 +1,6 @@
 namespace Domain.DTOs.Authorization;
 
-public class LoginResponseDto
+public class TokensResponseDto
 {
     public required string AccessToken { get; set; }
     

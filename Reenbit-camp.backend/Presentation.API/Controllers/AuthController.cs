@@ -4,6 +4,7 @@ using Application.Users.Commands.RegisterUser;
 using Domain.DTOs.Authorization;
 using Domain.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
 using Presentation.API.Contracts.Auth;
@@ -59,6 +60,7 @@ public class AuthController : ApiController
         return Ok(result.Value);
     }
 
+    [Authorize]
     [HttpPost("refresh")]
     public async Task<IActionResult> RefreshTokens(
         [FromBody] RefreshTokensRequest request,

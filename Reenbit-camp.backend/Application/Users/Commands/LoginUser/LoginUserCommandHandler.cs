@@ -49,16 +49,29 @@ public class LoginUserCommandHandler
         
         var accessToken = _tokenProvider.CreateToken(user);
         var refreshToken = _tokenProvider.GenerateRefreshToken();
-
-        var session = new Session()
-        {
-            Token = refreshToken,
-            ExpiresOn = DateTime.UtcNow
-                .AddDays(_tokenProvider.RefreshTokenLifetimeDays),
-            UserId = user.Id,
-        };
         
-        sessionRepository.Add(session);
+        var session = await sessionRepository
+            .GetSessionByUserIdAsync(user.Id, cancellationToken);
+        if (session != null)
+        {
+            session.Token = refreshToken;
+            session.ExpiresOn = DateTime.UtcNow
+                .AddDays(_tokenProvider.RefreshTokenLifetimeDays);
+            
+            sessionRepository.Update(session);
+        }
+        else
+        {
+            session = new Session()
+            {
+                Token = refreshToken,
+                ExpiresOn = DateTime.UtcNow
+                    .AddDays(_tokenProvider.RefreshTokenLifetimeDays),
+                UserId = user.Id,
+            };
+        
+            sessionRepository.Add(session);
+        }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

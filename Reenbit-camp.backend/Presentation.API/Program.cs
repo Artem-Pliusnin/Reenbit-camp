@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication()
     .AddPersistence(builder.Configuration)
     .AddInfrastructure(builder.Configuration)
-    .AddPresentation()
+    .AddPresentation(builder.Configuration)
     .AddDatabase(builder.Configuration);
 
 var r = builder.Configuration;
@@ -29,6 +29,9 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

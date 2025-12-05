@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddApplication()
     .AddPersistence(builder.Configuration)
-    .AddInfrastructure()
+    .AddInfrastructure(builder.Configuration)
     .AddPresentation()
     .AddDatabase(builder.Configuration);
 

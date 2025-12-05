@@ -17,4 +17,6 @@ public class User
     public string Password { get; set; }
     
     public UserRole Role { get; set; } = UserRole.User;
+    
+    public List<BoardMember> Boards { get; set; }
 }

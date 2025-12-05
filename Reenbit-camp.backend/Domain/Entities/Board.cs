@@ -16,4 +16,5 @@ public class Board
     
     public User CreatedByUser { get; set; }
     public User? LastUpdatedByUser { get; set; }
+    public List<BoardMember> Members { get; set; }
 }

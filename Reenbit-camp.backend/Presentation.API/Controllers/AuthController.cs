@@ -1,4 +1,6 @@
+using Application.Users.Commands.LoginUser;
 using Application.Users.Commands.RegisterUser;
+using Domain.DTOs.Authorization;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,26 @@ public class AuthController : ApiController
         if (result.IsFailure)
         {
             return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginUser(
+        [FromBody] LoginUserRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new LoginUserCommand(
+            request.Email,
+            request.Password);
+        
+        Result<LoginResponseDto> result =
+            await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return Unauthorized("Invalid credentials");
         }
         
         return Ok(result.Value);

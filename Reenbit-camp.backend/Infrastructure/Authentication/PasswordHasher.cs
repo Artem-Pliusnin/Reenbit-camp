@@ -22,7 +22,7 @@ public class PasswordHasher : IPasswordHasher
 
     public bool Verify(string password, string hashedPassword)
     {
-        string[] parts = hashedPassword.Split('-');
+        string[] parts = hashedPassword.Split('.');
         byte[] hash = Convert.FromHexString(parts[0]);
         byte[] salt = Convert.FromHexString(parts[1]);
 

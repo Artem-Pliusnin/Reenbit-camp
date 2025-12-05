@@ -11,6 +11,8 @@ public class TrelloAppDbContext : DbContext
     }
     
     DbSet<User> Users { get; set; }
+    
+    DbSet<Session> Sessions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

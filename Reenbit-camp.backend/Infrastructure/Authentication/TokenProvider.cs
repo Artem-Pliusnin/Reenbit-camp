@@ -4,21 +4,20 @@ using System.Security.Cryptography;
 using System.Text;
 using Application.Abstractions.Services;
 using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Authentication;
 
 public class TokenProvider : ITokenProvider
 {
-    private readonly JwtOptions _options;
+    private readonly IOptions<JwtOptions> _options;
 
-    public TokenProvider(JwtOptions options)
+    public TokenProvider(IOptions<JwtOptions> options)
     {
         _options = options;
-        AccessTokenLifetimeMinutes = _options.ExpirationMinutes;
-        RefreshTokenLifetimeDays = _options.RefreshTokenExpirationDays;
+        AccessTokenLifetimeMinutes = _options.Value.ExpirationMinutes;
+        RefreshTokenLifetimeDays = _options.Value.RefreshTokenExpirationDays;
     }
     
     public int AccessTokenLifetimeMinutes { get; }
@@ -34,17 +33,17 @@ public class TokenProvider : ITokenProvider
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
         
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.Key));
 
         var credentials = new SigningCredentials(key,
             SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _options.Issuer,
-            audience: _options.Audience,
+            issuer: _options.Value.Issuer,
+            audience: _options.Value.Audience,
             claims: claims,
             expires: DateTime.UtcNow
-                .AddMinutes(Convert.ToDouble(_options.ExpirationMinutes)),
+                .AddMinutes(Convert.ToDouble(_options.Value.ExpirationMinutes)),
             signingCredentials: credentials
         );
 

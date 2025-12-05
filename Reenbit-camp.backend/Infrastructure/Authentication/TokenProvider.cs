@@ -17,7 +17,13 @@ public class TokenProvider : ITokenProvider
     public TokenProvider(JwtOptions options)
     {
         _options = options;
+        AccessTokenLifetimeMinutes = _options.ExpirationMinutes;
+        RefreshTokenLifetimeDays = _options.RefreshTokenExpirationDays;
     }
+    
+    public int AccessTokenLifetimeMinutes { get; }
+    
+    public int RefreshTokenLifetimeDays { get; }
 
     public string CreateToken(User user)
     {
@@ -54,4 +60,5 @@ public class TokenProvider : ITokenProvider
         
         return Convert.ToBase64String(randomNumber);
     }
+    
 }

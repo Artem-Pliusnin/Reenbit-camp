@@ -1,6 +1,8 @@
 using Application.Abstractions.Messaging;
 using Domain.DTOs.Boards;
 using Domain.Entities;
+using Domain.Enums;
+using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
@@ -16,28 +18,43 @@ public class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, Boa
     }
 
     public async Task<Result<BoardDto>> Handle(
-        CreateBoardCommand request, 
+        CreateBoardCommand request,
         CancellationToken cancellationToken)
     {
-        var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
-
-        var board = new Board()
+        try
         {
-            Title = request.Title,
-            CreatedBy = request.UserId,
-            CreationDate = DateTime.UtcNow,
-        };
-        
-        boardRepository.Add(board);
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var boardMemberRepository = _unitOfWork.GetRepository<IBoardMemberRepository>();
 
-        var response = new BoardDto()
+            var board = new Board()
+            {
+                Title = request.Title,
+                CreatedBy = request.UserId,
+                CreationDate = DateTime.UtcNow,
+            };
+
+            var boardMember = new BoardMember()
+            {
+                Board = board,
+                UserId = request.UserId,
+                Role = BoardRole.Owner
+            };
+
+            boardMemberRepository.Add(boardMember);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            var response = new BoardDto()
+            {
+                Id = board.Id,
+                Title = board.Title,
+            };
+
+            return response;
+
+        }
+        catch (Exception ex)
         {
-            Id = board.Id,
-            Title = board.Title,
-        };
-        
-        return response;
+            return Result.Failure<BoardDto>(BoardErrors.CreateBoardError);
+        }
     }
 }

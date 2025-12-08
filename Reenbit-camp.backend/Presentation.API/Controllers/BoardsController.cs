@@ -13,16 +13,16 @@ using Presentation.API.Contracts.Boards;
 
 namespace Presentation.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 public class BoardsController : ApiController
 {
     public BoardsController(ISender sender)
         : base(sender)
     {}
-
-    [Authorize]
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateBoard(
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync(
         [FromBody] CreateBoardRequest request, 
         CancellationToken cancellationToken)
     {
@@ -46,9 +46,8 @@ public class BoardsController : ApiController
         return Ok(result.Value);
     }
     
-    [Authorize]
-    [HttpGet("by-user")]
-    public async Task<IActionResult> GetUserBoards(
+    [HttpGet]
+    public async Task<IActionResult> GetByUserAsync(
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -58,7 +57,6 @@ public class BoardsController : ApiController
         {
             return Unauthorized();
         }
-
         var query = new GetUserBoardsQuery(userId);
         
         Result<List<BoardDto>> result = await Sender.Send(query, cancellationToken);
@@ -71,10 +69,10 @@ public class BoardsController : ApiController
         return Ok(result.Value);
     }
     
-    [Authorize]
-    [HttpPut("update")]
-    public async Task<IActionResult> UpdateBoard(
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync(
         [FromBody] UpdateBoardRequest request, 
+        [FromRoute] int id,
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -85,7 +83,7 @@ public class BoardsController : ApiController
             return Unauthorized();
         }
 
-        var command = new UpdateBoardCommand(userId, request.BoardId, request.Title);
+        var command = new UpdateBoardCommand(userId, id, request.Title);
         
         Result result = await Sender.Send(command, cancellationToken);
         

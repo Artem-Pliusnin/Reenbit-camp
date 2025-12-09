@@ -3,12 +3,12 @@ using Reenbit.Camp.Frontend.Models.Auth;
 
 namespace Reenbit.Camp.Frontend.Components.Auth;
 
-public partial class LogIn : ComponentBase
+public partial class Register : ComponentBase
 {
-    private LoginModel model = new();
+    private RegisterModel model = new();
     
     private async Task OnRegisterAsync()
     {
-        Console.WriteLine("Login clicked!");
+        Console.WriteLine("User registered:");
     }
 }

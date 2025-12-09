@@ -1,17 +1,18 @@
 <h3 class="text-center mb-4">Sign In</h3>
 
-<EditForm Model="model" class="d-flex flex-column gap-2 align-items-center">
+<EditForm Model="model" OnValidSubmit="OnRegisterAsync" class="d-flex flex-column gap-2 align-items-center">
     <DataAnnotationsValidator />
+    
     <div class="form-group mb-2 w-100">
         <label for="InputEmail">Email</label>
         <InputText
             @bind-Value="model.Email"
             class="form-control"
             id="InputEmail"
-            placeholder="Email">
-        </InputText>
+            placeholder="Email" />
         <ValidationMessage For="@(() => model.Email)"/>
     </div>
+    
     <div class="form-group mb-2 w-100">
         <label for="InputPassword">Password</label>
         <InputText
@@ -19,9 +20,9 @@
             type="password"
             class="form-control"
             id="InputPassword"
-            placeholder="Password">
-        </InputText>
+            placeholder="Password" />
         <ValidationMessage For="@(() => model.Password)"/>
     </div>
-    <button type="submit" class="btn submit-btn mt-3">Submit</button>
+    
+    <button type="submit" class="btn submit-btn mt-3">Sign In</button>
 </EditForm>

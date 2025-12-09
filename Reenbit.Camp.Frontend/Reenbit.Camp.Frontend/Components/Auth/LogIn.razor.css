@@ -1,0 +1,26 @@
+.submit-btn{
+    width: fit-content;
+    height: fit-content;
+    background-color: rgb(134, 182, 246);
+    border: unset;
+    font-weight: bold;
+    color: white;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+}
+
+label{
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 0.25rem;
+}
+
+.input{
+    background-color: rgba(180, 212, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 1.2rem;
+    padding: 0 1rem 0 1rem;
+    font-size: 1.2rem;
+    box-sizing: border-box;
+}

@@ -32,8 +32,7 @@ public class AuthService : IAuthService
         {
             LogoutRequest request = new LogoutRequest(session.RefreshToken);
 
-            await _apiClient.PostAsync<LogoutRequest, object>(
-                "auth/logout", request);
+            await _apiClient.PostAsyncRaw("auth/logout", request);
         }
     }
 

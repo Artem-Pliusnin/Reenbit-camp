@@ -40,4 +40,9 @@ public class ApiClient
         var error = await response.Content.ReadFromJsonAsync<ApiError>();
         return (default, error);
     }
+    
+    public async Task<HttpResponseMessage> PostAsyncRaw<TRequest>(string uri, TRequest request)
+    {
+        return await _httpClient.PostAsJsonAsync(uri, request);
+    }
 }

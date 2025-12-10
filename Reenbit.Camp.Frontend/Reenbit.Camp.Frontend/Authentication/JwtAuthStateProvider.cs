@@ -3,16 +3,22 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
 using Reenbit.Camp.Frontend.Models.Auth.APIModels;
+using Reenbit.Camp.Frontend.Services.Auth;
+using Reenbit.Camp.Frontend.Services.Refresh;
 
 namespace Reenbit.Camp.Frontend.Authentication;
 
 public class JwtAuthStateProvider : AuthenticationStateProvider 
 {
     private ILocalStorageService _localStorage;
+    private IRefreshService _refreshService;
     
-    public JwtAuthStateProvider(ILocalStorageService localStorage)
+    public JwtAuthStateProvider(
+        ILocalStorageService localStorage,
+        IRefreshService refreshService)
     {
         _localStorage = localStorage;
+        _refreshService = refreshService;
     }
     
     public async override Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -24,7 +30,21 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         
         if (session != null && !string.IsNullOrEmpty(session.AccessToken))
         {
-            identity = GetClaimsIdentity(session.AccessToken);
+            if (session.AccessTokenExpiresAt <= DateTime.UtcNow)
+            {
+                var (newTokens, _) = await _refreshService
+                    .RefreshTokensAsync(new RefreshRequest(session.RefreshToken));
+
+                if (newTokens != null)
+                {
+                    await _localStorage.SetItemAsync("Session", newTokens);
+                    identity = GetClaimsIdentity(newTokens.AccessToken);
+                }
+            }
+            else
+            {
+                identity = GetClaimsIdentity(session.AccessToken);
+            }
         }
 
         var user = new ClaimsPrincipal(identity);

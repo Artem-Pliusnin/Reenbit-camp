@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using Reenbit.Camp.Frontend.Models.Auth.APIModels;
 
@@ -6,10 +7,10 @@ namespace Reenbit.Camp.Frontend.Services.Auth;
 public class AuthService : IAuthService
 {
     private readonly ApiClient _apiClient;
-    
     private readonly ILocalStorageService _localStorage;
 
-    public AuthService(ApiClient apiClient, ILocalStorageService localStorage)
+    public AuthService(ApiClient apiClient, 
+        ILocalStorageService localStorage)
     {
         _apiClient = apiClient;
         _localStorage = localStorage;
@@ -35,8 +36,7 @@ public class AuthService : IAuthService
             await _apiClient.PostAsyncRaw("auth/logout", request);
         }
     }
-
-
+    
     public async Task<(bool Success, string? ErrorMessage)> RegisterAsync(RegisterRequest request)
     {
         var (data, error) = await _apiClient.PostAsync<RegisterRequest, object>(

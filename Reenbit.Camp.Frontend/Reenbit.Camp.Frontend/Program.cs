@@ -7,6 +7,7 @@ using Reenbit.Camp.Frontend.Authentication;
 using Reenbit.Camp.Frontend.Handlers;
 using Reenbit.Camp.Frontend.Services;
 using Reenbit.Camp.Frontend.Services.Auth;
+using Reenbit.Camp.Frontend.Services.Refresh;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -15,16 +16,28 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddScoped<TokenHandler>();
-builder.Services.AddHttpClient<ApiClient>(client =>
-{
-    client.BaseAddress = new Uri("https://localhost:7011/api/");
-}).AddHttpMessageHandler<TokenHandler>();
-
 builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRefreshService, RefreshService>(sp =>
+{
+    var client = sp.GetRequiredService<IHttpClientFactory>()
+        .CreateClient("RefreshClient");
+    return new RefreshService(client);
+});
+
+builder.Services.AddScoped<TokenHandler>();
+
+builder.Services.AddHttpClient<ApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7011/api/");
+}).AddHttpMessageHandler<TokenHandler>();
+
+builder.Services.AddHttpClient("RefreshClient", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7011/api/");
+});
 
 await builder.Build().RunAsync();

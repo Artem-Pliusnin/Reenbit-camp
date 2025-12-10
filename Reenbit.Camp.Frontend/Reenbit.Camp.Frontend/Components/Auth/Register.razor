@@ -19,7 +19,7 @@
             @bind-Value="model.LastName"
             class="form-control"
             id="InputLastName"
-            placeholder="Last name (optional)" />
+            placeholder="Last name" />
         <ValidationMessage For="@(() => model.LastName)" />
     </div>
 
@@ -54,6 +54,11 @@
             placeholder="Repeat password" />
         <ValidationMessage For="@(() => model.RepeatPassword)" />
     </div>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+    <span class="text-danger w-100 text-start">@ErrorMessage</span>
+    }
     
     <button type="submit" class="btn submit-btn mt-3">Sign Up</button>
 </EditForm>

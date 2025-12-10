@@ -8,6 +8,7 @@ public class RegisterModel
     [MaxLength(50)]
     public string FirstName { get; set; }
     
+    [Required(ErrorMessage = "Last name is required")]
     [MaxLength(50)]
     public string LastName { get; set; }
     

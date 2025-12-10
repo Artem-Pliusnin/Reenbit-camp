@@ -37,14 +37,14 @@ public class LoginUserCommandHandler
         
         if (user is null)
         {
-            return Result.Failure<TokensResponseDto>(UserErrors.NotFoundByEmail);
+            return Result.Failure<TokensResponseDto>(UserErrors.InvalidCredentials);
         }
         
         var verified = _passwordHasher.Verify(request.Password, user.Password);
 
         if (!verified)
         {
-            return Result.Failure<TokensResponseDto>(UserErrors.InvalidPassword);
+            return Result.Failure<TokensResponseDto>(UserErrors.InvalidCredentials);
         }
         
         var accessToken = _tokenProvider.CreateToken(user);

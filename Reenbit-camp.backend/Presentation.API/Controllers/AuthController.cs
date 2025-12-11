@@ -4,6 +4,7 @@ using Application.Users.Commands.LogoutUser;
 using Application.Users.Commands.RefreshTokens;
 using Application.Users.Commands.RegisterUser;
 using Domain.DTOs.Authorization;
+using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -56,7 +57,7 @@ public class AuthController : ApiController
         
         if (result.IsFailure)
         {
-            return Unauthorized("Invalid credentials");
+            return HandleUnauthorized(result);
         }
         
         return Ok(result.Value);
@@ -75,7 +76,7 @@ public class AuthController : ApiController
         
         if (result.IsFailure)
         {
-            return Unauthorized(result.Error.Message);
+            return  HandleUnauthorized(result);
         }
         
         return Ok(result.Value);
@@ -92,7 +93,8 @@ public class AuthController : ApiController
         if (userIdClaim == null ||
             !int.TryParse(userIdClaim.Value, out var userId))
         {
-            return Unauthorized();
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
         }
 
         var command = new LogoutUserCommand(
@@ -104,7 +106,7 @@ public class AuthController : ApiController
         
         if (result.IsFailure )
         {
-            return BadRequest(result.Error.Message);
+            return HandleUnauthorized(result);
         }
         
         return Ok(result.Value);

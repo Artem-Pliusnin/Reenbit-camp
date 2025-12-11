@@ -25,6 +25,20 @@ public abstract class ApiController : ControllerBase
                 result.Error));
     }
     
+    protected IActionResult HandleUnauthorized(Result result)
+    {
+        if (result.IsSuccess)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return Unauthorized(
+            CreateProblemDetails(
+                "Unauthorized",
+                StatusCodes.Status401Unauthorized,
+                result.Error));
+    }
+    
     private static ProblemDetails CreateProblemDetails(
         string title,
         int status,

@@ -8,12 +8,11 @@ public static class UserErrors
         "User.EmailAlreadyTaken",
         "The specified email is already taken");
     
-    public static readonly Error NotFoundByEmail = new(
-        "Users.NotFoundByEmail",
-        "The user with the specified email was not found");
-    
-    public static readonly Error InvalidPassword = new(
-        "Users.InvalidPassword",
-        "The user password is invalid");
+    public static readonly Error InvalidCredentials = new(
+        "Users.InvalidCredentials",
+        "Invalid credentials");
 
+    public static readonly Error UserUnauthorized = new(
+        "Users.Unauthorized",
+        "User is not authorized");
 }

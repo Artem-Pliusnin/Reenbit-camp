@@ -4,6 +4,7 @@ using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetUserBoards;
 using Domain.DTOs.Boards;
 using Domain.Entities;
+using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +32,8 @@ public class BoardsController : ApiController
         if (userIdClaim == null ||
             !int.TryParse(userIdClaim.Value, out var userId))
         {
-            return Unauthorized();
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
         }
 
         var command = new CreateBoardCommand(userId, request.Title);
@@ -55,7 +57,8 @@ public class BoardsController : ApiController
         if (userIdClaim == null ||
             !int.TryParse(userIdClaim.Value, out var userId))
         {
-            return Unauthorized();
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
         }
         var query = new GetUserBoardsQuery(userId);
         
@@ -80,7 +83,8 @@ public class BoardsController : ApiController
         if (userIdClaim == null ||
             !int.TryParse(userIdClaim.Value, out var userId))
         {
-            return Unauthorized();
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
         }
 
         var command = new UpdateBoardCommand(userId, id, request.Title);

@@ -4,25 +4,27 @@
 
 <div class="container-md d-flex justify-content-center mt-5">
     <div class="col-md-6 d-flex flex-column justify-content-center p-4 background-container">
-        @if(isAuthorizing)
-        { 
+        @if (isAuthorizing)
+        {
             <LogIn></LogIn>
         }
         else
         {
-            <Register OnChangeToLogin="() => OnLoginChange(true)"></Register>
+            <Register OnChangeToLogin=@(() => OnLoginChange(true))></Register>
         }
-
+        
         <div class="d-flex flex-row justify-content-center mt-4">
             @if (isAuthorizing)
             {
-            <p class="text-muted me-1 mb-0">New here?</p>
-            <button class="btn btn-link p-0" @onclick="() => OnLoginChange(false)">Sign Up</button>
+                <p class="text-muted me-1 mb-0">New here?</p>
+                
+                <button class="btn btn-link p-0" @onclick=@(() => OnLoginChange(false))>Sign Up</button>
             }
             else
             {
-            <p class="text-muted me-1 mb-0">Already have an account?</p>
-            <button class="btn btn-link p-0" @onclick="() => OnLoginChange(true)">Sign In</button>
+                <p class="text-muted me-1 mb-0">Already have an account?</p>
+                
+                <button class="btn btn-link p-0" @onclick=@(() => OnLoginChange(true))>Sign In</button>
             }
         </div>
     </div>

@@ -1,4 +1,5 @@
-using Domain.APIModels.Auth;
+using Domain.Requests.Auth;
+using Domain.Responses.Auth;
 
 namespace Services.Abstractions.Services;
 

@@ -1,7 +1,8 @@
 using System.Net.Http.Headers;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Domain.APIModels.Auth;
+using Domain.Requests.Auth;
+using Domain.Responses.Auth;
 using Services.Abstractions.Services;
 
 namespace Services.Handlers;

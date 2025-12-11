@@ -1,4 +1,4 @@
-namespace Domain.APIModels.Auth;
+namespace Domain.Requests.Auth;
 
 public sealed record LoginRequest(
     string Email,

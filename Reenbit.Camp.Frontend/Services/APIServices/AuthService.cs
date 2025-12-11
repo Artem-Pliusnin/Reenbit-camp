@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using Services.Abstractions.Services;
-using Domain.APIModels.Auth;
+using Domain.Requests.Auth;
+using Domain.Responses.Auth;
 
 namespace Services.APIServices;
 

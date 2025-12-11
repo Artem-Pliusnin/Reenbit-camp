@@ -1,3 +1,3 @@
-namespace Domain.APIModels.Auth;
+namespace Domain.Requests.Auth;
 
 public sealed record RefreshRequest(string RefreshToken);

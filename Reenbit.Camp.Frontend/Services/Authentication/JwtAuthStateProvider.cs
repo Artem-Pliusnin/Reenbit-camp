@@ -2,7 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
-using Domain.APIModels.Auth;
+using Domain.Requests.Auth;
+using Domain.Responses.Auth;
 using Services.Abstractions.Services;
 
 namespace WebApp.Authentication;

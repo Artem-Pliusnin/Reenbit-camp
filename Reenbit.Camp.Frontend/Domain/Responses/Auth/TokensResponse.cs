@@ -1,4 +1,4 @@
-namespace Domain.APIModels.Auth;
+namespace Domain.Responses.Auth;
 
 public sealed record TokensResponse(
     string AccessToken, 

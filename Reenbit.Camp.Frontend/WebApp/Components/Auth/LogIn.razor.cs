@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using WebApp.Authentication;
 using Domain.Models.Auth;
-using Domain.APIModels.Auth;
+using Domain.Requests.Auth;
+using Domain.Responses.Auth;
 using Services.Abstractions.Services;
 
 namespace WebApp.Components.Auth;

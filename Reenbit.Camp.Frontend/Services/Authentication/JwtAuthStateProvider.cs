@@ -1,0 +1,83 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
+using Blazored.LocalStorage;
+using Domain.APIModels.Auth;
+using Services.Abstractions.Services;
+
+namespace WebApp.Authentication;
+
+public class JwtAuthStateProvider : AuthenticationStateProvider 
+{
+    private ILocalStorageService _localStorage;
+    private IRefreshService _refreshService;
+    
+    public JwtAuthStateProvider(
+        ILocalStorageService localStorage,
+        IRefreshService refreshService)
+    {
+        _localStorage = localStorage;
+        _refreshService = refreshService;
+    }
+    
+    public async override Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        var session  = await _localStorage
+            .GetItemAsync<TokensResponse>("Session");
+        
+        var identity = new ClaimsIdentity();
+        
+        if (session != null && !string.IsNullOrEmpty(session.AccessToken))
+        {
+            if (session.AccessTokenExpiresAt <= DateTime.UtcNow)
+            {
+                var (newTokens, _) = await _refreshService
+                    .RefreshTokensAsync(new RefreshRequest(session.RefreshToken));
+
+                if (newTokens != null)
+                {
+                    await _localStorage.SetItemAsync("Session", newTokens);
+                    identity = GetClaimsIdentity(newTokens.AccessToken);
+                }
+            }
+            else
+            {
+                identity = GetClaimsIdentity(session.AccessToken);
+            }
+        }
+
+        var user = new ClaimsPrincipal(identity);
+        
+        return new AuthenticationState(user);
+    }
+
+    public async Task MarkUserAsLoggedInAsync(TokensResponse response)
+    {
+        await _localStorage.SetItemAsync("Session", response);
+        
+        var identity = GetClaimsIdentity(response.AccessToken);
+        var user = new ClaimsPrincipal(identity);
+        
+        NotifyAuthenticationStateChanged(
+            Task.FromResult(new AuthenticationState(user)));
+    }
+
+    public async Task MarkUserAsLoggedOutAsync()
+    {
+        await _localStorage.RemoveItemAsync("Session");
+        
+        var identity = new ClaimsIdentity();
+        var user = new ClaimsPrincipal(identity);
+        
+        NotifyAuthenticationStateChanged(
+            Task.FromResult(new AuthenticationState(user)));
+    }
+
+    private ClaimsIdentity GetClaimsIdentity(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var claims = jwtToken.Claims;
+        return new ClaimsIdentity(claims, "jwt");
+    }
+}

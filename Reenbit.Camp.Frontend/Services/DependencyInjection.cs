@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Refit;
 using WebApp.Authentication;
 using Services.Abstractions.Services;
+using Services.API;
 using Services.APIServices;
 using Services.Handlers;
 
@@ -17,27 +19,15 @@ public static class DependencyInjection
         services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
 
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IRefreshService, RefreshService>(sp =>
-        {
-            var client = sp.GetRequiredService<IHttpClientFactory>()
-                .CreateClient("RefreshClient");
-            return new RefreshService(client);
-        });
         
         services.AddScoped<TokenHandler>();
 
         var apiBaseUrl = configuration["ApiBaseUrl"] ?? 
                          throw new Exception("Api url not configured");;
         
-        services.AddHttpClient<ApiClient>(client =>
-        {
-            client.BaseAddress = new Uri(apiBaseUrl);
-        }).AddHttpMessageHandler<TokenHandler>();
-
-        services.AddHttpClient("RefreshClient", client =>
-        {
-            client.BaseAddress = new Uri(apiBaseUrl);
-        });
+        services.AddRefitClient<IAuthApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
 
         return services;
     }

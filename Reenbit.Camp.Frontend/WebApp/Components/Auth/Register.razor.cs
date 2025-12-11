@@ -22,7 +22,7 @@ public partial class Register : ComponentBase
     {
         ErrorMessage = null;
         
-        var (data, errorMessage) = 
+        var result = 
             await AuthService.RegisterAsync(
                 new RegisterRequest(
                     model.FirstName, 
@@ -30,9 +30,9 @@ public partial class Register : ComponentBase
                     model.Email, 
                     model.Password));
         
-        if (!string.IsNullOrEmpty(errorMessage))
+        if (!result.IsSuccess)
         {
-            ErrorMessage = errorMessage;
+            ErrorMessage = result.Error?.Detail;
             return;
         }
         

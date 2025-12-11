@@ -11,14 +11,14 @@ namespace WebApp.Authentication;
 public class JwtAuthStateProvider : AuthenticationStateProvider 
 {
     private ILocalStorageService _localStorage;
-    private IRefreshService _refreshService;
+    private IAuthService _authService;
     
     public JwtAuthStateProvider(
         ILocalStorageService localStorage,
-        IRefreshService refreshService)
+        IAuthService authService)
     {
         _localStorage = localStorage;
-        _refreshService = refreshService;
+        _authService = authService;
     }
     
     public async override Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -32,13 +32,13 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         {
             if (session.AccessTokenExpiresAt <= DateTime.UtcNow)
             {
-                var (newTokens, _) = await _refreshService
+                var result = await _authService
                     .RefreshTokensAsync(new RefreshRequest(session.RefreshToken));
 
-                if (newTokens != null)
+                if (result.IsSuccess)
                 {
-                    await _localStorage.SetItemAsync("Session", newTokens);
-                    identity = GetClaimsIdentity(newTokens.AccessToken);
+                    await _localStorage.SetItemAsync("Session", result.Value);
+                    identity = GetClaimsIdentity(result.Value.AccessToken);
                 }
             }
             else

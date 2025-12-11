@@ -4,22 +4,23 @@ using Microsoft.AspNetCore.Components;
 using Domain.Requests.Auth;
 using Domain.Responses.Auth;
 using Services.Abstractions.Services;
+using Services.API;
 
 namespace Services.Handlers;
 
 public class TokenHandler : DelegatingHandler
 {
     private readonly ILocalStorageService _localStorage;
-    private readonly IRefreshService _refreshService;
+    private readonly IAuthService _authService;
     private readonly NavigationManager _navigationManager;
 
     public TokenHandler(
         ILocalStorageService localStorage,
         NavigationManager navigationManager,
-        IRefreshService refreshService)
+        IAuthService authService)
     {
         _localStorage = localStorage;
-        _refreshService = refreshService;
+        _authService = authService;
         _navigationManager = navigationManager;
     }
 
@@ -36,25 +37,29 @@ public class TokenHandler : DelegatingHandler
             (IsAccessTokenExpiring(session, now) ||
              IsRefreshTokenExpiring(session, now)))
         {
-            var (newTokens, _) = await _refreshService
+            var result = await _authService
                 .RefreshTokensAsync(new RefreshRequest(session.RefreshToken));
 
-            if (newTokens != null)
+            if (result.IsSuccess)
             {
-                await _localStorage.SetItemAsync("Session", newTokens);
+                await _localStorage.SetItemAsync("Session", result.Value);
+                session = result.Value;
             }
             else
             {
                 await _localStorage.RemoveItemAsync("Session");
                 _navigationManager.NavigateTo("/auth");
             }
-            session = newTokens;
         }
         
-        if (session != null && !string.IsNullOrEmpty(session.AccessToken))
+        if (session != null)
         {
             request.Headers.Authorization = 
                 new AuthenticationHeaderValue("Bearer", session.AccessToken);
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/auth");
         }
 
         return await base.SendAsync(request, cancellationToken);

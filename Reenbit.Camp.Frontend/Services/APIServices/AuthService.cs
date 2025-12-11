@@ -2,30 +2,38 @@ using Blazored.LocalStorage;
 using Services.Abstractions.Services;
 using Domain.Requests.Auth;
 using Domain.Responses.Auth;
+using Domain.Shared;
+using Services.API;
+using Services.Extensions;
 
 namespace Services.APIServices;
 
 public class AuthService : IAuthService
 {
-    private readonly ApiClient _apiClient;
+    private readonly IAuthApi _authApi;
     private readonly ILocalStorageService _localStorage;
 
-    public AuthService(ApiClient apiClient, 
+    public AuthService(IAuthApi authApi, 
         ILocalStorageService localStorage)
     {
-        _apiClient = apiClient;
+        _authApi = authApi;
         _localStorage = localStorage;
     }
     
-    public async Task<(TokensResponse? Data, string? ErrorMessage)> LoginAsync(LoginRequest request)
+    public async Task<Result<TokensResponse>> LoginAsync(LoginRequest request)
     {
-        var (data, error) = await _apiClient.PostAsync<LoginRequest, TokensResponse>(
-            "auth/login", request);
+        var response = await _authApi.LoginAsync(request);
 
-        return (data, error?.Detail);
+        if (response.IsSuccessStatusCode && response.Content != null)
+        {
+            return response.Content;
+        }
+        
+        var error = response.GetApiErrorAsync();
+        return Result.Failure<TokensResponse>(error);
     }
     
-    public async Task LogOutAsync()
+    public async Task<Result> LogOutAsync()
     {
         var session  = await _localStorage
             .GetItemAsync<TokensResponse>("Session");
@@ -34,18 +42,42 @@ public class AuthService : IAuthService
         {
             LogoutRequest request = new LogoutRequest(session.RefreshToken);
 
-            await _apiClient.PostAsyncRaw("auth/logout", request);
+            var response =  await _authApi.LogoutAsync(request);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return Result.Success();
+            }
+            
+            return Result.Failure(response.GetApiErrorAsync());
         }
+
+        return Result.Success();
     }
     
-    public async Task<(bool Success, string? ErrorMessage)> RegisterAsync(RegisterRequest request)
+    public async Task<Result<bool>> RegisterAsync(RegisterRequest request)
     {
-        var (data, error) = await _apiClient.PostAsync<RegisterRequest, object>(
-            "auth/register", request);
+        var response = await _authApi.RegisterAsync(request);
 
-        if (error != null)
-            return (false, error.Detail);
-
-        return (true, null);
+        if (response.IsSuccessStatusCode && response.Content != null)
+        {
+            return response.Content;
+        }
+        
+        var error = response.GetApiErrorAsync();
+        return Result.Failure<bool>(error);
+    }
+    
+    public async Task<Result<TokensResponse>> RefreshTokensAsync(RefreshRequest request)
+    {
+        var response = await _authApi.RefreshAsync(request);
+        
+        if (response.IsSuccessStatusCode && response.Content != null)
+        {
+            return response.Content;
+        }
+        
+        var error = response.GetApiErrorAsync();
+        return Result.Failure<TokensResponse>(error);
     }
 }

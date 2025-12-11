@@ -26,19 +26,19 @@ public partial class LogIn : ComponentBase
     {
         ErrorMessage = null;
         
-        var (data, errorMessage) = 
+        var result = 
             await AuthService.LoginAsync(new LoginRequest(model.Email, model.Password));
         
-        if (!string.IsNullOrEmpty(errorMessage))
+        if (!result.IsSuccess)
         {
-            ErrorMessage = errorMessage;
+            ErrorMessage = result.Error?.Detail;
             return;
         }
 
-        if (data.AccessToken != null && data.RefreshToken != null)
+        if (result.Value?.AccessToken != null && result.Value?.AccessToken != null)
         {
             await ((JwtAuthStateProvider)AuthenticationStateProvider)
-                .MarkUserAsLoggedInAsync(data);
+                .MarkUserAsLoggedInAsync(result.Value);
             
             Navigation.NavigateTo("/");   
         }

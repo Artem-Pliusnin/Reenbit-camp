@@ -21,16 +21,11 @@ public class LogoutUserCommandHandler : ICommandHandler<LogoutUserCommand, bool>
         var sessionRepository = _unitOfWork.GetRepository<ISessionRepository>();
         
         var session = await sessionRepository
-            .GetSessionByRefreshTokenAsync(request.RefreshToken, cancellationToken);
+            .GetSessionByUserIdAsync(request.UserId, cancellationToken);
 
         if (session == null)
         {
-            return Result.Failure<bool>(SessionErrors.InvalidRefreshToken);
-        }
-
-        if (session.UserId != request.UserId)
-        {
-            return Result.Failure<bool>(SessionErrors.RefreshTokenUserMismatch);
+            return Result.Failure<bool>(SessionErrors.NotFound);
         }
         
         sessionRepository.Remove(session);

@@ -8,7 +8,7 @@ public static class SessionErrors
         "Session.InvalidRefreshToken",
         "Invalid or expired refresh token");
     
-    public static readonly Error RefreshTokenUserMismatch = new(
-        "Session.RefreshTokenUserMismatch",
-        "The refresh token does not belong to the specified user");
+    public static readonly Error NotFound = new(
+        "Session.NotFound",
+        "User session doesn't exist.");
 }

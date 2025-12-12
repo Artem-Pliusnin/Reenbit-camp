@@ -85,7 +85,6 @@ public class AuthController : ApiController
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> LogoutUser(
-        [FromBody] LogoutUserRequest request,
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -97,9 +96,7 @@ public class AuthController : ApiController
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new LogoutUserCommand(
-            userId, 
-            request.RefreshToken);
+        var command = new LogoutUserCommand(userId);
         
         Result<bool> result = 
             await Sender.Send(command, cancellationToken);

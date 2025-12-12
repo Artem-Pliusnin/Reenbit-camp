@@ -13,7 +13,7 @@ public interface IAuthApi
     Task<ApiResponse<bool>> RegisterAsync([Body] RegisterRequest request);
 
     [Post("/auth/logout")]
-    Task<ApiResponse<object>> LogoutAsync([Body] LogoutRequest request);
+    Task<ApiResponse<object>> LogoutAsync([Header("Authorization")] string bearerToken);
 
     [Post("/auth/refresh")]
     Task<ApiResponse<TokensResponse>> RefreshAsync([Body] RefreshRequest request);

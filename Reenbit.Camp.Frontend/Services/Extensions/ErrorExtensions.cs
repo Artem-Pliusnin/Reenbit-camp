@@ -13,12 +13,14 @@ public static class ErrorExtensions
         }
 
         if (response.Error?.Content == null)
+        {
             return new ApiError
             {
                 Title = "Network Error",
                 Detail = "No response from server",
                 Status = 0
             };
+        }
 
         try
         {
@@ -39,8 +41,8 @@ public static class ErrorExtensions
         {
             return new ApiError
             {
-                Title = "Deserialization Error",
-                Detail = "Failed to parse error response",
+                Title = "Unhandled Error",
+                Detail = response.Error?.Content,
                 Status = (int?)response.StatusCode
             };
         }

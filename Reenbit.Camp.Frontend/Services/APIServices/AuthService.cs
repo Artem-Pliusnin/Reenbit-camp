@@ -35,31 +35,35 @@ public class AuthService : IAuthService
     
     public async Task<Result> LogOutAsync()
     {
-        var session  = await _localStorage
-            .GetItemAsync<TokensResponse>("Session");
-
-        if (session != null && !string.IsNullOrEmpty(session.RefreshToken))
+        var session = await _localStorage.GetItemAsync<TokensResponse>("Session");
+        
+        if (session == null || string.IsNullOrEmpty(session.AccessToken))
         {
-            LogoutRequest request = new LogoutRequest(session.RefreshToken);
-
-            var response =  await _authApi.LogoutAsync(request);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                return Result.Success();
-            }
-            
-            return Result.Failure(response.GetApiErrorAsync());
+            return Result.Failure(ApiError.NullValue);
         }
 
-        return Result.Success();
+        if (session.AccessTokenExpiresAt < DateTime.UtcNow)
+        {
+            await _localStorage.RemoveItemAsync("Session");
+            return Result.Success();
+        }
+        
+        var response =  await _authApi.LogoutAsync(session.AccessToken);
+            
+        if (response.IsSuccessStatusCode) 
+        {
+            return Result.Success();
+        }
+            
+        return Result.Failure(response.GetApiErrorAsync());
     }
+
     
     public async Task<Result<bool>> RegisterAsync(RegisterRequest request)
     {
         var response = await _authApi.RegisterAsync(request);
 
-        if (response.IsSuccessStatusCode && response.Content != null)
+        if (response.IsSuccessStatusCode)
         {
             return response.Content;
         }

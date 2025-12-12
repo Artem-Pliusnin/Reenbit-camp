@@ -23,11 +23,10 @@ public static class DependencyInjection
         services.AddScoped<TokenHandler>();
 
         var apiBaseUrl = configuration["ApiBaseUrl"] ?? 
-                         throw new Exception("Api url not configured");;
-        
+                         throw new Exception("Api url not configured");
+
         services.AddRefitClient<IAuthApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
-            .AddHttpMessageHandler<TokenHandler>();
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
 
         return services;
     }

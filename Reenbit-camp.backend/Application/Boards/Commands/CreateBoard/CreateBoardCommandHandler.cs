@@ -52,7 +52,7 @@ public class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, Boa
             return response;
 
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure<BoardDto>(BoardErrors.CreateBoardError);
         }

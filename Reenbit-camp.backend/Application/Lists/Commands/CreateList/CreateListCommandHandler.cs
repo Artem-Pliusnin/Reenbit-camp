@@ -46,7 +46,7 @@ public class CreateListCommandHandler : ICommandHandler<CreateListCommand, ListD
 
             return response;
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Failure<ListDto>(ListErrors.CreateListError);
         }

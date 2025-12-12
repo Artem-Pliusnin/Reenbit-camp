@@ -96,8 +96,7 @@ public class AuthController : ApiController
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new LogoutUserCommand(
-            userId);
+        var command = new LogoutUserCommand(userId);
         
         Result<bool> result = 
             await Sender.Send(command, cancellationToken);

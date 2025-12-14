@@ -2,4 +2,4 @@ using Application.Abstractions.Messaging;
 
 namespace Application.Lists.Commands.DeleteList;
 
-public record DeleteListCommand(int ListId) : ICommand;
+public sealed record DeleteListCommand(int ListId) : ICommand;

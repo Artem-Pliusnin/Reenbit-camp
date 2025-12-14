@@ -3,4 +3,4 @@ using Domain.DTOs.Lists;
 
 namespace Application.Lists.Queries;
 
-public record GetListsByBoardQuery(int BoardId) : IQuery<List<ListDto>>;
+public sealed record GetListsByBoardQuery(int BoardId) : IQuery<List<ListDto>>;

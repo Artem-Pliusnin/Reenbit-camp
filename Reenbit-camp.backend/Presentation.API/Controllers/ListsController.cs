@@ -3,6 +3,7 @@ using Application.Boards.Commands.CreateBoard;
 using Application.Lists.Commands.CreateList;
 using Application.Lists.Commands.DeleteList;
 using Application.Lists.Commands.UpdateList;
+using Application.Lists.Commands.UpdateListPosition;
 using Application.Lists.Queries;
 using Domain.DTOs.Boards;
 using Domain.DTOs.Lists;
@@ -93,6 +94,35 @@ public class ListsController : ApiController
         
         return Ok();
     }
+    
+    
+    [HttpPut("{id}/position")]
+    public async Task<IActionResult> UpdateAsync(
+        [FromBody] UpdateListPositionRequest request,
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null ||
+            !int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+
+        var command = new UpdateListPositionCommand(id, request.NewPosition, userId);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(

@@ -8,6 +8,8 @@ public class BaseRepository<TEntity, TId> : IRepository<TEntity, TId>
     where TEntity : class
 {
     protected DbSet<TEntity> _dbSet;
+    
+    protected DbContext _dbContext;
 
     public BaseRepository(DbContext context)
     {
@@ -16,6 +18,7 @@ public class BaseRepository<TEntity, TId> : IRepository<TEntity, TId>
 
     public void SetContext(DbContext context)
     {
+        _dbContext = context;
         _dbSet = context.Set<TEntity>();
     }
 

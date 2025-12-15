@@ -5,7 +5,7 @@ using Domain.Shared;
 
 namespace Application.Lists.Commands.UpdateList;
 
-public class UpdateListCommandHandler : ICommandHandler<UpdateListCommand>
+internal class UpdateListCommandHandler : ICommandHandler<UpdateListCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 

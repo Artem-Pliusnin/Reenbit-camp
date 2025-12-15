@@ -6,7 +6,7 @@ using Domain.Shared;
 
 namespace Application.Lists.Queries;
 
-public class GetListsByBoardQueryHandler : IQueryHandler<GetListsByBoardQuery, List<ListDto>>
+internal class GetListsByBoardQueryHandler : IQueryHandler<GetListsByBoardQuery, List<ListDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;

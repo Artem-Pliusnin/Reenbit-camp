@@ -7,7 +7,7 @@ using Domain.Shared;
 
 namespace Application.Lists.Commands.CreateList;
 
-public class CreateListCommandHandler : ICommandHandler<CreateListCommand, ListDto>
+internal class CreateListCommandHandler : ICommandHandler<CreateListCommand, ListDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 

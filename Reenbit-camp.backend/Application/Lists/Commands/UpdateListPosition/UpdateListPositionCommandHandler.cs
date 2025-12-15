@@ -5,7 +5,7 @@ using Domain.Shared;
 
 namespace Application.Lists.Commands.UpdateListPosition;
 
-public class UpdateListPositionCommandHandler : ICommandHandler<UpdateListPositionCommand>
+internal class UpdateListPositionCommandHandler : ICommandHandler<UpdateListPositionCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 

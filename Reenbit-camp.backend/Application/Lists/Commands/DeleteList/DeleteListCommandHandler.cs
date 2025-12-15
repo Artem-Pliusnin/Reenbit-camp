@@ -5,7 +5,7 @@ using Domain.Shared;
 
 namespace Application.Lists.Commands.DeleteList;
 
-public class DeleteListCommandHandler : ICommandHandler<DeleteListCommand>
+internal class DeleteListCommandHandler : ICommandHandler<DeleteListCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 

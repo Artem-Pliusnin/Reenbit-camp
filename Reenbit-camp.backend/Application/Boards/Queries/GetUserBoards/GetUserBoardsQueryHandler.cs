@@ -24,7 +24,7 @@ internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, Li
         var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
         
         var boards = await boardRepository
-            .GetByUserIdAsync(request.UserId, cancellationToken);
+            .GetByUserIdAsync(request.UserId, request.Filter, cancellationToken);
 
         var response = _mapper.Map<List<BoardDto>>(boards);
         

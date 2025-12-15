@@ -6,11 +6,11 @@ namespace Services.Abstractions.Services;
 
 public interface IAuthService
 {
-    Task<Result<TokensResponse>> LoginAsync(LoginRequest request);
+    Task<Result<TokensResponseDto>> LoginAsync(LoginRequest request);
     
     Task<Result> LogOutAsync();
     
     Task<Result<bool>> RegisterAsync(RegisterRequest request);
     
-    Task<Result<TokensResponse>> RefreshTokensAsync(RefreshRequest request);
+    Task<Result<TokensResponseDto>> RefreshTokensAsync(RefreshRequest request);
 }

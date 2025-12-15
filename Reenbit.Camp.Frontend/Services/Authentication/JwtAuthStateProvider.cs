@@ -24,7 +24,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
     public async override Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var session  = await _localStorage
-            .GetItemAsync<TokensResponse>("Session");
+            .GetItemAsync<TokensResponseDto>("Session");
         
         var identity = new ClaimsIdentity();
         
@@ -52,11 +52,11 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         return new AuthenticationState(user);
     }
 
-    public async Task MarkUserAsLoggedInAsync(TokensResponse response)
+    public async Task MarkUserAsLoggedInAsync(TokensResponseDto responseDto)
     {
-        await _localStorage.SetItemAsync("Session", response);
+        await _localStorage.SetItemAsync("Session", responseDto);
         
-        var identity = GetClaimsIdentity(response.AccessToken);
+        var identity = GetClaimsIdentity(responseDto.AccessToken);
         var user = new ClaimsPrincipal(identity);
         
         NotifyAuthenticationStateChanged(

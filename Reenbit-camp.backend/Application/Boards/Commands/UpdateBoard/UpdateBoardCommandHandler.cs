@@ -29,7 +29,7 @@ public class UpdateBoardCommandHandler : ICommandHandler<UpdateBoardCommand>
 
             if (board == null)
             {
-                return Result.Failure<BoardDto>(BoardErrors.BoardDoesNotExistError);
+                return Result.Failure(BoardErrors.BoardDoesNotExistError);
             }
 
             board.Title = request.Title;
@@ -42,9 +42,9 @@ public class UpdateBoardCommandHandler : ICommandHandler<UpdateBoardCommand>
 
             return Result.Success();
         }
-        catch (Exception ex)
+        catch
         {
-            return Result.Failure<BoardDto>(BoardErrors.UpdateBoardError);
+            return Result.Failure(BoardErrors.UpdateBoardError);
         }
     }
 }

@@ -7,4 +7,7 @@ public partial class BoardCard : ComponentBase
 {
     [Parameter]
     public BoardModel Board { get; set; }
+    
+    [Parameter]
+    public bool IsNew { get; set; }
 }

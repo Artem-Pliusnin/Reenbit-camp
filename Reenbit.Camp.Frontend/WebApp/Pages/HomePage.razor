@@ -2,32 +2,68 @@
 @using WebApp.Components.Boards
 
 <div class="container-fluid">
-    <h3 class="text-center fw-semibold mb-4">My Boards</h3>
+    <h3 class="text-center fw-semibold pb-4 border-bottom" style="box-sizing: border-box">My Boards</h3>
 
     <div class="row">
         <div class="col-lg-9 col-md-8 order-2 order-md-1">
-            <div class="row g-3">
-                @foreach (var board in Boards)
-                {
-                <BoardCard Board="@board" />
-                }
-            </div>
+            @if(isLoading)
+            {
+                <div class="d-flex justify-content-center align-items-center" style="height: 20rem"> 
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var board in Boards)
+                    {
+                        <BoardCard Board=@board IsNew=@(CreatedBoards.Contains(board.Id)) />
+                    }
+                </div>
+            }
         </div>
 
         <div class="col-lg-3 col-md-4 order-1 order-md-2 mb-3 mb-md-0">
-            <div class="card filter-panel">
-                <EditForm Model="@filter" class="card-body">
-                    <h6 class="fw-semibold mb-3">Filters</h6>
+            <div class="card mb-3">
+                <EditForm Model=@newBoard OnValidSubmit=@CreateBoardAsync class="card-body">
+                    <h6 class="fw-semibold mb-3">
+                        Create board
+                        <i class="bi bi-plus-circle"></i>
+                    </h6>
 
-                    <InputText class="form-control mb-3"
-                               placeholder="Board name"
-                               @bind-Value="filter.Title"
-                               @bind:event="oninput" />
+                    <div class="input-group">
+                        <InputText class="form-control"
+                                   style="min-width: 5rem"
+                                   placeholder="Board title"
+                                   maxlength="50"
+                                   @bind-Value=@newBoard.Title />
+
+                        <button class="btn btn-primary" type="submit">
+                            Create
+                        </button>
+                    </div>
+                    
+                    <ValidationMessage For=@(() => newBoard.Title)/>
+                </EditForm>
+            </div>
+            
+            <div class="card filter-panel">
+                <EditForm Model=@filter class="card-body">
+                    <h6 class="fw-semibold mb-3">
+                        Filters
+                        <i class="bi bi-funnel"></i>
+                    </h6>
+
+                    <input class="form-control mb-3"
+                           placeholder="Board name"
+                           @bind=@filter.Title
+                           @bind:event="oninput"
+                           @onkeyup=@ResetTimer/>
 
                     <div class="form-check">
                         <InputCheckbox class="form-check-input"
                                        id="myBoards"
-                                       @bind-Value="filter.OnlyMyBoards" />
+                                       @bind-Value=@filter.OnlyMyBoards/>
                         <label class="form-check-label" for="myBoards">
                             Only my boards
                         </label>
@@ -36,4 +72,38 @@
             </div>
         </div>
     </div>
+    
+    @if (TotalPages > 1)
+    {
+    <nav class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            
+            <li class="page-item @(filter.Page == 1 ? "disabled" : "")">
+                <button class="page-link"
+                        @onclick=@(() => ChangePage(filter.Page - 1))>
+                    &laquo;
+                </button>
+            </li>
+
+            @foreach (var visiblePage in VisiblePages)
+            {
+            <li class="page-item @(visiblePage == filter.Page ? "active" : "")">
+                <button class="page-link"
+                        @onclick=@(() => ChangePage(visiblePage))>
+                    @visiblePage
+                </button>
+            </li>
+            }
+            
+            <li class="page-item @(filter.Page == TotalPages ? "disabled" : "")">
+                <button class="page-link"
+                        @onclick=@(() => ChangePage(filter.Page + 1))>
+                    &raquo;
+                </button>
+            </li>
+
+        </ul>
+    </nav>
+    }
+
 </div>

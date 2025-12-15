@@ -8,7 +8,7 @@ using Domain.Shared;
 
 namespace Application.Users.Commands.LoginUser;
 
-public class LoginUserCommandHandler 
+internal class LoginUserCommandHandler 
     : ICommandHandler<LoginUserCommand, TokensResponseDto>
 {
     private readonly IUnitOfWork _unitOfWork;

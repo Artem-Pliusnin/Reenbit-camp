@@ -7,7 +7,7 @@ using Domain.Shared;
 
 namespace Application.Users.Commands.RegisterUser;
 
-public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, int>
+internal class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, int>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;

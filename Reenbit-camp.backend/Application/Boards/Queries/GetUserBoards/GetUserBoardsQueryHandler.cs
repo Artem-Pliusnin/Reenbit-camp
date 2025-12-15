@@ -6,7 +6,7 @@ using Domain.Shared;
 
 namespace Application.Boards.Queries.GetUserBoards;
 
-public class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, List<BoardDto>>
+internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, List<BoardDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;

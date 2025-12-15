@@ -7,7 +7,7 @@ using Domain.Shared;
 
 namespace Application.Boards.Commands.UpdateBoard;
 
-public class UpdateBoardCommandHandler : ICommandHandler<UpdateBoardCommand>
+internal class UpdateBoardCommandHandler : ICommandHandler<UpdateBoardCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 

@@ -5,7 +5,7 @@ using Domain.Shared;
 
 namespace Application.Users.Commands.LogoutUser;
 
-public class LogoutUserCommandHandler : ICommandHandler<LogoutUserCommand, bool>
+internal class LogoutUserCommandHandler : ICommandHandler<LogoutUserCommand, bool>
 {
     private readonly IUnitOfWork _unitOfWork;
 

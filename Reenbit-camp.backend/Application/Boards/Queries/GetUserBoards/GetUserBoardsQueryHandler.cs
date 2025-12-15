@@ -1,12 +1,13 @@
 using Application.Abstractions.Messaging;
 using AutoMapper;
 using Domain.DTOs.Boards;
+using Domain.DTOs.Shared;
 using Domain.Repositories;
 using Domain.Shared;
 
 namespace Application.Boards.Queries.GetUserBoards;
 
-internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, List<BoardDto>>
+internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, PaginationDto<BoardDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -17,17 +18,22 @@ internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, Li
         _mapper = mapper;
     }
 
-    public async Task<Result<List<BoardDto>>> Handle(
+    public async Task<Result<PaginationDto<BoardDto>>> Handle(
         GetUserBoardsQuery request, 
         CancellationToken cancellationToken)
     {
         var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
         
-        var boards = await boardRepository
+        var paginationDto = await boardRepository
             .GetByUserIdAsync(request.UserId, request.Filter, cancellationToken);
 
-        var response = _mapper.Map<List<BoardDto>>(boards);
+        var boards = _mapper.Map<List<BoardDto>>(paginationDto.Dtos);
         
-        return response;
+        return new PaginationDto<BoardDto>()
+        {
+            Dtos = boards,
+            CurrentPage = paginationDto.CurrentPage,
+            TotalPages = paginationDto.TotalPages,
+        };
     }
 }

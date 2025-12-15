@@ -3,6 +3,7 @@ using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetUserBoards;
 using Domain.DTOs.Boards;
+using Domain.DTOs.Shared;
 using Domain.Entities;
 using Domain.Errors;
 using Domain.Models;
@@ -65,9 +66,13 @@ public class BoardsController : ApiController
         
         var query = new GetUserBoardsQuery(
             userId,
-            new BoardsFilter(queryParameters.Title, queryParameters.OnlyMyBoards));
+            new BoardsFilter(
+                queryParameters.Title,
+                queryParameters.OnlyMyBoards,
+                queryParameters.Page,
+                queryParameters.PageSize));
         
-        Result<List<BoardDto>> result = await Sender.Send(query, cancellationToken);
+        Result<PaginationDto<BoardDto>> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {

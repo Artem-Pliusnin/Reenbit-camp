@@ -3,8 +3,10 @@ using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetUserBoards;
 using Domain.DTOs.Boards;
+using Domain.DTOs.Shared;
 using Domain.Entities;
 using Domain.Errors;
+using Domain.Models;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -50,6 +52,7 @@ public class BoardsController : ApiController
     
     [HttpGet]
     public async Task<IActionResult> GetByUserAsync(
+        [FromQuery] GetBoardsQueryParameters queryParameters,
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -60,9 +63,16 @@ public class BoardsController : ApiController
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
         }
-        var query = new GetUserBoardsQuery(userId);
         
-        Result<List<BoardDto>> result = await Sender.Send(query, cancellationToken);
+        var query = new GetUserBoardsQuery(
+            userId,
+            new BoardsFilter(
+                queryParameters.Title,
+                queryParameters.OnlyMyBoards,
+                queryParameters.Page,
+                queryParameters.PageSize));
+        
+        Result<PaginationDto<BoardDto>> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {

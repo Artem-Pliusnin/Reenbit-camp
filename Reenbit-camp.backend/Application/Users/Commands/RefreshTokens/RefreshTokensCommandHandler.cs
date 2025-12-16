@@ -7,7 +7,7 @@ using Domain.Shared;
 
 namespace Application.Users.Commands.RefreshTokens;
 
-public class RefreshTokensCommandHandler : ICommandHandler<RefreshTokensCommand, TokensResponseDto>
+internal class RefreshTokensCommandHandler : ICommandHandler<RefreshTokensCommand, TokensResponseDto>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITokenProvider _tokenProvider;

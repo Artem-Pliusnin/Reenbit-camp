@@ -20,7 +20,7 @@ public class AuthService : IAuthService
         _localStorage = localStorage;
     }
     
-    public async Task<Result<TokensResponse>> LoginAsync(LoginRequest request)
+    public async Task<Result<TokensResponseDto>> LoginAsync(LoginRequest request)
     {
         var response = await _authApi.LoginAsync(request);
 
@@ -30,12 +30,12 @@ public class AuthService : IAuthService
         }
         
         var error = response.GetApiErrorAsync();
-        return Result.Failure<TokensResponse>(error);
+        return Result.Failure<TokensResponseDto>(error);
     }
     
     public async Task<Result> LogOutAsync()
     {
-        var session = await _localStorage.GetItemAsync<TokensResponse>("Session");
+        var session = await _localStorage.GetItemAsync<TokensResponseDto>("Session");
         
         if (session == null || string.IsNullOrEmpty(session.AccessToken))
         {
@@ -72,7 +72,7 @@ public class AuthService : IAuthService
         return Result.Failure<bool>(error);
     }
     
-    public async Task<Result<TokensResponse>> RefreshTokensAsync(RefreshRequest request)
+    public async Task<Result<TokensResponseDto>> RefreshTokensAsync(RefreshRequest request)
     {
         var response = await _authApi.RefreshAsync(request);
         
@@ -82,6 +82,6 @@ public class AuthService : IAuthService
         }
         
         var error = response.GetApiErrorAsync();
-        return Result.Failure<TokensResponse>(error);
+        return Result.Failure<TokensResponseDto>(error);
     }
 }

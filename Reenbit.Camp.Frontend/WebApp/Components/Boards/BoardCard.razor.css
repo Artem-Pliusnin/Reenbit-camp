@@ -1,0 +1,36 @@
+.board-card {
+    border: none;
+    border-radius: 8px;
+    min-height: 120px;
+    cursor: pointer;
+    transition: transform .1s ease, box-shadow .1s ease;
+}
+
+.board-card-blue {
+    background: linear-gradient(
+            90deg,
+            rgba(2, 0, 36, 1) 0%,
+            rgba(9, 9, 121, 1) 35%,
+            rgba(0, 212, 255, 1) 100%
+    );
+}
+
+.board-card-green {
+    background: linear-gradient(
+            90deg,
+            rgba(0, 23, 3, 1) 0%, 
+            rgba(3, 61, 13, 1) 35%, 
+            rgba(0, 212, 7, 1) 100%);
+}
+
+
+.board-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+.board-title{
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 400;
+}

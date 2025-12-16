@@ -7,7 +7,7 @@ namespace Services.API;
 public interface IAuthApi
 {
     [Post("/auth/login")]
-    Task<ApiResponse<TokensResponse>> LoginAsync([Body] LoginRequest request);
+    Task<ApiResponse<TokensResponseDto>> LoginAsync([Body] LoginRequest request);
 
     [Post("/auth/register")]
     Task<ApiResponse<bool>> RegisterAsync([Body] RegisterRequest request);
@@ -16,5 +16,5 @@ public interface IAuthApi
     Task<ApiResponse<object>> LogoutAsync([Header("Authorization")] string bearerToken);
 
     [Post("/auth/refresh")]
-    Task<ApiResponse<TokensResponse>> RefreshAsync([Body] RefreshRequest request);
+    Task<ApiResponse<TokensResponseDto>> RefreshAsync([Body] RefreshRequest request);
 }

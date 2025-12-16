@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +18,13 @@ public static class DependencyInjection
         this IServiceCollection services, 
         IConfiguration configuration)
     {
+        services.AddAutoMapper(cfg => { }
+            , typeof(DependencyInjection).Assembly);
+        
         services.AddScoped<AuthenticationStateProvider, JwtAuthStateProvider>();
 
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IBoardsService, BoardsService>();
         
         services.AddScoped<TokenHandler>();
 
@@ -27,6 +33,10 @@ public static class DependencyInjection
 
         services.AddRefitClient<IAuthApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
+        
+        services.AddRefitClient<IBoardsApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
 
         return services;
     }

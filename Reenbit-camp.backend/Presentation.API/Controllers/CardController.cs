@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Application.Cards.Commands.CreateCard;
 using Application.Cards.Commands.DeleteCard;
 using Application.Cards.Commands.UpdateCard;
+using Application.Cards.Commands.UpdateCardPosition;
 using Domain.DTOs.Cards;
 using Domain.Errors;
 using Domain.Shared;
@@ -78,6 +79,34 @@ public class CardController : ApiController
         
         return Ok();
     }
+    
+    [HttpPut("{id}/position")]
+    public async Task<IActionResult> UpdateAsync(
+        [FromBody] UpdateCardPositionRequest request,
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null ||
+            !int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+
+        var command = new UpdateCardPositionCommand(id, request.NewListId,request.NewPosition, userId);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+
     
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(

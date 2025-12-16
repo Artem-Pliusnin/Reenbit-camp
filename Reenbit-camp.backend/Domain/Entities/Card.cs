@@ -1,20 +1,28 @@
 namespace Domain.Entities;
 
-public class List
+public class Card
 {
     public int Id { get; set; }
 
-    public int BoardId { get; set; }
+    public int ListId { get; set; }
     
     public string Title { get; set; }
     
+    public string? Description { get; set; }
+    
+    public bool IsCompleted { get; set; }
+    
     public int Position { get; set; }
+    
+    public DateTime? StartDate { get; set; }
+    
+    public DateTime? DueDate { get; set; }
     
     public int? LastUpdatedBy { get; set; }
     
     public DateTime? LastUpdateDate { get; set; }
     
-    public Board Board { get; set; }
+    public List List { get; set; }
+    
     public User? LastUpdatedByUser { get; set; }
-    public List<Card> Cards { get; set; }
 }

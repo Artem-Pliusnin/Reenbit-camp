@@ -25,8 +25,7 @@ public class CardConfiguration : IEntityTypeConfiguration<Card>
             .IsRequired();
         
         builder.Property(c => c.Description)
-            .HasColumnName("description")
-            .IsRequired();
+            .HasColumnName("description");
         
         builder.Property(c => c.IsCompleted)
             .HasColumnName("is_completed")

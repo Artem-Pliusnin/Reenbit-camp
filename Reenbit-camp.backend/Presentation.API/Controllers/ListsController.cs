@@ -1,11 +1,9 @@
 using System.Security.Claims;
-using Application.Boards.Commands.CreateBoard;
 using Application.Lists.Commands.CreateList;
 using Application.Lists.Commands.DeleteList;
 using Application.Lists.Commands.UpdateList;
 using Application.Lists.Commands.UpdateListPosition;
-using Application.Lists.Queries;
-using Domain.DTOs.Boards;
+using Application.Lists.Queries.GetListsByBoard;
 using Domain.DTOs.Lists;
 using Domain.Errors;
 using Domain.Shared;

@@ -3,6 +3,7 @@ using Application.Cards.Commands.CreateCard;
 using Application.Cards.Commands.DeleteCard;
 using Application.Cards.Commands.UpdateCard;
 using Application.Cards.Commands.UpdateCardPosition;
+using Application.Cards.Queries.GetCardsByList;
 using Domain.DTOs.Cards;
 using Domain.Errors;
 using Domain.Shared;
@@ -22,6 +23,23 @@ public class CardController : ApiController
     public CardController(ISender sender)
         : base(sender)
     {}
+    
+    [HttpGet("list/{id}")]
+    public async Task<IActionResult> GetByListAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetCardsByListQuery(id);
+        
+        Result<List<CardDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
     
     [HttpPost]
     public async Task<IActionResult> CreateAsync(

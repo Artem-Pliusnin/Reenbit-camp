@@ -13,6 +13,15 @@ public class CardRepository :
         : base(context)
     {}
 
+    public async Task<List<Card>> GetByListIdAsync(
+        int listId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Where(card => card.ListId == listId)
+            .OrderBy(c => c.Position)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Card?> GetLastListsCard(
         int listId, 
         CancellationToken cancellationToken = default)

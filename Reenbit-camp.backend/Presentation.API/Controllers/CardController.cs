@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Application.Cards.Commands.CreateCard;
 using Application.Cards.Commands.DeleteCard;
 using Application.Cards.Commands.UpdateCard;
+using Application.Cards.Commands.UpdateCardDeadline;
 using Application.Cards.Commands.UpdateCardPosition;
 using Application.Cards.Queries.GetCardsByList;
 using Domain.DTOs.Cards;
@@ -124,7 +125,33 @@ public class CardController : ApiController
         
         return Ok();
     }
+    
+    [HttpPut("{id}/deadline")]
+    public async Task<IActionResult> UpdateAsync(
+        [FromBody] UpdateCardDeadlineRequest request,
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
+        if (userIdClaim == null ||
+            !int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+
+        var command = new UpdateCardDeadlineCommand(id, userId,request.StartDate,request.DueDate);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
     
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(

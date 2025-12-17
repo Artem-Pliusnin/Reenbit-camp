@@ -8,7 +8,7 @@ using Domain.Shared;
 
 namespace Application.Boards.Commands.CreateBoard;
 
-public class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, BoardDto>
+internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, BoardDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 

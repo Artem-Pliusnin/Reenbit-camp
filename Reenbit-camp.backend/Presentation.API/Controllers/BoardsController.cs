@@ -3,8 +3,6 @@ using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetUserBoards;
 using Domain.DTOs.Boards;
-using Domain.DTOs.Shared;
-using Domain.Entities;
 using Domain.Errors;
 using Domain.Models;
 using Domain.Shared;

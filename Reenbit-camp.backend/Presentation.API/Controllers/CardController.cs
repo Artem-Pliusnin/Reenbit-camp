@@ -1,36 +1,38 @@
 using System.Security.Claims;
-using Application.Lists.Commands.CreateList;
-using Application.Lists.Commands.DeleteList;
-using Application.Lists.Commands.UpdateList;
-using Application.Lists.Commands.UpdateListPosition;
-using Application.Lists.Queries.GetListsByBoard;
-using Domain.DTOs.Lists;
+using Application.Cards.Commands.CreateCard;
+using Application.Cards.Commands.DeleteCard;
+using Application.Cards.Commands.UpdateCard;
+using Application.Cards.Commands.UpdateCardDeadline;
+using Application.Cards.Commands.UpdateCardPosition;
+using Application.Cards.Queries.GetCardsByList;
+using Domain.DTOs.Cards;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
-using Presentation.API.Contracts.List;
+using Presentation.API.Contracts.Cards;
 
 namespace Presentation.API.Controllers;
 
 [Authorize]
 [Route("api/[controller]")]
-public class ListsController : ApiController
+
+public class CardController : ApiController
 {
-    public ListsController(ISender sender)
+    public CardController(ISender sender)
         : base(sender)
     {}
     
-    [HttpGet("board/{id}")]
-    public async Task<IActionResult> GetByBoardAsync(
+    [HttpGet("list/{id}")]
+    public async Task<IActionResult> GetByListAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var query = new GetListsByBoardQuery(id);
+        var query = new GetCardsByListQuery(id);
         
-        Result<List<ListDto>> result = await Sender.Send(query, cancellationToken);
+        Result<List<CardDto>> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -42,7 +44,7 @@ public class ListsController : ApiController
     
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
-        [FromBody] CreateListRequest request, 
+        [FromBody] CreateCardRequest request, 
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -54,9 +56,9 @@ public class ListsController : ApiController
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new CreateListCommand(request.BoardId, request.Title, userId);
+        var command = new CreateCardCommand(request.ListId, request.Title, userId);
         
-        Result<ListDto> result = await Sender.Send(command, cancellationToken);
+        Result<CardDto> result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -65,11 +67,11 @@ public class ListsController : ApiController
         
         return Ok(result.Value);
     }
-
+    
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAsync(
-        [FromBody] UpdateListRequest request,
         [FromRoute] int id,
+        [FromBody] UpdateCardRequest request,
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -81,7 +83,11 @@ public class ListsController : ApiController
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new UpdateListCommand(userId, id, request.Title);
+        var command = new UpdateCardCommand(
+            userId, 
+            id, 
+            request.Title, 
+            request.Description);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -92,11 +98,10 @@ public class ListsController : ApiController
         
         return Ok();
     }
-    
     
     [HttpPut("{id}/position")]
     public async Task<IActionResult> UpdateAsync(
-        [FromBody] UpdateListPositionRequest request,
+        [FromBody] UpdateCardPositionRequest request,
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
@@ -109,7 +114,7 @@ public class ListsController : ApiController
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new UpdateListPositionCommand(id, request.NewPosition, userId);
+        var command = new UpdateCardPositionCommand(id, request.NewListId,request.NewPosition, userId);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -120,14 +125,40 @@ public class ListsController : ApiController
         
         return Ok();
     }
+    
+    [HttpPut("{id}/deadline")]
+    public async Task<IActionResult> UpdateAsync(
+        [FromBody] UpdateCardDeadlineRequest request,
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
+        if (userIdClaim == null ||
+            !int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
 
+        var command = new UpdateCardDeadlineCommand(id, userId,request.StartDate,request.DueDate);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteListCommand(id);
+        var command = new DeleteCardCommand(id);
         
         Result result = await Sender.Send(command, cancellationToken);
         

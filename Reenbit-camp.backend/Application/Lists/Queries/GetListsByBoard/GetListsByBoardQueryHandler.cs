@@ -4,7 +4,7 @@ using Domain.DTOs.Lists;
 using Domain.Repositories;
 using Domain.Shared;
 
-namespace Application.Lists.Queries;
+namespace Application.Lists.Queries.GetListsByBoard;
 
 internal class GetListsByBoardQueryHandler : IQueryHandler<GetListsByBoardQuery, List<ListDto>>
 {

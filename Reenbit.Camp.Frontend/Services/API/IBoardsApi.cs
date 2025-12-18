@@ -15,6 +15,9 @@ public interface IBoardsApi
     [Get("/Boards")]
     Task<ApiResponse<PaginationDto<BoardDto>>> GetByUserAsync(
         [Query] BoardsFilterModel filter);
+    
+    [Get("/Boards/{id}")]
+    Task<ApiResponse<BoardInfoDto>> GetInfoAsync(int id);
 
     [Put("/Boards/{id}")]
     Task<ApiResponse<object>> UpdateAsync(

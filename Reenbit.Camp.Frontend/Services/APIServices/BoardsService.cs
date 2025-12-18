@@ -34,6 +34,21 @@ public class BoardsService : IBoardsService
         var error = response.GetApiErrorAsync();
         return Result.Failure<BoardModel>(error);
     }
+    
+    public async Task<Result<BoardInfoModel>> GetInfoAsync(int boardId)
+    {
+        var response = await _boardsApi.GetInfoAsync(boardId);
+
+        if (response.IsSuccessStatusCode && response.Content != null)
+        {
+            var boardInfoModel = _mapper.Map<BoardInfoModel>(response.Content);
+            
+            return boardInfoModel;
+        }
+        
+        var error = response.GetApiErrorAsync();
+        return Result.Failure<BoardInfoModel>(error);
+    }
 
     public async Task<Result<PaginationDto<BoardModel>>> GetByUserAsync(BoardsFilterModel filter)
     {

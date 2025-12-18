@@ -10,6 +10,8 @@ public interface IBoardsService
 {
     Task<Result<BoardModel>> CreateAsync(CreateBoardRequest request);
     
+    Task<Result<BoardInfoModel>> GetInfoAsync(int boardId);
+    
     Task<Result<PaginationDto<BoardModel>>> GetByUserAsync(BoardsFilterModel filter);
     
     Task<Result<object>> UpdateAsync(int id, UpdateBoardRequest request);

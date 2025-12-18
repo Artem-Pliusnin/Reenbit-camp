@@ -1,0 +1,22 @@
+@page "/board/{boardId:int}"
+@using WebApp.Components.Boards
+
+@if(isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center w-100" 
+         style="height: 80vh">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else
+{
+    <div class="board-layout">
+        <div class="board-header">
+            <h4 class="board-name">@Board.Title</h4>
+        </div>
+
+        <div class="board-content">
+            <BoardLists Lists=@Board.Lists />
+        </div>
+    </div> 
+}

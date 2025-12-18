@@ -41,7 +41,7 @@ public partial class HomePage : ComponentBase, IDisposable
         }
     }
     
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         await LoadBoardsAsync();
         aTimer = new System.Timers.Timer(300);

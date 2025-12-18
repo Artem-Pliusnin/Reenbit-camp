@@ -1,0 +1,10 @@
+.board-lists {
+    overflow-x: auto;
+}
+
+.board-list {
+    min-width: 280px;
+    background: #ebecf0;
+    padding: 8px;
+    border-radius: 6px;
+}

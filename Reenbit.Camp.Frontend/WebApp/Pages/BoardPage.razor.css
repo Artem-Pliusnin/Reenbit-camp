@@ -29,9 +29,17 @@
     overflow-y: auto;
 }
 
-.board-name{
+.board-title{
     text-align: center;
     height: fit-content;
+    cursor: pointer;
     margin: 0;
 }
+
+.board-title-input {
+    max-width: 300px;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
 

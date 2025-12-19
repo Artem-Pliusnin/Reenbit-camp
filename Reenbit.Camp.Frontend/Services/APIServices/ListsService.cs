@@ -1,8 +1,6 @@
 using AutoMapper;
-using Domain.Models.Boards;
 using Domain.Models.Lists;
 using Domain.Requests.Lists;
-using Domain.Responses.Lists;
 using Domain.Shared;
 using Services.Abstractions.Services;
 using Services.API;

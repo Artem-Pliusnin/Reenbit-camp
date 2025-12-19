@@ -1,21 +1,98 @@
 @using Domain.Models.Cards
+@using WebApp.Components.Cards
 
 <div class="d-flex gap-3 board-lists">
     @foreach (var list in Lists.OrderBy(l => l.Position))
     {
-    <TelerikListBox @ref=@ListBoxRefs[list.Id]
-                    Data=@list.Cards
-                    TextField=@nameof(CardModel.Title)
-                    Id=@list.Id.ToString()
-                    SelectionMode=@ListBoxSelectionMode.Multiple
-                    @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
-                    Draggable=@true
-                    DropSources=@ListBoxDropSources
-                    OnDrop="( (ListBoxDropEventArgs<CardModel> args) =>
-                        OnListBoxDrop(args, list.Id.ToString(), list.Cards) )">
-        <ListBoxToolBarSettings>
-            <ListBoxToolBar Visible=@false />
-        </ListBoxToolBarSettings>
-    </TelerikListBox>
+        <div class="d-flex flex-column gap-1 align-items-center list-container">
+            <span class="w-100 text-start list-header">@list.Title</span>
+            <TelerikListBox Width="100%"
+                            Class="w-100"
+                            @ref=@ListBoxRefs[list.Id]
+                            Data=@list.Cards
+                            TextField=@nameof(CardModel.Title)
+                            Id=@list.Id.ToString()
+                            SelectionMode=@ListBoxSelectionMode.Multiple
+                                                                                                                                            @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
+                            Draggable=@true
+                            DropSources=@ListBoxDropSources
+                            OnDrop="((ListBoxDropEventArgs<CardModel> args) => OnListBoxDrop(args, list.Id.ToString(), list.Cards))">
+
+                <ItemTemplate>
+                    <SimpleCard Card=@context></SimpleCard>
+                </ItemTemplate>
+
+                <NoDataTemplate>
+                </NoDataTemplate>
+
+                <ListBoxToolBarSettings>
+                    <ListBoxToolBar Visible=@false/>
+                </ListBoxToolBarSettings>
+            </TelerikListBox>
+
+            <div class="add-card-footer d-flex align-items-center gap-2">
+                <input class="form-control form-control-sm flex-grow-1"
+                       placeholder="Add a task..."
+                       @bind=@NewCardTitles[list.Id]
+                       @bind:event="oninput" />
+
+                <button class="btn btn-sm btn-outline-dark"
+                        disabled=@string.IsNullOrWhiteSpace(NewCardTitles[list.Id])
+                        @onclick=@(() => AddCard(list.Id))>
+                    Add
+                </button>
+            </div>
+        </div>
     }
+    <div class="d-flex flex-column gap-2 list-container">
+        <input class="form-control form-control-sm flex-grow-1"
+               placeholder="List title ..."
+               @bind=@NewListTitle
+                              @bind:event="oninput" />
+
+        <button class="btn btn-sm btn-outline-dark"
+                disabled=@string.IsNullOrWhiteSpace(NewListTitle)
+                                @onclick=@AddList>
+            Create list
+        </button>
+    </div>
 </div>
+
+<style>
+    .k-listbox{
+        flex: 1;
+        min-height: 0;
+        height: fit-content;
+        overflow-y: scroll;
+    }
+    
+    .k-listbox .k-list-item {
+        padding: 0;
+        background: transparent;
+        border-radius: 1rem;
+    }
+
+    .k-listbox .k-list-scroller{
+        background: none;
+        border: none;
+    }
+
+    .k-listbox .k-list-content .k-list-ul{
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .k-list-item.k-selected{
+        color: black;
+    }
+
+    .k-list-item.k-selected:hover{
+        color: black;
+    }
+
+    .k-nodata{
+        min-height: 4rem;
+    }
+    
+</style>

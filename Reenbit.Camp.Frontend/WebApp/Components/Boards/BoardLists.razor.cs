@@ -8,13 +8,78 @@ namespace WebApp.Components.Boards;
 public partial class BoardLists : ComponentBase
 {
     [Parameter, EditorRequired]
+    public int BoardId { get; set; }
+    
+    [Parameter, EditorRequired]
     public List<ListModel> Lists { get; set; } = new();
     
     private Dictionary<int, TelerikListBox<CardModel>> ListBoxRefs { get; set; } = new();
     
     private Dictionary<int, IEnumerable<CardModel>> ListBoxSelectedItems { get; set; } = new();
 
-    private List<string> ListBoxDropSources = new List<string>();
+    private List<string> ListBoxDropSources =>
+        Lists.Select(l => l.Id.ToString()).ToList();
+    
+    private string NewListTitle = string.Empty;
+    
+    private Dictionary<int, string> NewCardTitles = new();
+
+    private async Task AddCard(int listId)
+    {
+        var title = NewCardTitles[listId];
+        
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return;
+        }
+
+        var list = Lists.First(l => l.Id == listId);
+
+        list.Cards.Add(new CardModel
+        {
+            Id = Random.Shared.Next(),
+            Title = title,
+            Position = list.Cards.Count,
+            IsCompleted = false
+        });
+
+        NewCardTitles[listId] = string.Empty;
+
+        ListBoxRefs[listId].Rebind();
+    }
+    
+    private async Task AddList()
+    {
+        if (string.IsNullOrWhiteSpace(NewListTitle))
+        {
+            return;
+        }
+
+        var newList = new ListModel
+        {
+            Id = Random.Shared.Next(),
+            Title = NewListTitle,
+            Position = Lists.Count,
+            Cards = new List<CardModel>()
+        };
+
+        Lists.Add(newList);
+        
+        NewListTitle = string.Empty;
+        
+        ListBoxRefs.Add(newList.Id, new TelerikListBox<CardModel>());
+            
+        ListBoxSelectedItems.Add(newList.Id, new List<CardModel>());
+
+        NewCardTitles.Add(newList.Id, "");
+        
+        foreach (var listBoxRef in ListBoxRefs)
+        {
+            listBoxRef.Value.Rebind();
+        }
+        
+        await InvokeAsync(StateHasChanged);
+    }
 
     private void OnListBoxDrop(
         ListBoxDropEventArgs<CardModel> args,
@@ -84,20 +149,23 @@ public partial class BoardLists : ComponentBase
         return list.Cards;
     }
 
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        ListBoxDropSources = Lists.Select(l => l.Id.ToString()).ToList();
-        
         foreach (var list in Lists)
         {
             if (!ListBoxRefs.ContainsKey(list.Id))
             {
-                ListBoxRefs.Add(list.Id, new TelerikListBox<CardModel>());
+                ListBoxRefs[list.Id] = new TelerikListBox<CardModel>();
             }
-            
+
             if (!ListBoxSelectedItems.ContainsKey(list.Id))
             {
-                ListBoxSelectedItems.Add(list.Id, new List<CardModel>());
+                ListBoxSelectedItems[list.Id] = new List<CardModel>();
+            }
+
+            if (!NewCardTitles.ContainsKey(list.Id))
+            {
+                NewCardTitles[list.Id] = string.Empty;
             }
         }
     }

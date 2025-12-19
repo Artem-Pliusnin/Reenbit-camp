@@ -37,6 +37,10 @@ public static class DependencyInjection
         services.AddRefitClient<IBoardsApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
             .AddHttpMessageHandler<TokenHandler>();
+        
+        services.AddRefitClient<IListsApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
 
         return services;
     }

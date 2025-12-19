@@ -79,6 +79,6 @@ public class BoardsService : IBoardsService
         }
         
         var error = response.GetApiErrorAsync();
-        return Result.Failure<List<BoardModel>>(error);
+        return Result.Failure<object>(error);
     }
 }

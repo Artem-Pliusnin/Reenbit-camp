@@ -57,6 +57,10 @@ main {
         position: sticky;
         top: 0;
     }
+    
+    main{
+        width: calc(100vw - 250px);
+    }
 
     .top-row {
         position: sticky;

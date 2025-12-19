@@ -1,0 +1,46 @@
+@using static Telerik.Blazor.ThemeConstants
+
+<div class="card simple-card bg-light" @onclick=@(() => { Console.WriteLine("111111"); })>
+    <div class="card-body simple-card-body d-flex flex-column gap-2">
+        <div class="simple-card-title">
+            @Card.Title
+        </div>
+        
+        <div class="m2 d-flex flex-row gap-1" @onclick:stopPropagation>
+            <TelerikCheckBox
+                Class=""
+                Id="IsCompleted"
+                @bind-Value=@Card.IsCompleted
+                Rounded=@CheckBox.Rounded.Large
+                Size=@CheckBox.Size.Large/>
+            
+            <label for="IsCompleted">
+                @(Card.IsCompleted ? "Completed" : "In progress")
+            </label>
+        </div>
+
+        @if (Card.DueDate.HasValue)
+        {
+            <div class="simple-card-footer">
+                <span class="badge simple-date-badge @DateBadgeClass">
+                    <TelerikSvgIcon 
+                        Icon=@Telerik.SvgIcons.SvgIcon.Clock 
+                        Size="SvgIconSize.Small" />
+                    
+                    <span class="ms-1">
+                        @Card.DueDate.Value.ToString("dd MMM")
+                    </span>
+                </span>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    
+    .k-checkbox:checked, .k-checkbox.k-checked {
+        border-color: limegreen;
+        color: white;
+        background-color: limegreen;
+    }
+</style>

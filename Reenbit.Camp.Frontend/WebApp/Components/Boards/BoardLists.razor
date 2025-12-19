@@ -13,10 +13,11 @@
                             TextField=@nameof(CardModel.Title)
                             Id=@list.Id.ToString()
                             SelectionMode=@ListBoxSelectionMode.Multiple
-                                                                                                                                            @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
+                            @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
                             Draggable=@true
                             DropSources=@ListBoxDropSources
-                            OnDrop="((ListBoxDropEventArgs<CardModel> args) => OnListBoxDrop(args, list.Id.ToString(), list.Cards))">
+                            OnDrop="((ListBoxDropEventArgs<CardModel> args) 
+                            => OnListBoxDrop(args, list.Id.ToString(), list.Cards))">
 
                 <ItemTemplate>
                     <SimpleCard Card=@context></SimpleCard>

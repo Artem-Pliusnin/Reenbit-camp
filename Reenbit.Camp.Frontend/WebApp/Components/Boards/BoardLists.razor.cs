@@ -1,6 +1,9 @@
 using Domain.Models.Cards;
 using Domain.Models.Lists;
+using Domain.Requests.Cards;
+using Domain.Requests.Lists;
 using Microsoft.AspNetCore.Components;
+using Services.Abstractions.Services;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Boards;
@@ -12,6 +15,12 @@ public partial class BoardLists : ComponentBase
     
     [Parameter, EditorRequired]
     public List<ListModel> Lists { get; set; } = new();
+    
+    [Inject] 
+    public IListsService ListsService { get; set; } = default!;
+    
+    [Inject] 
+    public ICardsService CardsService { get; set; } = default!;
     
     private Dictionary<int, TelerikListBox<CardModel>> ListBoxRefs { get; set; } = new();
     
@@ -32,16 +41,18 @@ public partial class BoardLists : ComponentBase
         {
             return;
         }
+        
+        var result = await CardsService
+            .CreateAsync(new CreateCardRequest(listId, title));
+
+        if (result.IsFailure || result.Value == null)
+        {
+            return;
+        }
 
         var list = Lists.First(l => l.Id == listId);
 
-        list.Cards.Add(new CardModel
-        {
-            Id = Random.Shared.Next(),
-            Title = title,
-            Position = list.Cards.Count,
-            IsCompleted = false
-        });
+        list.Cards.Add(result.Value);
 
         NewCardTitles[listId] = string.Empty;
 
@@ -54,24 +65,24 @@ public partial class BoardLists : ComponentBase
         {
             return;
         }
+        
+        var result = await ListsService
+            .CreateAsync(new CreateListRequest(BoardId, NewListTitle));
 
-        var newList = new ListModel
+        if (result.IsFailure || result.Value == null)
         {
-            Id = Random.Shared.Next(),
-            Title = NewListTitle,
-            Position = Lists.Count,
-            Cards = new List<CardModel>()
-        };
-
-        Lists.Add(newList);
+            return;
+        }
+        
+        Lists.Add(result.Value);
         
         NewListTitle = string.Empty;
         
-        ListBoxRefs.Add(newList.Id, new TelerikListBox<CardModel>());
+        ListBoxRefs.Add(result.Value.Id, new TelerikListBox<CardModel>());
             
-        ListBoxSelectedItems.Add(newList.Id, new List<CardModel>());
+        ListBoxSelectedItems.Add(result.Value.Id, new List<CardModel>());
 
-        NewCardTitles.Add(newList.Id, "");
+        NewCardTitles.Add(result.Value.Id, "");
         
         foreach (var listBoxRef in ListBoxRefs)
         {
@@ -81,7 +92,7 @@ public partial class BoardLists : ComponentBase
         await InvokeAsync(StateHasChanged);
     }
 
-    private void OnListBoxDrop(
+    private async void OnListBoxDrop(
         ListBoxDropEventArgs<CardModel> args,
         string sourceListBoxId,
         List<CardModel> sourceData)
@@ -102,6 +113,12 @@ public partial class BoardLists : ComponentBase
         {
             listBoxRef.Value.Rebind();
         }
+
+        await PersistCardMove(
+            args.Items,
+            int.Parse(args.DestinationListBoxId),
+            destinationIndex
+        );
     }
 
     private void ReorderItems(
@@ -145,8 +162,26 @@ public partial class BoardLists : ComponentBase
     private List<CardModel> GetListBoxDataFromId(string listBoxId)
     {
         var list = Lists.First(l => l.Id.ToString() == listBoxId);
-
         return list.Cards;
+    }
+    
+    private async Task PersistCardMove(
+        List<CardModel> cards,
+        int newListId,
+        int startPosition)
+    {
+        var requests = cards.Select((card, index) =>
+            new UpdateCardPositionRequest(
+                card.Id,
+                newListId,
+                startPosition + index + 1
+            )
+        ).ToList();
+        
+        foreach (var request in requests)
+        { 
+            await CardsService.UpdatePositionAsync(request.CardId, request);
+        }
     }
 
     protected override void OnInitialized()

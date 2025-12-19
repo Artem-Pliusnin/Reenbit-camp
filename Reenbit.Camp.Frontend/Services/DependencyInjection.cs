@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +23,8 @@ public static class DependencyInjection
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IBoardsService, BoardsService>();
+        services.AddScoped<IListsService, ListsService>();
+        services.AddScoped<ICardsService, CardsService>();
         
         services.AddScoped<TokenHandler>();
 
@@ -39,6 +39,10 @@ public static class DependencyInjection
             .AddHttpMessageHandler<TokenHandler>();
         
         services.AddRefitClient<IListsApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
+        
+        services.AddRefitClient<ICardsApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
             .AddHttpMessageHandler<TokenHandler>();
 

@@ -1,0 +1,19 @@
+<div class="list-header">
+    @if (!IsEditingTitle)
+    {
+    <h4 class="list-title"
+        @onclick=@StartEditTitle>
+        @ListTitle
+    </h4>
+    }
+    else
+    {
+    <input class="form-control form-control-sm list-title-input"
+           @bind=@TitleInput
+           @bind:event="oninput"
+           @onblur=@SaveTitle
+           @onkeydown=@OnTitleKeyDown
+           maxlength=50
+           autofocus />
+    }
+</div>

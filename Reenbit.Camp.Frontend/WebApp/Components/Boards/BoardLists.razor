@@ -1,11 +1,12 @@
 @using Domain.Models.Cards
 @using WebApp.Components.Cards
+@using WebApp.Components.Lists
 
 <div class="d-flex gap-3 board-lists">
     @foreach (var list in Lists.OrderBy(l => l.Position))
     {
         <div class="d-flex flex-column gap-1 align-items-center list-container">
-            <span class="w-100 text-start list-header">@list.Title</span>
+            <ListHeader ListId=@list.Id ListTitle=@list.Title></ListHeader>
             <TelerikListBox Width="100%"
                             Class="w-100"
                             @ref=@ListBoxRefs[list.Id]
@@ -34,6 +35,7 @@
             <div class="add-card-footer d-flex align-items-center gap-2">
                 <input class="form-control form-control-sm flex-grow-1"
                        placeholder="Add a task..."
+                       maxlength=255
                        @bind=@NewCardTitles[list.Id]
                        @bind:event="oninput" />
 
@@ -48,8 +50,9 @@
     <div class="d-flex flex-column gap-2 list-container">
         <input class="form-control form-control-sm flex-grow-1"
                placeholder="List title ..."
+               maxlength=50
                @bind=@NewListTitle
-                              @bind:event="oninput" />
+               @bind:event="oninput" />
 
         <button class="btn btn-sm btn-outline-dark"
                 disabled=@string.IsNullOrWhiteSpace(NewListTitle)

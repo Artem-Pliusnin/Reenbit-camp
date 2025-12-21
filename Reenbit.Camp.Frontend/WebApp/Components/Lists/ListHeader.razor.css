@@ -1,0 +1,23 @@
+.list-header{
+    width: 100%;
+    height: fit-content;
+    min-height: 3rem;
+    flex-shrink: 0;
+    border-bottom: 1px solid black;
+    box-shadow: 0 4px 4px -4px rgba(0,0,0,0.4);
+    border-radius: 0 0 0.3rem 0.3rem;
+}
+
+.list-title{
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.board-title-input {
+    width: 100%;
+    font-size: 1.25rem;
+    font-weight: 500;
+}

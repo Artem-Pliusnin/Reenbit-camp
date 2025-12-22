@@ -10,4 +10,8 @@ public interface IBoardRepository : IRepository<Board, int>
         int userId, 
         BoardsFilter filter,
         CancellationToken cancellationToken = default);
+    
+    Task<Board?> GetFullInfoAsync(
+        int boardId, 
+        CancellationToken cancellationToken = default);
 }

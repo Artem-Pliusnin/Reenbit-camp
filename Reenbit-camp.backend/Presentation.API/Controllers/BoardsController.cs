@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
+using Application.Boards.Queries.GetBoardData;
 using Application.Boards.Queries.GetUserBoards;
 using Domain.DTOs.Boards;
+using Domain.DTOs.Shared;
 using Domain.Errors;
 using Domain.Models;
 using Domain.Shared;
@@ -71,6 +73,24 @@ public class BoardsController : ApiController
                 queryParameters.PageSize));
         
         Result<PaginationDto<BoardDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetInfoAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+
+        var query = new GetBoardDataQuery(id);
+            
+        Result<BoardInfoDto> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {

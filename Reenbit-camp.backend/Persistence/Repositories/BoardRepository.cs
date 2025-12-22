@@ -64,4 +64,13 @@ public class BoardRepository :
             TotalPages = totalPages
         };
     }
+
+    public async Task<Board?> GetFullInfoAsync(
+        int boardId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Include(b => b.Lists.OrderBy(l => l.Position))
+            .ThenInclude(l => l.Cards.OrderBy(c => c.Position))
+            .FirstOrDefaultAsync(b => b.Id == boardId, cancellationToken);
+    }
 }

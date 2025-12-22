@@ -3,10 +3,14 @@
 @using WebApp.Components.Lists
 
 <div class="d-flex gap-3 board-lists">
-    @foreach (var list in Lists.OrderBy(l => l.Position))
+    @foreach (var list in Board.Lists.OrderBy(l => l.Position))
     {
         <div class="d-flex flex-column gap-1 align-items-center list-container">
-            <ListHeader ListId=@list.Id ListTitle=@list.Title></ListHeader>
+            <ListHeader
+                ListId=@list.Id
+                ListTitle=@list.Title
+                OnMoveList=@HandleMoveList>
+            </ListHeader>
             <TelerikListBox Width="100%"
                             Class="w-100"
                             @ref=@ListBoxRefs[list.Id]
@@ -17,8 +21,8 @@
                             @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
                             Draggable=@true
                             DropSources=@ListBoxDropSources
-                            OnDrop="((ListBoxDropEventArgs<CardModel> args) 
-                            => OnListBoxDrop(args, list.Id.ToString(), list.Cards))">
+                            OnDrop=@((ListBoxDropEventArgs<CardModel> args) 
+                            => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
 
                 <ItemTemplate>
                     <SimpleCard Card=@context></SimpleCard>
@@ -56,7 +60,7 @@
 
         <button class="btn btn-sm btn-outline-dark"
                 disabled=@string.IsNullOrWhiteSpace(NewListTitle)
-                                @onclick=@AddList>
+                @onclick=@AddList>
             Create list
         </button>
     </div>

@@ -1,3 +1,4 @@
+using Domain.Models.Boards;
 using Domain.Models.Cards;
 using Domain.Models.Lists;
 using Domain.Requests.Cards;
@@ -10,11 +11,8 @@ namespace WebApp.Components.Boards;
 
 public partial class BoardLists : ComponentBase
 {
-    [Parameter, EditorRequired]
-    public int BoardId { get; set; }
-    
-    [Parameter, EditorRequired]
-    public List<ListModel> Lists { get; set; } = new();
+    [CascadingParameter]
+    public BoardInfoModel Board { get; set; } = default!;
     
     [Inject] 
     public IListsService ListsService { get; set; } = default!;
@@ -27,7 +25,7 @@ public partial class BoardLists : ComponentBase
     private Dictionary<int, IEnumerable<CardModel>> ListBoxSelectedItems { get; set; } = new();
 
     private List<string> ListBoxDropSources =>
-        Lists.Select(l => l.Id.ToString()).ToList();
+        Board.Lists.Select(l => l.Id.ToString()).ToList();
     
     private string NewListTitle = string.Empty;
     
@@ -50,7 +48,7 @@ public partial class BoardLists : ComponentBase
             return;
         }
 
-        var list = Lists.First(l => l.Id == listId);
+        var list = Board.Lists.First(l => l.Id == listId);
 
         list.Cards.Add(result.Value);
 
@@ -67,14 +65,14 @@ public partial class BoardLists : ComponentBase
         }
         
         var result = await ListsService
-            .CreateAsync(new CreateListRequest(BoardId, NewListTitle));
+            .CreateAsync(new CreateListRequest(Board.Id, NewListTitle));
 
         if (result.IsFailure || result.Value == null)
         {
             return;
         }
         
-        Lists.Add(result.Value);
+        Board.Lists.Add(result.Value);
         
         NewListTitle = string.Empty;
         
@@ -161,7 +159,7 @@ public partial class BoardLists : ComponentBase
 
     private List<CardModel> GetListBoxDataFromId(string listBoxId)
     {
-        var list = Lists.First(l => l.Id.ToString() == listBoxId);
+        var list = Board.Lists.First(l => l.Id.ToString() == listBoxId);
         return list.Cards;
     }
     
@@ -183,10 +181,33 @@ public partial class BoardLists : ComponentBase
             await CardsService.UpdatePositionAsync(request.CardId, request);
         }
     }
+    
+    private async Task HandleMoveList(MoveListModel moveListModel)
+    {
+        var list = Board.Lists.First(l => l.Id == moveListModel.ListId);
+
+        Board.Lists.Remove(list);
+        Board.Lists.Insert(moveListModel.NewPosition - 1, list);
+
+        for (int i = 0; i < Board.Lists.Count; i++)
+        {
+            Board.Lists[i].Position = i + 1;
+        }
+
+        await ListsService.UpdatePositionAsync(
+            moveListModel.ListId,
+            new UpdateListPositionRequest(
+                moveListModel.ListId,
+                moveListModel.NewPosition
+            )
+        );
+
+        await InvokeAsync(StateHasChanged);
+    }
 
     protected override void OnInitialized()
     {
-        foreach (var list in Lists)
+        foreach (var list in Board.Lists)
         {
             if (!ListBoxRefs.ContainsKey(list.Id))
             {

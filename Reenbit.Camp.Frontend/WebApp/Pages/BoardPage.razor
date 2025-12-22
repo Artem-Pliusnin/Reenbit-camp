@@ -32,7 +32,9 @@ else
         </div>
 
         <div class="board-content">
-            <BoardLists Lists=@Board.Lists BoardId=@BoardId/>
+            <CascadingValue Value=@Board>
+                <BoardLists></BoardLists>
+            </CascadingValue>
         </div>
     </div> 
 }

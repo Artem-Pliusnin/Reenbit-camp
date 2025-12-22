@@ -1,5 +1,4 @@
 .list-header{
-    width: 100%;
     height: fit-content;
     min-height: 3rem;
     flex-shrink: 0;
@@ -21,3 +20,23 @@
     font-size: 1.25rem;
     font-weight: 500;
 }
+
+.list-menu {
+    background: white;
+    border-radius: 0.5rem;
+}
+
+.list-menu-item {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    box-sizing: border-box;
+    background: none;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    text-align: left;
+    font-size: 1rem;
+}
+
+.list-menu-item:hover {
+    background: rgb(240, 240, 240);
+}
+

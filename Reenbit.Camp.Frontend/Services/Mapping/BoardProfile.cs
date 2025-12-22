@@ -9,5 +9,7 @@ public class BoardProfile : Profile
     public BoardProfile()
     {
         CreateMap<BoardDto, BoardModel>();
+        
+        CreateMap<BoardInfoDto, BoardInfoModel>();
     }
 }

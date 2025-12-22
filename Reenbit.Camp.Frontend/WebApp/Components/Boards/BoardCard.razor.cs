@@ -10,4 +10,12 @@ public partial class BoardCard : ComponentBase
     
     [Parameter]
     public bool IsNew { get; set; }
+    
+    [Inject] 
+    public NavigationManager Navigation{ get; set; } = default!;
+    
+    private void GoToBoard()
+    {
+        Navigation.NavigateTo($"/board/{Board.Id}");
+    }
 }

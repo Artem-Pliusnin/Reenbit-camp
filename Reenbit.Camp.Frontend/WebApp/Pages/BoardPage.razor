@@ -1,0 +1,40 @@
+@page "/board/{boardId:int}"
+@using WebApp.Components.Boards
+
+@if(isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center w-100" 
+         style="height: 80vh">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else
+{
+    <div class="board-layout">
+        <div class="board-header">
+            @if (!IsEditingTitle)
+            {
+                <h4 class="board-title"
+                    @onclick=@StartEditTitle>
+                    @Board.Title
+                </h4>
+            }
+            else
+            {
+                <input class="form-control form-control-sm board-title-input" 
+                       @bind=@TitleInput 
+                       @bind:event="oninput" 
+                       @onblur=@SaveTitle 
+                       @onkeydown=@OnTitleKeyDown
+                       maxlength=50
+                       autofocus />
+            }
+        </div>
+
+        <div class="board-content">
+            <CascadingValue Value=@Board>
+                <BoardLists></BoardLists>
+            </CascadingValue>
+        </div>
+    </div> 
+}

@@ -95,7 +95,7 @@ public class ListsController : ApiController
     
     
     [HttpPut("{id}/position")]
-    public async Task<IActionResult> UpdateAsync(
+    public async Task<IActionResult> UpdatePositionAsync(
         [FromBody] UpdateListPositionRequest request,
         [FromRoute] int id,
         CancellationToken cancellationToken)

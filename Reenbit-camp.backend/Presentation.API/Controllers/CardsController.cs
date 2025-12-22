@@ -19,9 +19,9 @@ namespace Presentation.API.Controllers;
 [Authorize]
 [Route("api/[controller]")]
 
-public class CardController : ApiController
+public class CardsController : ApiController
 {
-    public CardController(ISender sender)
+    public CardsController(ISender sender)
         : base(sender)
     {}
     
@@ -70,8 +70,8 @@ public class CardController : ApiController
     
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAsync(
-        [FromRoute] int id,
         [FromBody] UpdateCardRequest request,
+        [FromRoute] int id,
         CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -100,7 +100,7 @@ public class CardController : ApiController
     }
     
     [HttpPut("{id}/position")]
-    public async Task<IActionResult> UpdateAsync(
+    public async Task<IActionResult> UpdatePositionAsync(
         [FromBody] UpdateCardPositionRequest request,
         [FromRoute] int id,
         CancellationToken cancellationToken)
@@ -127,7 +127,7 @@ public class CardController : ApiController
     }
     
     [HttpPut("{id}/deadline")]
-    public async Task<IActionResult> UpdateAsync(
+    public async Task<IActionResult> UpdateDeadlineAsync(
         [FromBody] UpdateCardDeadlineRequest request,
         [FromRoute] int id,
         CancellationToken cancellationToken)

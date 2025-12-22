@@ -19,6 +19,7 @@ public class ListRepository :
     {
         return await _dbSet.Where(list => list.BoardId == boardId)
             .OrderBy(l => l.Position)
+            .Include(l => l.Cards)
             .ToListAsync(cancellationToken);
     }
 

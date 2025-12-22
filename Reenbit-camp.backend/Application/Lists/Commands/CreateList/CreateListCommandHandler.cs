@@ -1,4 +1,6 @@
 using Application.Abstractions.Messaging;
+using AutoMapper;
+using Domain.DTOs.Cards;
 using Domain.DTOs.Lists;
 using Domain.Entities;
 using Domain.Errors;
@@ -10,10 +12,12 @@ namespace Application.Lists.Commands.CreateList;
 internal class CreateListCommandHandler : ICommandHandler<CreateListCommand, ListDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public CreateListCommandHandler(IUnitOfWork unitOfWork)
+    public CreateListCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
     
     public async Task<Result<ListDto>> Handle(
@@ -41,7 +45,8 @@ internal class CreateListCommandHandler : ICommandHandler<CreateListCommand, Lis
             {
                 Id = list.Id,
                 Title = list.Title,
-                Position = list.Position
+                Position = list.Position,
+                Cards = _mapper.Map<List<CardDto>>(list.Cards),
             };
 
             return response;

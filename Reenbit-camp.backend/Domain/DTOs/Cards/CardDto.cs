@@ -8,6 +8,8 @@ public class CardDto
     
     public required int Position { get; set; }
     
+    public required bool IsCompleted { get; set; }
+    
     public required DateTime? StartDate { get; set; }
     
     public required DateTime? DueDate { get; set; }

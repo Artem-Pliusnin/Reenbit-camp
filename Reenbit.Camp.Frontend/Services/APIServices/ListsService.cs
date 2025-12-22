@@ -22,67 +22,37 @@ public class ListsService : IListsService
     public async Task<Result<ListModel>> CreateAsync(CreateListRequest request)
     {
         var response = await _listsApi.CreateAsync(request);
-
-        if (response.IsSuccessStatusCode && response.Content != null)
-        {
-            var newList = _mapper.Map<ListModel>(response.Content);
-            return newList;
-        }
         
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<ListModel>(error);
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<ListModel>(content));
     }
 
     public async Task<Result<List<ListModel>>> GetByBoardAsync(int boardId)
     {
         var response = await _listsApi.GetByBoardAsync(boardId);
 
-        if (response.IsSuccessStatusCode && response.Content != null)
-        {
-            var lists = _mapper.Map<List<ListModel>>(response.Content);
-            return lists;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<List<ListModel>>(error);
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<List<ListModel>>(content));
     }
 
     public async Task<Result<object>> UpdateAsync(int id, UpdateListRequest request)
     {
         var response = await _listsApi.UpdateAsync(request, id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 
     public async Task<Result<object>> UpdatePositionAsync(int id, UpdateListPositionRequest request)
     {
         var response = await _listsApi.UpdatePositionAsync(request, id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 
     public async Task<Result<object>> DeleteAsync(int id)
     {
         var response = await _listsApi.DeleteAsync(id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 }

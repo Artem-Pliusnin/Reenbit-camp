@@ -23,80 +23,44 @@ public class CardsService : ICardsService
     public async Task<Result<CardModel>> CreateAsync(CreateCardRequest request)
     {
         var response = await _cardsApi.CreateAsync(request);
-
-        if (response.IsSuccessStatusCode && response.Content != null)
-        {
-            var newCard = _mapper.Map<CardModel>(response.Content);
-            return newCard;
-        }
         
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<CardModel>(error);
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<CardModel>(content));
     }
 
     public async Task<Result<List<CardModel>>> GetByListAsync(int listId)
     {
         var response = await _cardsApi.GetByListAsync(listId);
 
-        if (response.IsSuccessStatusCode && response.Content != null)
-        {
-            var cards = _mapper.Map<List<CardModel>>(response.Content);
-            return cards;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<List<CardModel>>(error);
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<List<CardModel>>(content));
     }
 
     public async Task<Result<object>> UpdateAsync(int id, UpdateCardRequest request)
     {
         var response = await _cardsApi.UpdateAsync(request, id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 
     public async Task<Result<object>> UpdatePositionAsync(int id, UpdateCardPositionRequest request)
     {
         var response = await _cardsApi.UpdatePositionAsync(request, id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 
     public async Task<Result<object>> UpdateDeadlineAsync(int id, UpdateCardDeadlineRequest request)
     {
         var response = await _cardsApi.UpdateDeadlineAsync(request, id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 
     public async Task<Result<object>> DeleteAsync(int id)
     {
         var response = await _cardsApi.DeleteAsync(id);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<object>(error);
+        return response.HandleResult();
     }
 }

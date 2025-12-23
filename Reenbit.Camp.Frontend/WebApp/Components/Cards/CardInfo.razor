@@ -1,0 +1,200 @@
+@using Telerik.SvgIcons
+@if (isLoading)
+{
+    <div class="w-100 h-100 d-flex justify-content-center align-items-center"> 
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else
+{
+<div class="card-info-panel py-2 px-4">
+    <div class="card-info-content">
+        <div class="d-flex flex-row align-items-center gap-2 mb-3" style="height: fit-content">
+            <TelerikCheckBox
+                Class=""
+                Id="IsCompleted"
+                @bind-Value=@Card.IsCompleted
+                Rounded=@ThemeConstants.CheckBox.Rounded.Large
+                Size=@ThemeConstants.CheckBox.Size.Large/>
+
+            <h4 class="task-title">
+                @Card.Title
+            </h4>
+        </div>
+
+        <div class="mb-3">
+            <h5 class="fw-semibold mb-2">Description</h5>
+
+            @if (!IsEditingDescription)
+            {
+                <div class="d-flex description-view"
+                     @onclick=@StartEditDescription>
+                    @if (string.IsNullOrWhiteSpace(Card.Description))
+                    {
+                        <p class="text-muted fst-italic description-field px-2">Add a description…</p>
+                    }
+                    else
+                    {
+                        @Card.Description
+                    }
+                </div>
+            }
+            else
+            {   
+                <div class="description-edit">
+                    <textarea class="form-control mb-2"
+                            rows="4"
+                            @bind=@InputDescription>
+                    </textarea>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm"
+                                @onclick=@SaveDescription>
+                            Save
+                        </button>
+
+                        <button class="btn btn-light btn-sm"
+                                @onclick=@CancelEditDescription>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <h5 class="fw-semibold mb-2">Members</h5>
+        </div>
+
+        <div class="mb-3">
+            <h5 class="fw-semibold mb-2">Labels</h5>
+        </div>
+        
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-6 d-flex flex-column">
+                <small class="text-muted">Start date</small>
+
+                @if (!IsEditingStartDate)
+                {
+                    <span class="badge simple-date-badge d-flex justify-content-between"
+                          @onclick=@OnStartDateOpen>
+                        
+                        @if (Card.StartDate != null)
+                        {   
+                            <div class="d-flex flex-row gap-1">
+                                <TelerikSvgIcon
+                                    Icon=@Telerik.SvgIcons.SvgIcon.Clock
+                                    Size="SvgIconSize.Small"/>
+
+                                <span>
+                                    @Card.StartDate.Value.ToString("dd MMM yyyy HH:mm")
+                                </span>
+                            </div>
+                            
+                            <div @onclick:stopPropagation>
+                                <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.X
+                                               FillMode="ButtonFillMode.Flat"
+                                               Class="clear-date-button"
+                                               OnClick=@ClearStartDate/>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="ms-1">Add date</span>
+                        }
+                    </span>
+                }
+                else
+                {
+                    <TelerikDateTimePicker
+                        @bind-Value=@Card.StartDate
+                        Min=@StartDateMin
+                        Max=@StartDateMax
+                        Format="dd MMM yyyy HH:mm"
+                        Width="100%"
+                        AdaptiveMode=@AdaptiveMode.Auto
+                        OnClose=@OnStartDateClose/>
+                }
+            </div>
+
+            <div class="col-12 col-md-6 d-flex flex-column">
+                <small class="text-muted">Due date</small>
+
+                @if (!IsEditingDueDate)
+                {
+                    <span class="badge simple-date-badge d-flex justify-content-between @DateBadgeClass"
+                          @onclick=@OnDueDateOpen>
+                        
+                        @if (Card.DueDate != null)
+                        {   
+                            <div class="d-flex flex-row gap-1">
+                                <TelerikSvgIcon
+                                    Icon=@Telerik.SvgIcons.SvgIcon.Clock
+                                    Size="SvgIconSize.Small"/>
+
+                                <span>
+                                    @Card.DueDate.Value.ToString("dd MMM yyyy HH:mm")
+                                </span>
+                            </div>
+                            
+                            <div @onclick:stopPropagation>
+                                <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.X
+                                               FillMode="ButtonFillMode.Flat"
+                                               Class="clear-date-button"
+                                               OnClick=@ClearDueDate/>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="ms-1">Add date</span>
+                        }
+                    </span>
+                }
+                else
+                {
+                    <TelerikDateTimePicker
+                        @bind-Value=@Card.DueDate
+                        Min=@DueDateMin
+                        Max=@DueDateMax
+                        Format="dd MMM yyyy HH:mm"
+                        Width="100%"
+                        AdaptiveMode=@AdaptiveMode.Auto
+                        OnClose=@OnDueDateClose/>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<style>
+    .d-flex .k-checkbox-wrap {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0;
+        height: 4rem;
+    }
+    
+    .d-flex .k-checkbox-wrap .k-checkbox {
+        position: relative;
+        top: 0;
+    }
+    
+    .k-checkbox:checked, .k-checkbox.k-checked {
+        border-color: limegreen;
+        color: white;
+        background-color: limegreen;
+    }
+
+    .clear-date-button {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        background-color: #f1f2f4;
+        color:  gray;
+        border: none;
+        padding: 0;
+    }
+    
+</style>

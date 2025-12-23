@@ -10,6 +10,8 @@ public interface ICardsService
     
     Task<Result<List<CardModel>>> GetByListAsync(int listId);
     
+    Task<Result<CardInfoModel>> GetInfoAsync(int id);
+    
     Task<Result<object>> UpdateAsync(int id, UpdateCardRequest request);
     
     Task<Result<object>> UpdatePositionAsync(int id, UpdateCardPositionRequest request);

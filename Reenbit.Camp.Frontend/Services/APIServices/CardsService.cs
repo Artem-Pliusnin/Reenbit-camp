@@ -36,6 +36,14 @@ public class CardsService : ICardsService
             => _mapper.Map<List<CardModel>>(content));
     }
 
+    public async Task<Result<CardInfoModel>> GetInfoAsync(int id)
+    {
+        var response = await _cardsApi.GetInfoAsync(id);
+
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<CardInfoModel>(content));
+    }
+
     public async Task<Result<object>> UpdateAsync(int id, UpdateCardRequest request)
     {
         var response = await _cardsApi.UpdateAsync(request, id);

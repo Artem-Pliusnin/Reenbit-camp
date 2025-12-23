@@ -10,6 +10,9 @@ public interface ICardsApi
 {
     [Get("/Cards/list/{id}")]
     Task<ApiResponse<List<CardDto>>> GetByListAsync(int id);
+    
+    [Get("/Cards/{id}")]
+    Task<ApiResponse<CardInfoDto>> GetInfoAsync(int id);
 
     [Post("/Cards")]
     Task<ApiResponse<CardDto>> CreateAsync(

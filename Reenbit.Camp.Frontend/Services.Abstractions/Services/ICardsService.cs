@@ -14,6 +14,8 @@ public interface ICardsService
     
     Task<Result<object>> UpdateAsync(int id, UpdateCardRequest request);
     
+    Task<Result<object>> UpdateStatusAsync(int id, UpdateCardStatusRequest request);
+    
     Task<Result<object>> UpdatePositionAsync(int id, UpdateCardPositionRequest request);
     
     Task<Result<object>> UpdateDeadlineAsync(int id, UpdateCardDeadlineRequest request);

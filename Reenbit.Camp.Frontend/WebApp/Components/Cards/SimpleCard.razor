@@ -12,7 +12,8 @@
                 Id="IsCompleted"
                 @bind-Value=@Card.IsCompleted
                 Rounded=@CheckBox.Rounded.Large
-                Size=@CheckBox.Size.Large/>
+                Size=@CheckBox.Size.Large
+                OnChange=@OnChangeStatus/>
             
             <label for="IsCompleted">
                 @(Card.IsCompleted ? "Completed" : "In progress")
@@ -56,7 +57,10 @@
              style="box-sizing: border-box">
             <div class="row g-3">
                 <div class="col-12 col-lg-7 p-0">
-                  <CardInfo CardId=@Card.Id></CardInfo>
+                    <CardInfo
+                        @ref=@CardInfoRef
+                        CardId=@Card.Id 
+                        OnCloseWindow=@HandleCradWindowClose></CardInfo>
                 </div>
                 
                 <div class="col-12 col-lg-5 p-0">

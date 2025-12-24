@@ -23,6 +23,11 @@ public interface ICardsApi
         [Body] UpdateCardRequest request,
         int id);
     
+    [Put("/Cards/{id}/status")]
+    Task<ApiResponse<object>> UpdateStatusAsync(
+        [Body] UpdateCardStatusRequest request,
+        int id);
+    
     [Put("/Cards/{id}/position")]
     Task<ApiResponse<object>> UpdatePositionAsync(
         [Body] UpdateCardPositionRequest request,

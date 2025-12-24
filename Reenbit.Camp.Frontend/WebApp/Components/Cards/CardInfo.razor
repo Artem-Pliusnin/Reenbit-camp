@@ -1,4 +1,5 @@
 @using Telerik.SvgIcons
+
 @if (isLoading)
 {
     <div class="w-100 h-100 d-flex justify-content-center align-items-center"> 
@@ -18,9 +19,23 @@ else
                 Size=@ThemeConstants.CheckBox.Size.Large
                 OnChange=@OnChangeStatus/>
 
-            <h4 class="task-title">
+            @if (!IsEditingTitle)
+            {
+            <h4 class="list-title"
+                @onclick=@StartEditTitle>
                 @Card.Title
             </h4>
+            }
+            else
+            {
+            <input class="form-control form-control-sm task-title-input"
+                   @bind=@InputTitle
+                   @bind:event="oninput"
+                   @onblur=@SaveTitle
+                   @onkeydown=@OnTitleKeyDown
+                   maxlength=50
+                   autofocus />
+            }
         </div>
 
         <div class="mb-3">
@@ -70,15 +85,16 @@ else
         <div class="mb-3">
             <h5 class="fw-semibold mb-2">Labels</h5>
         </div>
+    </div>
         
-        <div class="row g-3 mb-3">
-            <div class="col-12 col-md-6 d-flex flex-column">
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-6 d-flex flex-column">
                 <small class="text-muted">Start date</small>
 
                 @if (!IsEditingStartDate)
                 {
                     <span class="badge simple-date-badge d-flex justify-content-between"
-                          @onclick=@OnStartDateOpen>
+                          @onclick=@(() => OnStartDateStateChange(true))>
                         
                         @if (Card.StartDate != null)
                         {   
@@ -93,7 +109,7 @@ else
                             </div>
                             
                             <div @onclick:stopPropagation>
-                                <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.X
+                                <TelerikButton Icon=@SvgIcon.X
                                                FillMode="ButtonFillMode.Flat"
                                                Class="clear-date-button"
                                                OnClick=@ClearStartDate/>
@@ -108,61 +124,64 @@ else
                 else
                 {
                     <TelerikDateTimePicker
-                        @bind-Value=@Card.StartDate
+                        Value=@Card.StartDate
                         Min=@StartDateMin
                         Max=@StartDateMax
                         Format="dd MMM yyyy HH:mm"
                         Width="100%"
                         AdaptiveMode=@AdaptiveMode.Auto
-                        OnClose=@OnStartDateClose/>
+                        OnClose=@(() => OnStartDateStateChange(false))
+                        OnBlur=@(() => OnStartDateStateChange(false))
+                        OnChange=@OnStartDateChanged/>
                 }
             </div>
 
-            <div class="col-12 col-md-6 d-flex flex-column">
-                <small class="text-muted">Due date</small>
+        <div class="col-12 col-md-6 d-flex flex-column">
+            <small class="text-muted">Due date</small>
 
-                @if (!IsEditingDueDate)
-                {
-                    <span class="badge simple-date-badge d-flex justify-content-between @DateBadgeClass"
-                          @onclick=@OnDueDateOpen>
+            @if (!IsEditingDueDate)
+            {
+                <span class="badge simple-date-badge d-flex justify-content-between @DateBadgeClass"
+                      @onclick=@(() => OnDueDateStateChange(true))>
                         
-                        @if (Card.DueDate != null)
-                        {   
-                            <div class="d-flex flex-row gap-1">
-                                <TelerikSvgIcon
-                                    Icon=@Telerik.SvgIcons.SvgIcon.Clock
-                                    Size="SvgIconSize.Small"/>
+                    @if (Card.DueDate != null)
+                    {   
+                        <div class="d-flex flex-row gap-1">
+                            <TelerikSvgIcon
+                                Icon=@Telerik.SvgIcons.SvgIcon.Clock
+                                Size="SvgIconSize.Small"/>
 
-                                <span>
-                                    @Card.DueDate.Value.ToString("dd MMM yyyy HH:mm")
-                                </span>
-                            </div>
+                            <span>
+                                @Card.DueDate.Value.ToString("dd MMM yyyy HH:mm")
+                            </span>
+                        </div>
                             
-                            <div @onclick:stopPropagation>
-                                <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.X
-                                               FillMode="ButtonFillMode.Flat"
-                                               Class="clear-date-button"
-                                               OnClick=@ClearDueDate/>
-                            </div>
-                        }
-                        else
-                        {
-                            <span class="ms-1">Add date</span>
-                        }
-                    </span>
-                }
-                else
-                {
-                    <TelerikDateTimePicker
-                        @bind-Value=@Card.DueDate
-                        Min=@DueDateMin
-                        Max=@DueDateMax
-                        Format="dd MMM yyyy HH:mm"
-                        Width="100%"
-                        AdaptiveMode=@AdaptiveMode.Auto
-                        OnClose=@OnDueDateClose/>
-                }
-            </div>
+                        <div @onclick:stopPropagation>
+                            <TelerikButton Icon=@SvgIcon.X
+                                           FillMode="ButtonFillMode.Flat"
+                                           Class="clear-date-button"
+                                           OnClick=@ClearDueDate/>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="ms-1">Add date</span>
+                    }
+                </span>
+            }
+            else
+            {
+                <TelerikDateTimePicker
+                    Value=@Card.DueDate
+                    Min=@DueDateMin
+                    Max=@DueDateMax
+                    Format="dd MMM yyyy HH:mm"
+                    Width="100%"
+                    AdaptiveMode=@AdaptiveMode.Auto
+                    OnClose=@(() => OnDueDateStateChange(false))
+                    OnBlur=@(() => OnDueDateStateChange(false))
+                    OnChange=@OnDueDateChanged/>
+            }
         </div>
     </div>
 </div>

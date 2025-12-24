@@ -50,6 +50,13 @@ public class CardsService : ICardsService
 
         return response.HandleResult();
     }
+    
+    public async Task<Result<object>> UpdateStatusAsync(int id, UpdateCardStatusRequest request)
+    {
+        var response = await _cardsApi.UpdateStatusAsync(request, id);
+
+        return response.HandleResult();
+    }
 
     public async Task<Result<object>> UpdatePositionAsync(int id, UpdateCardPositionRequest request)
     {

@@ -1,4 +1,5 @@
 using Domain.Models.Cards;
+using Domain.Requests.Cards;
 using Microsoft.AspNetCore.Components;
 using Services.Abstractions.Services;
 using Telerik.Blazor;
@@ -15,6 +16,15 @@ public partial class SimpleCard : ComponentBase
     private CardInfo? CardInfoRef;
     
     private bool IsCardOpen = false;
+    
+    private async Task OnChangeStatus()
+    {
+        await CardsService.UpdateStatusAsync(
+            Card.Id, 
+            new UpdateCardStatusRequest(
+                Card.Id, 
+                Card.IsCompleted));
+    }
 
     private void OpenCard()
     {

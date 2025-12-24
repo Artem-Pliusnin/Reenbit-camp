@@ -2,6 +2,9 @@
     height: fit-content;
     min-height: 70vh;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .task-title{
@@ -12,6 +15,12 @@
     overflow-wrap: anywhere;
     word-break: break-word;
     margin: 0;
+}
+
+.task-title-input {
+    width: 100%;
+    font-size: 1.25rem;
+    font-weight: 500;
 }
 
 .description-view {

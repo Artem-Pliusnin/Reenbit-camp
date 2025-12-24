@@ -1,5 +1,6 @@
 using Domain.Models.Cards;
 using Microsoft.AspNetCore.Components;
+using Services.Abstractions.Services;
 using Telerik.Blazor;
 
 namespace WebApp.Components.Cards;
@@ -8,6 +9,10 @@ public partial class SimpleCard : ComponentBase
 {
     [Parameter, EditorRequired]
     public CardModel Card { get; set; }
+
+    [Inject] private ICardsService CardsService { get; set; } = default!;
+    
+    private CardInfo? CardInfoRef;
     
     private bool IsCardOpen = false;
 
@@ -17,7 +22,18 @@ public partial class SimpleCard : ComponentBase
     }
     private void CloseCard()
     {
+        CardInfoRef?.UpdateCard();
         IsCardOpen = false;
+    }
+    
+    private async Task HandleCradWindowClose(UpdateCardModel updateCardModel)
+    {
+        Card.Title = updateCardModel.Title;
+        Card.IsCompleted = updateCardModel.IsCompleted;
+        Card.StartDate = updateCardModel.StartDate;
+        Card.DueDate = updateCardModel.DueDate;
+
+        await InvokeAsync(StateHasChanged);
     }
 
     protected string DateBadgeClass =>

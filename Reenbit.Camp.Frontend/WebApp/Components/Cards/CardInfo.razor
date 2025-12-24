@@ -15,7 +15,8 @@ else
                 Id="IsCompleted"
                 @bind-Value=@Card.IsCompleted
                 Rounded=@ThemeConstants.CheckBox.Rounded.Large
-                Size=@ThemeConstants.CheckBox.Size.Large/>
+                Size=@ThemeConstants.CheckBox.Size.Large
+                OnChange=@OnChangeStatus/>
 
             <h4 class="task-title">
                 @Card.Title

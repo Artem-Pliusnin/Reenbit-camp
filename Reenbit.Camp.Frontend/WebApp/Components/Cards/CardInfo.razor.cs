@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using Domain.Models.Cards;
 using Domain.Requests.Cards;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Services.Abstractions.Services;
-using Telerik.Blazor.Components;
+
 
 namespace WebApp.Components.Cards;
 
@@ -15,13 +15,20 @@ public partial class CardInfo : ComponentBase
     [Inject]
     private ICardsService CardsService { get; set; } = default!;
     
+    [Parameter, EditorRequired]
+    public EventCallback<UpdateCardModel> OnCloseWindow { get; set; }
+    
     private bool isLoading;
     
     private CardInfoModel Card = new();
     
-    private bool IsEditingDescription;
+    private string? InputTitle;
     
     private string? InputDescription;
+    
+    private bool IsEditingTitle;
+    
+    private bool IsEditingDescription;
     
     private bool IsEditingStartDate;
     
@@ -44,6 +51,55 @@ public partial class CardInfo : ComponentBase
         : (Card.DueDate < DateTime.UtcNow && !Card.IsCompleted)
             ? "bg-danger text-white"
             : "bg-success text-white";
+    
+    private void StartEditTitle()
+    {
+        InputTitle = Card.Title;
+        IsEditingTitle = true;
+    }
+
+    private async Task SaveTitle()
+    {
+        if (!string.IsNullOrWhiteSpace(InputTitle))
+        {
+            Card.Title = InputTitle;
+
+            await CardsService.UpdateAsync(
+                CardId, 
+                new UpdateCardRequest(
+                    Card.Id, 
+                    Card.Title,
+                    Card.Description));
+        }
+        
+        IsEditingTitle = false;
+    }
+
+    private void CancelEdit()
+    {
+        IsEditingTitle = false;
+    }
+
+    private async Task OnTitleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SaveTitle();
+        }
+        else if (e.Key == "Escape")
+        {
+            CancelEdit();
+        }
+    }
+    
+    private async Task OnChangeStatus()
+    {
+        await CardsService.UpdateStatusAsync(
+            Card.Id, 
+            new UpdateCardStatusRequest(
+                Card.Id, 
+                Card.IsCompleted));
+    }
     
     private void StartEditDescription()
     {
@@ -71,36 +127,55 @@ public partial class CardInfo : ComponentBase
         IsEditingDescription = false;
     }
 
-    private void ClearStartDate()
+    private async Task ClearStartDate()
     {
         Card.StartDate = null;
+        await UpdateDates();
     }
     
-    private void ClearDueDate()
+    private async Task ClearDueDate()
     {
         Card.DueDate = null;
+        await UpdateDates();
     }
     
-    private void OnStartDateOpen()
+    private void OnStartDateStateChange(bool value)
     {
-        IsEditingStartDate = true;
+        IsEditingStartDate = value;
     }
     
-    private void OnStartDateClose()
+    private void OnDueDateStateChange(bool value)
     {
-        IsEditingStartDate = false;
+        IsEditingDueDate = value;
     }
 
-    private void OnDueDateOpen()
+    private async Task OnStartDateChanged(object value)
     {
-        IsEditingDueDate = true;
-    }
-    
-    private void OnDueDateClose()
-    {
+        var date = (DateTime?)value;
+        if (date == DateTime.MinValue)
+        {
+            date = null;
+        }
+        
+        Card.StartDate = date;
         IsEditingDueDate = false;
+        
+        await UpdateDates();
     }
-
+    
+    private async Task OnDueDateChanged(object value)
+    {
+        var date = (DateTime?)value;
+        if (date == DateTime.MinValue)
+        {
+            date = null;
+        }
+        
+        Card.DueDate = date;
+        IsEditingDueDate = false;
+        
+        await UpdateDates();
+    }
     
     protected override async Task OnInitializedAsync()
     {
@@ -112,5 +187,25 @@ public partial class CardInfo : ComponentBase
             Card = result.Value;
             isLoading = false;
         }
+    }
+
+    private async Task UpdateDates()
+    {
+        await CardsService.UpdateDeadlineAsync(
+            CardId,
+            new UpdateCardDeadlineRequest(
+                Card.Id,
+                Card.StartDate,
+                Card.DueDate));
+    }
+
+    public void UpdateCard()
+    {
+        OnCloseWindow.InvokeAsync(
+            new UpdateCardModel(
+                Card.Title, 
+                Card.IsCompleted, 
+                Card.StartDate, 
+                Card.DueDate));
     }
 }

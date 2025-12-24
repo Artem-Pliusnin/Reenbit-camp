@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.Converters;
 
 namespace Persistence.Configurations;
 
@@ -33,7 +34,8 @@ public class ListConfiguration : IEntityTypeConfiguration<List>
 
         builder.Property(l => l.LastUpdateDate)
             .HasColumnName("last_update_date")
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasDefaultValue(DateTime.UtcNow)
+            .HasConversion(UtcDateTimeConverters.Nullable);;
         
         builder.HasOne(l => l.Board)
             .WithMany(b => b.Lists)

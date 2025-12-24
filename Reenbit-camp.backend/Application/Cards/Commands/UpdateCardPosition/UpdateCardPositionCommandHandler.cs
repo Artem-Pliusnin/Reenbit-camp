@@ -38,6 +38,8 @@ internal class UpdateCardPositionCommandHandler : ICommandHandler<UpdateCardPosi
             card.LastUpdatedBy = request.UserId;
             card.LastUpdateDate = DateTime.UtcNow;
             
+            cardRepository.Update(card);
+            
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             
             return Result.Success();

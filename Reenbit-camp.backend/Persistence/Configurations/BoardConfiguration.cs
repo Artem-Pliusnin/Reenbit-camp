@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.Converters;
 
 namespace Persistence.Configurations;
 
@@ -28,13 +29,15 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
         builder.Property(b => b.CreationDate)
             .HasColumnName("creation_date")
             .IsRequired()
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasDefaultValue(DateTime.UtcNow)
+            .HasConversion(UtcDateTimeConverters.NonNullable);
 
         builder.Property(b => b.LastUpdatedBy)
             .HasColumnName("last_updated_by");
 
         builder.Property(b => b.LastUpdateDate)
-            .HasColumnName("last_update_date");
+            .HasColumnName("last_update_date")
+            .HasConversion(UtcDateTimeConverters.Nullable);
         
         builder.HasOne(b => b.CreatedByUser)
             .WithMany()

@@ -1,0 +1,29 @@
+<div class="w-100 d-flex flex-column g-2 comments-panel py-2 px-4">
+    @if (!IsWritingComment)
+    {
+        <div class="w-100 comment-field p-2 text-muted fst-italic"
+         @onclick=@StartWritingComment>Add a comment…</div>
+    }
+    else
+    {
+    <div class="description-edit">
+                    <textarea class="form-control mb-2"
+                              rows="3"
+                              maxlength="1000"
+                              @bind=@InputComment>
+                    </textarea>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm"
+                    @onclick=@SaveComment>
+                Save
+            </button>
+
+            <button class="btn btn-light btn-sm"
+                    @onclick=@CancelWritingComment>
+                Cancel
+            </button>
+        </div>
+    </div>
+    }
+</div>

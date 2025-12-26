@@ -7,17 +7,17 @@ using Domain.Shared;
 
 namespace Application.Invitations.Commands.DeclinedInvitation;
 
-internal class DeclinedInvitationCommandHandler : ICommandHandler<DeclinedInvitationCommand>
+internal class DeclineInvitationCommandHandler : ICommandHandler<DeclineInvitationCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public DeclinedInvitationCommandHandler(IUnitOfWork unitOfWork)
+    public DeclineInvitationCommandHandler(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
     
     public async Task<Result> Handle(
-        DeclinedInvitationCommand request, 
+        DeclineInvitationCommand request, 
         CancellationToken cancellationToken)
     {
         var invitationRepository = _unitOfWork.GetRepository<IInvitationRepository>();

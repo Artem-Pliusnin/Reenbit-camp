@@ -1,10 +1,6 @@
-using System.Security.Claims;
 using Application.BoardMembers.Commands.UpdateBoardMemberRole;
 using Application.BoardMembers.Queries.GetBoardMembers;
-using Application.Cards.Commands.UpdateCardDeadline;
 using Domain.DTOs.BoardMembers;
-using Domain.DTOs.Lists;
-using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -16,9 +12,9 @@ namespace Presentation.API.Controllers;
 
 [Authorize]
 [Route("api/[controller]")]
-public class BoardMembersControllers : ApiController
+public class BoardMembersController : ApiController
 {
-    public BoardMembersControllers(ISender sender)
+    public BoardMembersController(ISender sender)
         : base(sender)
     {}
     
@@ -40,7 +36,7 @@ public class BoardMembersControllers : ApiController
     }
     
     [HttpPut("{id}/role")]
-    public async Task<IActionResult> UpdateDeadlineAsync(
+    public async Task<IActionResult> UpdateRoleAsync(
         [FromBody] UpdateBoardMemberRoleRequest request,
         [FromRoute] int id,
         CancellationToken cancellationToken)

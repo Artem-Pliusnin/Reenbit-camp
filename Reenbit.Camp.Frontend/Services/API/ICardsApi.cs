@@ -10,6 +10,9 @@ public interface ICardsApi
 {
     [Get("/Cards/list/{id}")]
     Task<ApiResponse<List<CardDto>>> GetByListAsync(int id);
+    
+    [Get("/Cards/{id}")]
+    Task<ApiResponse<CardInfoDto>> GetInfoAsync(int id);
 
     [Post("/Cards")]
     Task<ApiResponse<CardDto>> CreateAsync(
@@ -18,6 +21,11 @@ public interface ICardsApi
     [Put("/Cards/{id}")]
     Task<ApiResponse<object>> UpdateAsync(
         [Body] UpdateCardRequest request,
+        int id);
+    
+    [Put("/Cards/{id}/status")]
+    Task<ApiResponse<object>> UpdateStatusAsync(
+        [Body] UpdateCardStatusRequest request,
         int id);
     
     [Put("/Cards/{id}/position")]

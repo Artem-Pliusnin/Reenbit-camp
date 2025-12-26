@@ -1,6 +1,6 @@
 @using static Telerik.Blazor.ThemeConstants
 
-<div class="card simple-card bg-light" @onclick=@(() => { Console.WriteLine("111111"); })>
+<div class="card simple-card bg-light" @onclick=@OpenCard>
     <div class="card-body simple-card-body d-flex flex-column gap-2">
         <div class="simple-card-title">
             @Card.Title
@@ -12,7 +12,8 @@
                 Id="IsCompleted"
                 @bind-Value=@Card.IsCompleted
                 Rounded=@CheckBox.Rounded.Large
-                Size=@CheckBox.Size.Large/>
+                Size=@CheckBox.Size.Large
+                OnChange=@OnChangeStatus/>
             
             <label for="IsCompleted">
                 @(Card.IsCompleted ? "Completed" : "In progress")
@@ -36,11 +37,87 @@
     </div>
 </div>
 
+<TelerikDialog @bind-Visible=@IsCardOpen ShowCloseButton=@false>
+    <DialogTitle>
+        <div class="w-100 d-flex flex-row justify-content-end">
+            <div class="d-flex flex-row gap-1">
+                <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.MoreHorizontal"
+                               FillMode="ButtonFillMode.Flat"
+                               Class="dialog-icon-button" />
+
+                <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.X"
+                               FillMode="ButtonFillMode.Flat"
+                               Class="dialog-icon-button"
+                               OnClick=@CloseCard />
+            </div>
+        </div>
+    </DialogTitle>
+    <DialogContent>
+        <div class="container-fluid p-0" 
+             style="box-sizing: border-box">
+            <div class="row g-3">
+                <div class="col-12 col-lg-7 p-0">
+                    <CardInfo
+                        @ref=@CardInfoRef
+                        CardId=@Card.Id 
+                        OnCloseWindow=@HandleCradWindowClose></CardInfo>
+                </div>
+                
+                <div class="col-12 col-lg-5 p-0">
+                    <CardComments></CardComments>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+</TelerikDialog>
+
+
+
 <style>
-    
     .k-checkbox:checked, .k-checkbox.k-checked {
         border-color: limegreen;
         color: white;
         background-color: limegreen;
+    }
+
+    .k-dialog {
+        max-width: 90vw;        
+        width: 900px;
+        max-height: 90vh;
+        height: fit-content;
+        overflow-y: scroll;
+    }
+
+    .k-window-content:last-child{
+        padding: 0;
+    }
+
+    @@media (min-width: 1200px) {
+        .k-dialog {
+            width: 1100px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .k-dialog {
+            width: 95vw;
+        }
+    }
+
+    .dialog-icon-button {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: #f1f2f4;
+        border: none;
+        padding: 0;
+    }
+
+    .dialog-icon-button:hover {
+        background-color: #e4e6ea;
+    }
+
+    .dialog-icon-button:focus {
+        box-shadow: none;
     }
 </style>

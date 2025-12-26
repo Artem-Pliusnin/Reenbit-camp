@@ -19,4 +19,8 @@ public class User
     public UserRole Role { get; set; } = UserRole.User;
     
     public List<BoardMember> Boards { get; set; }
+    
+    public List<Invitation> ReceivedInvitations { get; set; }
+    
+    public List<Invitation> SendedInvitations { get; set; }
 }

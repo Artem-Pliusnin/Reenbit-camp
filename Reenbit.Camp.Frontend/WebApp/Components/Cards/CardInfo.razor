@@ -21,20 +21,20 @@ else
 
             @if (!IsEditingTitle)
             {
-            <h4 class="list-title"
-                @onclick=@StartEditTitle>
-                @Card.Title
-            </h4>
+                <h4 class="list-title"
+                    @onclick=@StartEditTitle>
+                    @Card.Title
+                </h4>
             }
             else
             {
-            <input class="form-control form-control-sm task-title-input"
-                   @bind=@InputTitle
-                   @bind:event="oninput"
-                   @onblur=@SaveTitle
-                   @onkeydown=@OnTitleKeyDown
-                   maxlength=50
-                   autofocus />
+                <input class="form-control form-control-sm task-title-input"
+                       @bind=@InputTitle
+                       @bind:event="oninput"
+                       @onblur=@SaveTitle                   
+                       @onkeydown=@OnTitleKeyDown
+                       maxlength=50
+                       autofocus/>
             }
         </div>
 

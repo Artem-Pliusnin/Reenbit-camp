@@ -6,24 +6,24 @@
     }
     else
     {
-    <div class="description-edit">
-                    <textarea class="form-control mb-2"
-                              rows="3"
-                              maxlength="1000"
-                              @bind=@InputComment>
-                    </textarea>
+        <div class="description-edit">
+            <textarea class="form-control mb-2"
+                      rows="3"
+                      maxlength="1000"
+                      @bind=@InputComment>
+            </textarea>
 
-        <div class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm"
-                    @onclick=@SaveComment>
-                Save
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm"
+                        @onclick=@SaveComment>
+                    Save
+                </button>
 
-            <button class="btn btn-light btn-sm"
-                    @onclick=@CancelWritingComment>
-                Cancel
-            </button>
+                <button class="btn btn-light btn-sm"
+                        @onclick=@CancelWritingComment>
+                    Cancel
+                </button>
+            </div>
         </div>
-    </div>
     }
 </div>

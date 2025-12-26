@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IBoardMemberRepository, BoardMemberRepository>();
         services.AddScoped<IListRepository, ListRepository>();
         services.AddScoped<ICardRepository, CardRepository>();
+        services.AddScoped<IInvitationRepository, InvitationRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         

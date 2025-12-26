@@ -3,18 +3,18 @@ using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
-namespace Application.Cards.Commands.UpdateCardPosition;
+namespace Application.Cards.Commands.UpdateCardStatus;
 
-internal class UpdateCardPositionCommandHandler : ICommandHandler<UpdateCardPositionCommand>
+public class UpdateCardStatusCommandHandler : ICommandHandler<UpdateCardStatusCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateCardPositionCommandHandler(IUnitOfWork unitOfWork)
+    public UpdateCardStatusCommandHandler(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<Result> Handle(UpdateCardPositionCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateCardStatusCommand request, CancellationToken cancellationToken)
     {
         var cardRepository = _unitOfWork.GetRepository<ICardRepository>();
         
@@ -28,13 +28,7 @@ internal class UpdateCardPositionCommandHandler : ICommandHandler<UpdateCardPosi
 
         try
         {
-            await cardRepository
-                .MoveCardAsync(
-                    card.Id,
-                    request.NewListId, 
-                    request.NewPosition, 
-                    cancellationToken);
-            
+            card.IsCompleted = request.IsCompleted;
             card.LastUpdatedBy = request.UserId;
             card.LastUpdateDate = DateTime.UtcNow;
             
@@ -46,7 +40,7 @@ internal class UpdateCardPositionCommandHandler : ICommandHandler<UpdateCardPosi
         }
         catch (Exception ex)
         {
-            return Result.Failure(new Error("Card.UpdatePositionFailure", ex.Message));
+            return Result.Failure(new Error("Card.UpdateStatusFailure", ex.Message));
         }
     }
 }

@@ -4,7 +4,9 @@ using Application.Cards.Commands.DeleteCard;
 using Application.Cards.Commands.UpdateCard;
 using Application.Cards.Commands.UpdateCardDeadline;
 using Application.Cards.Commands.UpdateCardPosition;
+using Application.Cards.Commands.UpdateCardStatus;
 using Application.Cards.Queries.GetCardsByList;
+using Application.Cards.Queries.GetFullCardInfo;
 using Domain.DTOs.Cards;
 using Domain.Errors;
 using Domain.Shared;
@@ -33,6 +35,24 @@ public class CardsController : ApiController
         var query = new GetCardsByListQuery(id);
         
         Result<List<CardDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetInfoAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+
+        var query = new GetFullCardInfoQuery(id);
+            
+        Result<CardInfoDto> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -98,6 +118,37 @@ public class CardsController : ApiController
         
         return Ok();
     }
+    
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatusAsync(
+        [FromBody] UpdateCardStatusRequest request,
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null ||
+            !int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+
+        var command = new UpdateCardStatusCommand(
+            id,
+            request.IsCompleted,
+            userId);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
     
     [HttpPut("{id}/position")]
     public async Task<IActionResult> UpdatePositionAsync(

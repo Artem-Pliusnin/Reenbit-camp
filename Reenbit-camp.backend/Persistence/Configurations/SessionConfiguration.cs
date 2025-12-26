@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.Converters;
 
 namespace Persistence.Configurations;
 
@@ -25,6 +26,7 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
 
         builder.Property(s => s.ExpiresOn)
             .HasColumnName("expires_on")
+            .HasConversion(UtcDateTimeConverters.NonNullable)
             .IsRequired();
         
         builder.Property(s => s.UserId)

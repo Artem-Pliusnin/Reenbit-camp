@@ -1,6 +1,8 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Persistence.Converters;
 
 namespace Persistence.Configurations;
 
@@ -37,17 +39,20 @@ public class CardConfiguration : IEntityTypeConfiguration<Card>
             .IsRequired();
         
         builder.Property(c => c.StartDate)
-            .HasColumnName("start_date");
+            .HasColumnName("start_date")
+            .HasConversion(UtcDateTimeConverters.Nullable);
         
         builder.Property(c => c.DueDate)
-            .HasColumnName("due_date");
+            .HasColumnName("due_date")
+            .HasConversion(UtcDateTimeConverters.Nullable);
         
         builder.Property(c => c.LastUpdatedBy)
             .HasColumnName("last_updated_by");
 
         builder.Property(c => c.LastUpdateDate)
             .HasColumnName("last_update_date")
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasDefaultValue(DateTime.UtcNow)
+            .HasConversion(UtcDateTimeConverters.Nullable);
         
         builder.HasOne(c => c.List)
             .WithMany(l => l.Cards)

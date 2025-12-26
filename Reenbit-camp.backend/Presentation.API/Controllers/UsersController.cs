@@ -23,7 +23,7 @@ public class UsersController : ApiController
         : base(sender)
     {}
     
-    [HttpGet]
+    [HttpGet("invitation/suggestions")]
     public async Task<IActionResult> GetInvitationSuggestionsAsync(
         [FromQuery] GetInviteSuggestionRequest request,
         CancellationToken cancellationToken)

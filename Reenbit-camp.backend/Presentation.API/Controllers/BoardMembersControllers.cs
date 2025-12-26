@@ -1,0 +1,59 @@
+using System.Security.Claims;
+using Application.BoardMembers.Commands.UpdateBoardMemberRole;
+using Application.BoardMembers.Queries.GetBoardMembers;
+using Application.Cards.Commands.UpdateCardDeadline;
+using Domain.DTOs.BoardMembers;
+using Domain.DTOs.Lists;
+using Domain.Errors;
+using Domain.Shared;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Presentation.API.Abstractions;
+using Presentation.API.Contracts.BoardMembers;
+
+namespace Presentation.API.Controllers;
+
+[Authorize]
+[Route("api/[controller]")]
+public class BoardMembersControllers : ApiController
+{
+    public BoardMembersControllers(ISender sender)
+        : base(sender)
+    {}
+    
+    [HttpGet("board/{id}")]
+    public async Task<IActionResult> GetByBoardAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetBoardMembersQuery(id);
+        
+        Result<List<BoardMemberDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpPut("{id}/role")]
+    public async Task<IActionResult> UpdateDeadlineAsync(
+        [FromBody] UpdateBoardMemberRoleRequest request,
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateBoardMemberRoleCommand(id, request.Role);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+}

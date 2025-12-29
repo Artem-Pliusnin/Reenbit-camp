@@ -1,0 +1,10 @@
+.logout-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(240, 240, 240);
+    border-radius: 50%;
+    height: 2rem;
+    width: 2rem;
+    box-sizing: border-box;
+}

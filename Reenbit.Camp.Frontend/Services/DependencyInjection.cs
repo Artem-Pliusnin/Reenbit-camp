@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IBoardsService, BoardsService>();
         services.AddScoped<IListsService, ListsService>();
         services.AddScoped<ICardsService, CardsService>();
+        services.AddScoped<IInvitationsService, InvitationsService>();
         
         services.AddScoped<TokenHandler>();
 
@@ -43,6 +44,10 @@ public static class DependencyInjection
             .AddHttpMessageHandler<TokenHandler>();
         
         services.AddRefitClient<ICardsApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
+        
+        services.AddRefitClient<IInvitationApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
             .AddHttpMessageHandler<TokenHandler>();
 

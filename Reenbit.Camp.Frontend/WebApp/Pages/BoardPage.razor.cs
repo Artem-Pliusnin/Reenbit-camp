@@ -16,11 +16,18 @@ public partial class BoardPage : ComponentBase
 
     private BoardInfoModel Board = new();
 
-    private bool isLoading = false;
+    private bool isLoading;
     
-    private bool IsEditingTitle = false;
+    private bool IsEditingTitle;
+    
+    private bool IsMembersDialogOpen;
     
     private string TitleInput = string.Empty;
+    
+    private void OpenMembersDialog()
+    {
+        IsMembersDialogOpen = true;
+    }
 
     private void StartEditTitle()
     {

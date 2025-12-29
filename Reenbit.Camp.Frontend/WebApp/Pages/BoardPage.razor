@@ -29,6 +29,11 @@ else
                        maxlength=50
                        autofocus />
             }
+            <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.User
+                           FillMode="ButtonFillMode.Flat"
+                           OnClick="@OpenMembersDialog">
+                Members
+            </TelerikButton>
         </div>
 
         <div class="board-content">
@@ -38,3 +43,31 @@ else
         </div>
     </div> 
 }
+
+<TelerikDialog @bind-Visible="@IsMembersDialogOpen"
+               Width="80rem"
+               ShowCloseButton="true">
+
+    <DialogTitle>
+        Board members
+    </DialogTitle>
+
+    <DialogContent>
+        <div class="container-fluid">
+            <div class="row g-3">
+
+                <!-- MEMBERS LIST -->
+                <div class="col-12 col-md-7">
+                    <BoardMembersList BoardId="@Board.Id" />
+                </div>
+
+                <!-- INVITE FORM -->
+                <div class="col-12 col-md-5">
+                    <BoardInviteForm BoardId="@Board.Id" />
+                </div>
+
+            </div>
+        </div>
+    </DialogContent>
+</TelerikDialog>
+

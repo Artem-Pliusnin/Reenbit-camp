@@ -1,0 +1,38 @@
+@using Domain.Enums
+<div class="members-list">
+    @if (IsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else
+    {
+        @foreach (var member in Members)
+        {
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                    <strong>@member.User.UserName</strong>
+                    <div class="text-muted small">@member.User.Email</div>
+                </div>
+
+                <TelerikDropDownList Data=@GetAvailableRoles(member)
+                                     @bind-Value=@member.Role
+                                     Enabled=@CanChangeRole(member)
+                                     OnChange=@(() => OnRoleChanged(member))
+                                     Width="10rem" />
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .k-list-container .k-list .k-list-content{
+        height: fit-content !important;
+    }
+
+    .k-popup{
+        height: fit-content !important;
+    }
+    
+</style>

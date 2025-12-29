@@ -1,5 +1,6 @@
 @page "/board/{boardId:int}"
 @using WebApp.Components.Boards
+@using WebApp.Components.BoardMembers
 
 @if(isLoading)
 {
@@ -44,30 +45,33 @@ else
     </div> 
 }
 
-<TelerikDialog @bind-Visible="@IsMembersDialogOpen"
-               Width="80rem"
-               ShowCloseButton="true">
-
+<TelerikDialog @bind-Visible=@IsMembersDialogOpen ShowCloseButton=@false Width="80vw">
     <DialogTitle>
-        Board members
+        <div class="w-100 d-flex flex-row justify-content-between">
+            <h4>Board members</h4>
+            <div class="d-flex flex-row gap-1">
+                <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.X
+                               FillMode="ButtonFillMode.Flat"
+                               Class="dialog-icon-button"
+                               OnClick=@CloseMembersDialog/>
+            </div>
+        </div>
     </DialogTitle>
 
     <DialogContent>
-        <div class="container-fluid">
-            <div class="row g-3">
+        <CascadingValue Name="CurrentUser" Value=@CurrentBoardMember>
+            <div class="container-fluid">
+                <div class="row g-3">
+                    <div class="col-12 col-md-7">
+                        <BoardMembersList BoardId="@Board.Id"></BoardMembersList>
+                    </div>
 
-                <!-- MEMBERS LIST -->
-                <div class="col-12 col-md-7">
-                    <BoardMembersList BoardId="@Board.Id" />
+                    <div class="col-12 col-md-5">
+                        <BoardInviteForm/>
+                    </div>
                 </div>
-
-                <!-- INVITE FORM -->
-                <div class="col-12 col-md-5">
-                    <BoardInviteForm BoardId="@Board.Id" />
-                </div>
-
             </div>
-        </div>
+        </CascadingValue>
     </DialogContent>
 </TelerikDialog>
 

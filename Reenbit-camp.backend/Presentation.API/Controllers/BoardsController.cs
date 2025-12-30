@@ -16,9 +16,8 @@ using Presentation.API.Contracts.Boards;
 
 namespace Presentation.API.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
-public class BoardsController : ApiController
+public class BoardsController : AuthorizedContoller
 {
     public BoardsController(ISender sender)
         : base(sender)
@@ -29,10 +28,7 @@ public class BoardsController : ApiController
         [FromBody] CreateBoardRequest request, 
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -55,10 +51,7 @@ public class BoardsController : ApiController
         [FromQuery] GetBoardsQueryParameters queryParameters,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -106,10 +99,7 @@ public class BoardsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));

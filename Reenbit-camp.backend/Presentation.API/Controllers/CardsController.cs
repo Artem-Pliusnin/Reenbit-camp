@@ -18,10 +18,9 @@ using Presentation.API.Contracts.Cards;
 
 namespace Presentation.API.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
 
-public class CardsController : ApiController
+public class CardsController : AuthorizedContoller
 {
     public CardsController(ISender sender)
         : base(sender)
@@ -49,7 +48,6 @@ public class CardsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-
         var query = new GetFullCardInfoQuery(id);
             
         Result<CardInfoDto> result = await Sender.Send(query, cancellationToken);
@@ -67,10 +65,7 @@ public class CardsController : ApiController
         [FromBody] CreateCardRequest request, 
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -94,10 +89,7 @@ public class CardsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -125,10 +117,7 @@ public class CardsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -156,10 +145,7 @@ public class CardsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -183,10 +169,7 @@ public class CardsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));

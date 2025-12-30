@@ -1,35 +1,57 @@
 using System.Security.Claims;
-using Application.Lists.Commands.CreateList;
-using Application.Lists.Commands.DeleteList;
-using Application.Lists.Commands.UpdateList;
-using Application.Lists.Commands.UpdateListPosition;
-using Application.Lists.Queries.GetListsByBoard;
-using Domain.DTOs.Lists;
+using Application.Invitations.Commands.AcceptInvitation;
+using Application.Invitations.Commands.CreateInvitation;
+using Application.Invitations.Commands.DeclinedInvitation;
+using Application.Invitations.Commands.DeleteInvitation;
+using Application.Invitations.Queries.GetInvitationsByBoard;
+using Application.Invitations.Queries.GetUserInvitations;
+using Domain.DTOs.Invitations;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
-using Presentation.API.Contracts.List;
+using Presentation.API.Contracts.Invitations;
 
 namespace Presentation.API.Controllers;
 
 [Route("api/[controller]")]
-public class ListsController : AuthorizedContoller
+public class InvitationsController : AuthorizedContoller
 {
-    public ListsController(ISender sender)
+    public InvitationsController(ISender sender)
         : base(sender)
     {}
     
+    [HttpGet]
+    public async Task<IActionResult> GetByUserAsync(CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new GetUserInvitationsQuery(userId);
+        
+        Result<List<InvitationDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
     [HttpGet("board/{id}")]
     public async Task<IActionResult> GetByBoardAsync(
-        [FromRoute] int id,
+        [FromRoute] int id, 
         CancellationToken cancellationToken)
     {
-        var query = new GetListsByBoardQuery(id);
+        var query = new GetInvitationsByBoardQuery(id);
         
-        Result<List<ListDto>> result = await Sender.Send(query, cancellationToken);
+        Result<List<InvitationDto>> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -41,7 +63,7 @@ public class ListsController : AuthorizedContoller
     
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
-        [FromBody] CreateListRequest request, 
+        [FromBody] CreateInvitationRequest request, 
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))
@@ -50,9 +72,12 @@ public class ListsController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new CreateListCommand(request.BoardId, request.Title, userId);
+        var command = new CreateInvitationCommand(
+            request.BoardId, 
+            request.InvitedUserId, 
+            userId);
         
-        Result<ListDto> result = await Sender.Send(command, cancellationToken);
+        Result<InvitationDto> result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -61,10 +86,9 @@ public class ListsController : AuthorizedContoller
         
         return Ok(result.Value);
     }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(
-        [FromBody] UpdateListRequest request,
+    
+    [HttpPut("{id}/accept")]
+    public async Task<IActionResult> AcceptInvitationAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
@@ -74,7 +98,7 @@ public class ListsController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new UpdateListCommand(userId, id, request.Title);
+        var command = new AcceptInvitationCommand(userId, id);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -86,10 +110,8 @@ public class ListsController : AuthorizedContoller
         return Ok();
     }
     
-    
-    [HttpPut("{id}/position")]
-    public async Task<IActionResult> UpdatePositionAsync(
-        [FromBody] UpdateListPositionRequest request,
+    [HttpPut("{id}/decline")]
+    public async Task<IActionResult> DeclineInvitationAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
@@ -99,7 +121,7 @@ public class ListsController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new UpdateListPositionCommand(id, request.NewPosition, userId);
+        var command = new DeclineInvitationCommand(userId, id);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -110,14 +132,13 @@ public class ListsController : AuthorizedContoller
         
         return Ok();
     }
-
-
+    
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteListCommand(id);
+        var command = new DeleteInvitationCommand(id);
         
         Result result = await Sender.Send(command, cancellationToken);
         

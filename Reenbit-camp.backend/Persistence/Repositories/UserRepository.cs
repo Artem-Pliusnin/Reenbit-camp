@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
@@ -21,5 +22,35 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
     public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _dbSet.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
+
+    public async Task<List<User>> GetForInvitationAsync(
+        int boardId, 
+        int userId, 
+        string? query, 
+        int limit = 5,
+        CancellationToken cancellationToken = default)
+    {
+        var usersQuery = _dbSet
+            .Where(u => u.Id != userId)
+            .Where(u => !u.Boards.Any(b => b.BoardId == boardId))
+            .Where(u => !u.ReceivedInvitations.Any(i => 
+                i.BoardId == boardId && 
+                i.Status == InvitationStatus.Pending));
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return new List<User>();
+        }
+        
+        var search = query.Trim().ToLowerInvariant();
+        usersQuery = usersQuery.Where(u => 
+            (u.FirstName + " " + u.LastName).ToLower().Contains(search) 
+            || u.Email.ToLower().Contains(search));
+        
+        return await usersQuery
+            .OrderBy(u => (u.FirstName + " " + u.LastName))
+            .Take(limit)
+            .ToListAsync(cancellationToken);
     }
 }

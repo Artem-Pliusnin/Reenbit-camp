@@ -15,4 +15,6 @@ public interface IInvitationsService
     Task<Result<object>> AcceptInvitationAsync(int id);
     
     Task<Result<object>> DeclineInvitationAsync(int id);
+    
+    Task<Result<object>> DeleteAsync(int id);
 }

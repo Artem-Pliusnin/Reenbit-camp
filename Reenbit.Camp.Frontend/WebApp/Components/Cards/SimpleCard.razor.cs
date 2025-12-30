@@ -36,7 +36,7 @@ public partial class SimpleCard : ComponentBase
         IsCardOpen = false;
     }
     
-    private async Task HandleCradWindowClose(UpdateCardModel updateCardModel)
+    private async Task HandleCardWindowClose(UpdateCardModel updateCardModel)
     {
         Card.Title = updateCardModel.Title;
         Card.IsCompleted = updateCardModel.IsCompleted;

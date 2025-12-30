@@ -10,7 +10,7 @@ public static class HandleResultExtensions
     {
         if (response.IsSuccessStatusCode)
         {
-            return response.Content;
+            return Result.Success(response.Content);
         }
 
         var error = response.GetApiErrorAsync();
@@ -28,7 +28,8 @@ public static class HandleResultExtensions
             {
                 mapped = mapFunc(response.Content);
             }
-            return mapped;
+            
+            return Result.Success<TResult>(mapped);
         }
 
         var error = response.GetApiErrorAsync(); 

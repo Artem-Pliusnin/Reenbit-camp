@@ -11,4 +11,6 @@ public interface IBoardMembersService
     Task<Result<BoardMemberModel>> GeCurrentAsync(int boardId);
 
     Task<Result<object>> UpdateRoleAsync(int id, UpdateBoardMemberRoleRequest request);
+    
+    Task<Result<object>> DeleteAsync(int id);
 }

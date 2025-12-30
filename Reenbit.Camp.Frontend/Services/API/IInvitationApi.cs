@@ -22,4 +22,7 @@ public interface IInvitationApi
     
     [Put("/Invitations/{id}/decline")]
     Task<ApiResponse<object>> DeclineInvitationAsync(int id);
+    
+    [Delete("/Invitations/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int id);
 }

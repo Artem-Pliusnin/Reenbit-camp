@@ -16,11 +16,21 @@
                     <div class="text-muted small">@member.User.Email</div>
                 </div>
 
-                <TelerikDropDownList Data=@GetAvailableRoles(member)
-                                     @bind-Value=@member.Role
-                                     Enabled=@CanChangeRole(member)
-                                     OnChange=@(() => OnRoleChanged(member))
-                                     Width="10rem" />
+                <div class="d-flex align-items-center gap-2">
+                    <TelerikDropDownList Data=@GetAvailableRoles(member)
+                                         @bind-Value=@member.Role
+                                         Enabled=@CanChangeRole(member)
+                                         OnChange=@(() => OnRoleChanged(member))
+                                         Width="8rem" />
+
+                    @if (CanRemove(member))
+                    {
+                    <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Trash
+                                   Class="delete-button"
+                                   Size="ButtonSize.Small"
+                                   OnClick=@(() => RemoveMember(member))/>
+                    }
+                </div>
             </div>
         }
     }
@@ -33,6 +43,24 @@
 
     .k-popup{
         height: fit-content !important;
+    }
+
+    .delete-button {
+        background-color: transparent;
+        height: fit-content;
+        width: fit-content;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .delete-button:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .delete-button:focus {
+        box-shadow: none;
     }
     
 </style>

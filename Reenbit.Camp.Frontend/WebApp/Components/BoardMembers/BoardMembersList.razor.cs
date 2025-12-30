@@ -55,6 +55,14 @@ public partial class BoardMembersList : ComponentBase
                 (int)CurrentUser.Role < (int)member.Role;
     }
     
+    private bool CanRemove(BoardMemberModel member)
+    {
+        return member.Id != CurrentUser.Id &&
+               (CurrentUser.Role == BoardRole.Owner || 
+                CurrentUser.Role == BoardRole.Admin ) &&
+               (int)CurrentUser.Role < (int)member.Role;
+    }
+    
     private async Task OnRoleChanged(BoardMemberModel member)
     {
             await BoardMembersService.UpdateRoleAsync(
@@ -65,5 +73,16 @@ public partial class BoardMembersList : ComponentBase
         );
         
         StateHasChanged();
+    }
+
+    private async Task RemoveMember(BoardMemberModel member)
+    {
+        var result = await BoardMembersService.DeleteAsync(member.Id);
+
+        if (result.IsSuccess)
+        {
+            Members.Remove(member);
+            StateHasChanged();
+        }
     }
 }

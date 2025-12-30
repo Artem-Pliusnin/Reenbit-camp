@@ -56,4 +56,11 @@ public class InvitationsService : IInvitationsService
 
         return response.HandleResult();
     }
+    
+    public async Task<Result<object>> DeleteAsync(int id)
+    {
+        var response = await _invitationApi.DeleteAsync(id);
+
+        return response.HandleResult();
+    }
 }

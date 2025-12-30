@@ -1,4 +1,6 @@
 using System.Timers;
+using Domain.Enums;
+using Domain.Models.BoardMembers;
 using Domain.Models.Invitations;
 using Domain.Models.Users;
 using Domain.Requests.Invitations;
@@ -14,6 +16,9 @@ public partial class BoardInviteForm : ComponentBase
 {
     [Parameter, EditorRequired]
     public int BoardId { get; set; }
+    
+    [CascadingParameter(Name="CurrentUser")]
+    private BoardMemberModel CurrentUser { get; set; }
     
     [Inject] 
     public IUsersService UsersService { get; set; } = default!;
@@ -86,5 +91,22 @@ public partial class BoardInviteForm : ComponentBase
         }
         
         IsInvitationsLoading = false;
+    }
+    
+    private bool CanRemove()
+    {
+        return CurrentUser.Role == BoardRole.Owner ||
+               CurrentUser.Role == BoardRole.Admin;
+    }
+    
+    private async Task RemoveInvitation(InvitationModel invitation)
+    {
+        var result = await InvitationsService.DeleteAsync(invitation.Id);
+
+        if (result.IsSuccess)
+        {
+            PendingInvitations.Remove(invitation);
+            StateHasChanged();
+        }
     }
 }

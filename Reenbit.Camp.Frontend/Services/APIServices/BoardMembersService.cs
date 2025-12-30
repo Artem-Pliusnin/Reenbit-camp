@@ -41,4 +41,11 @@ public class BoardMembersService : IBoardMembersService
 
         return response.HandleResult();
     }
+    
+    public async Task<Result<object>> DeleteAsync(int id)
+    {
+        var response = await _boardMembersApi.DeleteAsync(id);
+
+        return response.HandleResult();
+    }
 }

@@ -60,14 +60,14 @@ else
 
     <DialogContent>
         <CascadingValue Name="CurrentUser" Value=@CurrentBoardMember>
-            <div class="container-fluid">
+            <div class="container-fluid py-3">
                 <div class="row g-3">
-                    <div class="col-12 col-md-7">
-                        <BoardMembersList BoardId="@Board.Id"></BoardMembersList>
+                    <div class="col-12 col-md-7 left-container">
+                        <BoardMembersList BoardId=@Board.Id></BoardMembersList>
                     </div>
 
                     <div class="col-12 col-md-5">
-                        <BoardInviteForm/>
+                        <BoardInviteForm BoardId=@Board.Id></BoardInviteForm>
                     </div>
                 </div>
             </div>

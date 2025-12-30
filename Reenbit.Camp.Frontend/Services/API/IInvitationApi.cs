@@ -9,6 +9,9 @@ public interface IInvitationApi
 {
     [Get("/Invitations")]
     Task<ApiResponse<List<InvitationDto>>> GetByUserAsync();
+    
+    [Get("/Invitations/board/{id}")]
+    Task<ApiResponse<List<InvitationDto>>> GetByBoardAsync(int id);
 
     [Post("/Invitations")]
     Task<ApiResponse<InvitationDto>> CreateAsync(

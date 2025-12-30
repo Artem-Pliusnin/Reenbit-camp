@@ -1,0 +1,56 @@
+
+<div class="d-flex flex-column mb-2">
+    <h6>Invite users</h6>
+
+    <input class="form-control mb-3"
+           placeholder="Username or email"
+           @bind=@InputUser
+                      @bind:event="oninput"
+           @onkeyup=@ResetTimer/>
+
+    @if (Suggestions.Any())
+    {
+        <div class="mt-2 recommended-list">
+            @foreach (var user in Suggestions)
+            {
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div>
+                        <strong>@user.UserName</strong>
+                        <div class="text-muted small">@user.Email</div>
+                    </div>   
+
+                    <TelerikButton Size="ButtonSize.Small"
+                                   OnClick=@(() => Invite(user.Id))>
+                        Invite
+                    </TelerikButton>
+                </div>
+            }
+        </div>
+    }
+</div>
+<div class="invitations-list">
+    <h6>Pending invitations</h6>
+
+    @if (IsInvitationsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center"> 
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else if (!PendingInvitations.Any())
+    {
+        <div class="text-muted small">
+            No pending invitations
+        </div>
+    }
+    else
+    {
+        @foreach (var invitation in PendingInvitations)
+        {
+            <div class="d-flex flex-column mb-2">
+                <strong>@invitation.InvitedUser.UserName</strong>
+                <div class="text-muted small">@invitation.InvitedUser.Email</div>
+            </div>
+        }
+    }
+</div>

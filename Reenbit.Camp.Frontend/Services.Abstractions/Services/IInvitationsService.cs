@@ -10,6 +10,8 @@ public interface IInvitationsService
     
     Task<Result<List<InvitationModel>>> GetByUserAsync();
     
+    Task<Result<List<InvitationModel>>> GetByBoardAsync(int boardId);
+    
     Task<Result<object>> AcceptInvitationAsync(int id);
     
     Task<Result<object>> DeclineInvitationAsync(int id);

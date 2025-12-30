@@ -35,6 +35,14 @@ public class InvitationsService : IInvitationsService
             => _mapper.Map<List<InvitationModel>>(content));
     }
 
+    public async Task<Result<List<InvitationModel>>> GetByBoardAsync(int boardId)
+    {
+        var response = await _invitationApi.GetByBoardAsync(boardId);
+
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<List<InvitationModel>>(content));
+    }
+
     public async Task<Result<object>> AcceptInvitationAsync(int id)
     {
         var response = await _invitationApi.AcceptInvitationAsync(id);

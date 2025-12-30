@@ -47,30 +47,6 @@ public partial class BoardInvitationsMenu : ComponentBase
         if (result.IsSuccess)
         {
             Invitations = result.Value;
-            Invitations.Add(new InvitationModel()
-            {
-                Id = 1,
-                Board = new BoardModel()
-                {
-                    Id = 1,
-                    Title = "New Board",
-                },
-                InvitedByUser = new UserModel()
-                {
-                    Id = 1,
-                    Avatar = null,
-                    Email = "admin@admin.com",
-                    UserName = "Artem Pliusnin"
-                },
-                InvitedUser = new UserModel()
-                {
-                    Id = 1,
-                    Avatar = null,
-                    Email = "admin@admin.com",
-                    UserName = "Artem Pliusnin"
-                },
-                SentDate = DateTime.UtcNow,
-            });
         }
     }
 

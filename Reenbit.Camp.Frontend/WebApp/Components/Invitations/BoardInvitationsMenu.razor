@@ -13,8 +13,8 @@
             
             @if (IsLoading)
             {
-                <div class="text-center p-3">
-                    <TelerikLoader Size="LoaderSize.Small"/>
+                <div class="d-flex justify-content-center align-items-center"> 
+                    <div class="spinner-border text-primary" role="status"></div>
                 </div>
             }
             else if (!Invitations.Any())

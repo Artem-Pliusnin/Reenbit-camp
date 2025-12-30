@@ -1,0 +1,14 @@
+.recommended-list{
+    height: fit-content;
+    max-height: 15rem;
+    overflow-y: scroll;
+}
+
+.invitations-list{
+    height: fit-content;
+    max-height: 20rem;
+    overflow-y: scroll;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgb(209, 209, 209);
+    box-sizing: border-box;
+}

@@ -1,3 +1,4 @@
+using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Requests.Boards;
 using Microsoft.AspNetCore.Components;
@@ -13,14 +14,31 @@ public partial class BoardPage : ComponentBase
     
     [Inject] 
     public IBoardsService BoardsService { get; set; } = default!;
+    
+    [Inject] 
+    public IBoardMembersService BoardMemberService { get; set; } = default!;
 
     private BoardInfoModel Board = new();
 
-    private bool isLoading = false;
+    private BoardMemberModel CurrentBoardMember = new();
+
+    private bool isLoading;
     
-    private bool IsEditingTitle = false;
+    private bool IsEditingTitle;
+    
+    private bool IsMembersDialogOpen;
     
     private string TitleInput = string.Empty;
+    
+    private void OpenMembersDialog()
+    {
+        IsMembersDialogOpen = true;
+    }
+    
+    private void CloseMembersDialog()
+    {
+        IsMembersDialogOpen = false;
+    }
 
     private void StartEditTitle()
     {
@@ -63,12 +81,20 @@ public partial class BoardPage : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         isLoading = true;
-        var result = await BoardsService.GetInfoAsync(BoardId);
+        var boardResult = await BoardsService.GetInfoAsync(BoardId);
 
-        if (result.IsSuccess)
+        if (boardResult.IsSuccess)
         {
-            Board = result.Value;
-            isLoading = false;
+            Board = boardResult.Value;
         }
+        
+        var memberResult = await BoardMemberService.GeCurrentAsync(BoardId);
+        
+        if (memberResult.IsSuccess)
+        {
+            CurrentBoardMember = memberResult.Value;
+        }
+        
+        isLoading = false;
     }
 }

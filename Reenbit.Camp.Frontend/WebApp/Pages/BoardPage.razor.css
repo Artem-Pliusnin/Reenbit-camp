@@ -42,4 +42,13 @@
     font-weight: 500;
 }
 
+.left-container {
+    border-right: none;
+}
+
+@media (min-width: 768px){
+    .left-container {
+        border-right: 1px solid rgb(209, 209, 209);
+    }
+}
 

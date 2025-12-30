@@ -1,19 +1,24 @@
 ﻿@using WebApp.Components.Auth
+@using WebApp.Components.Invitations
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <AuthorizeView>
-            <Authorized>
-                <a class="navbar-brand" href="">@context.User.Identity?.Name</a>
-                
-                <Logout></Logout>
-            </Authorized>
-            
-            <NotAuthorized>
-                <RedirectToLogin></RedirectToLogin>
-            </NotAuthorized>
-        </AuthorizeView>
-        
+<div class="top-row px-3 navbar navbar-dark">
+    <div class="w-100 d-flex justify-content-between">
+        <div class="d-flex gap-2 justify-content-start">
+            <AuthorizeView>
+                <Authorized>
+                    <Logout></Logout>
+
+                    <a class="navbar-brand" href="">@context.User.Identity?.Name</a>
+
+                    <BoardInvitationsMenu></BoardInvitationsMenu>
+                </Authorized>
+
+                <NotAuthorized>
+                    <RedirectToLogin></RedirectToLogin>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>

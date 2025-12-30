@@ -25,4 +25,6 @@ public class Card
     public List List { get; set; }
     
     public User? LastUpdatedByUser { get; set; }
+    
+    public List<CardLabel> Labels { get; set; }
 }

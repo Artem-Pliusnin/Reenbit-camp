@@ -20,4 +20,6 @@ public class Board
     public List<Invitation> Invitations { get; set; }
     public List<BoardMember> Members { get; set; }
     public List<List> Lists { get; set; }
+    
+    public List<Label> Labels { get; set; }
 }

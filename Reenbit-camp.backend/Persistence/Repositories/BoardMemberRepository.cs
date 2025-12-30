@@ -18,6 +18,16 @@ public class BoardMemberRepository :
         CancellationToken cancellationToken = default)
     {
         return await _dbSet.Where(bm => bm.BoardId == boardId)
+            .Include(bm => bm.Board)
+            .Include(bm => bm.User)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<BoardMember?> GetByUserAndBoardIdAsync(int userId, int boardId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Where(bm => bm.BoardId == boardId && bm.UserId == userId)
+            .Include(bm => bm.Board)
+            .Include(bm => bm.User)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

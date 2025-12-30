@@ -17,7 +17,19 @@ public class LabelRepository :
         int boardId, 
         CancellationToken cancellationToken = default)
     {
-        return await _dbSet.Where(label => label.BoardId == boardId)
+        return await _dbSet.Where(l => l.BoardId == boardId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Label>> GetNotСonnectedToCardAsync(
+        int cardId,
+        int boardId,
+        CancellationToken cancellationToken = default)
+    {
+        
+        return await _dbSet
+            .Where(l => l.BoardId == boardId)
+            .Where(l => !l.CardLabels.Any(cl => cl.CardId == cardId))
             .ToListAsync(cancellationToken);
     }
 }

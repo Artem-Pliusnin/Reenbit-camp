@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Application.BoardMembers.Commands.DeleteBoardMember;
 using Application.BoardMembers.Commands.UpdateBoardMemberRole;
 using Application.BoardMembers.Queries.GetBoardMembers;
 using Application.BoardMembers.Queries.GetСurrentBoardMember;
@@ -71,6 +72,23 @@ public class BoardMembersController : ApiController
         CancellationToken cancellationToken)
     {
         var command = new UpdateBoardMemberRoleCommand(id, request.Role);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteBoardMemberCommand(id);
         
         Result result = await Sender.Send(command, cancellationToken);
         

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Application.Invitations.Commands.AcceptInvitation;
 using Application.Invitations.Commands.CreateInvitation;
 using Application.Invitations.Commands.DeclinedInvitation;
+using Application.Invitations.Commands.DeleteInvitation;
 using Application.Invitations.Queries.GetInvitationsByBoard;
 using Application.Invitations.Queries.GetUserInvitations;
 using Domain.DTOs.Invitations;
@@ -134,6 +135,23 @@ public class InvitationsController : ApiController
         }
 
         var command = new DeclineInvitationCommand(userId, id);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteInvitationCommand(id);
         
         Result result = await Sender.Send(command, cancellationToken);
         

@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Persistence.Converters;
 
 namespace Persistence.Configurations;
 
@@ -33,7 +34,8 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
         
         builder.Property(i => i.CreatedAt)
             .HasColumnName("created_at")
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasDefaultValue(DateTime.UtcNow)
+            .HasConversion(UtcDateTimeConverters.NonNullable);
         
         builder.Property(i => i.RespondedAt)
             .HasColumnName("responded_at");

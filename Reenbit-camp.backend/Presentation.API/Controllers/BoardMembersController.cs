@@ -14,9 +14,8 @@ using Presentation.API.Contracts.BoardMembers;
 
 namespace Presentation.API.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
-public class BoardMembersController : ApiController
+public class BoardMembersController : AuthorizedContoller
 {
     public BoardMembersController(ISender sender)
         : base(sender)
@@ -44,10 +43,7 @@ public class BoardMembersController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));

@@ -16,9 +16,8 @@ using Presentation.API.Contracts.Invitations;
 
 namespace Presentation.API.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
-public class InvitationsController : ApiController
+public class InvitationsController : AuthorizedContoller
 {
     public InvitationsController(ISender sender)
         : base(sender)
@@ -27,10 +26,7 @@ public class InvitationsController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetByUserAsync(CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -70,10 +66,7 @@ public class InvitationsController : ApiController
         [FromBody] CreateInvitationRequest request, 
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -99,10 +92,7 @@ public class InvitationsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));
@@ -125,10 +115,7 @@ public class InvitationsController : ApiController
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));

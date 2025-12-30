@@ -15,9 +15,8 @@ using Presentation.API.Contracts.Users;
 
 namespace Presentation.API.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
-public class UsersController : ApiController
+public class UsersController : AuthorizedContoller
 {
     public UsersController(ISender sender)
         : base(sender)
@@ -28,10 +27,7 @@ public class UsersController : ApiController
         [FromQuery] GetInviteSuggestionRequest request,
         CancellationToken cancellationToken)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim == null ||
-            !int.TryParse(userIdClaim.Value, out var userId))
+        if (!TryGetUserId(out var userId))
         {
             return  HandleUnauthorized(
                 Result.Failure(UserErrors.UserUnauthorized));

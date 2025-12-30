@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Application.Invitations.Commands.AcceptInvitation;
 using Application.Invitations.Commands.CreateInvitation;
 using Application.Invitations.Commands.DeclinedInvitation;
+using Application.Invitations.Queries.GetInvitationsByBoard;
 using Application.Invitations.Queries.GetUserInvitations;
 using Domain.DTOs.Invitations;
 using Domain.Errors;
@@ -35,6 +36,23 @@ public class InvitationsController : ApiController
         }
         
         var query = new GetUserInvitationsQuery(userId);
+        
+        Result<List<InvitationDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("board/{id}")]
+    public async Task<IActionResult> GetByBoardAsync(
+        [FromRoute] int id, 
+        CancellationToken cancellationToken)
+    {
+        var query = new GetInvitationsByBoardQuery(id);
         
         Result<List<InvitationDto>> result = await Sender.Send(query, cancellationToken);
         

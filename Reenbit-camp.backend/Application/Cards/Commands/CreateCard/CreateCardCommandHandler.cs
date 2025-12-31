@@ -18,7 +18,6 @@ internal class CreateCardCommandHandler : ICommandHandler<CreateCardCommand, Car
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
-
     
     public async Task<Result<CardDto>> Handle(
         CreateCardCommand request, 

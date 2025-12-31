@@ -12,6 +12,15 @@ public class CardRepository :
     public CardRepository(TrelloAppDbContext context) 
         : base(context)
     {}
+    
+    public async Task<Card?> GetByIdWithListAsync(
+        int cardId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(c => c.List)
+            .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken);
+    }
 
     public async Task<List<Card>> GetByListIdAsync(
         int listId, 

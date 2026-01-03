@@ -1,4 +1,5 @@
 @using Telerik.SvgIcons
+@using WebApp.Components.Labels
 
 @if (isLoading)
 {
@@ -83,7 +84,7 @@ else
         </div>
 
         <div class="mb-3">
-            <h5 class="fw-semibold mb-2">Labels</h5>
+            <CardLabelsSection OnUpdateLabels=@UpdateCardLabels CardId=@CardId></CardLabelsSection>
         </div>
     </div>
         

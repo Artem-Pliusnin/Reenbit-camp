@@ -1,3 +1,5 @@
+using Domain.Models.Labels;
+
 namespace Domain.Models.Cards;
 
 public class CardModel
@@ -12,4 +14,6 @@ public class CardModel
     public DateTime? StartDate { get; set; }
     
     public DateTime? DueDate { get; set; }
+    
+    public List<CardLabelModel> Labels { get; set; }
 }

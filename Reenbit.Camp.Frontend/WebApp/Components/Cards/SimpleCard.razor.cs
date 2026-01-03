@@ -1,3 +1,4 @@
+using Domain.Models.Boards;
 using Domain.Models.Cards;
 using Domain.Requests.Cards;
 using Microsoft.AspNetCore.Components;
@@ -8,6 +9,9 @@ namespace WebApp.Components.Cards;
 
 public partial class SimpleCard : ComponentBase
 {
+    [CascadingParameter]
+    public BoardInfoModel Board { get; set; } = default!;
+
     [Parameter, EditorRequired]
     public CardModel Card { get; set; }
 
@@ -42,6 +46,7 @@ public partial class SimpleCard : ComponentBase
         Card.IsCompleted = updateCardModel.IsCompleted;
         Card.StartDate = updateCardModel.StartDate;
         Card.DueDate = updateCardModel.DueDate;
+        Card.Labels = updateCardModel.Labels;
 
         await InvokeAsync(StateHasChanged);
     }

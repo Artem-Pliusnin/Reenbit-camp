@@ -14,6 +14,9 @@ public partial class CardLabelsSection : ComponentBase
     
     [Parameter, EditorRequired] 
     public int CardId { get; set; }
+    
+    [Parameter, EditorRequired] 
+    public EventCallback<List<CardLabelModel>> OnUpdateLabels { get; set; }
 
     private List<CardLabelModel> CardLabels { get; set; } = new();
     
@@ -37,7 +40,7 @@ public partial class CardLabelsSection : ComponentBase
     private void ResetCreateForm()
     {
         NewLabelText = string.Empty;
-        NewLabelColor = "#ffffff";
+        NewLabelColor = "#ffffffff";
     }
     
     private void OpenAddMenu()
@@ -93,6 +96,7 @@ public partial class CardLabelsSection : ComponentBase
         {
             CardLabels.Remove(cardLabel);
             AvailableLabels.Add(cardLabel.Label);
+            await OnUpdateLabels.InvokeAsync(CardLabels);
         }
         
         PopoverRef?.Refresh();
@@ -107,6 +111,7 @@ public partial class CardLabelsSection : ComponentBase
         {
             AvailableLabels.Remove(label);
             CardLabels.Add(result.Value);
+            await OnUpdateLabels.InvokeAsync(CardLabels);
         }
         
         PopoverRef?.Refresh();
@@ -144,6 +149,7 @@ public partial class CardLabelsSection : ComponentBase
             {
                 cardLabel.Label.Text = EditLabel.Text;
                 cardLabel.Label.Color = EditLabel.Color;
+                await OnUpdateLabels.InvokeAsync(CardLabels);
             }
 
             var availableLabel = AvailableLabels.FirstOrDefault(l => l.Id == EditLabel.Id);
@@ -166,6 +172,7 @@ public partial class CardLabelsSection : ComponentBase
         {
             CardLabels.RemoveAll(cl => cl.Label.Id == EditLabel.Id);
             AvailableLabels.RemoveAll(l => l.Id == EditLabel.Id);
+            await OnUpdateLabels.InvokeAsync(CardLabels);
         }
         
         ChangeToBaseMode();

@@ -71,6 +71,8 @@ public class BoardRepository :
     {
         return await _dbSet.Include(b => b.Lists.OrderBy(l => l.Position))
             .ThenInclude(l => l.Cards.OrderBy(c => c.Position))
+            .ThenInclude(c => c.Labels)
+            .ThenInclude(cl => cl.Label)
             .FirstOrDefaultAsync(b => b.Id == boardId, cancellationToken);
     }
 }

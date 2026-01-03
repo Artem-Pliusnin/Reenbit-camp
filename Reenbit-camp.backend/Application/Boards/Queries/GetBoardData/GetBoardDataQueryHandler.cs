@@ -25,7 +25,8 @@ internal class GetBoardDataQueryHandler
     {
         var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
         
-        var board = await boardRepository.GetFullInfoAsync(request.BoardId);
+        var board = await boardRepository
+            .GetFullInfoAsync(request.BoardId, cancellationToken);
 
         if (board == null)
         {

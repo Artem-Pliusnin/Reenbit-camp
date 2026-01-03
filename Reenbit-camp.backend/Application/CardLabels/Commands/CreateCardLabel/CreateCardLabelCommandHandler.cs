@@ -27,7 +27,7 @@ internal class CreateCardLabelCommandHandler : ICommandHandler<CreateCardLabelCo
         {
             var cardRepository = _unitOfWork.GetRepository<ICardRepository>();
             var card = await cardRepository
-                .GetByIdAsync(request.CardId, cancellationToken);
+                .GetByIdWithListAsync(request.CardId, cancellationToken);
 
             if (card == null)
             {

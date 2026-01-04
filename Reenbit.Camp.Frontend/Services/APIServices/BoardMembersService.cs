@@ -27,7 +27,7 @@ public class BoardMembersService : IBoardMembersService
             => _mapper.Map<List<BoardMemberModel>>(content));
     }
 
-    public async Task<Result<BoardMemberModel>> GeCurrentAsync(int boardId)
+    public async Task<Result<BoardMemberModel>> GetCurrentAsync(int boardId)
     {
         var response = await _boardMembersApi.GetCurrentAsync(boardId);
 

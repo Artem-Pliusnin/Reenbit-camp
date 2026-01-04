@@ -8,7 +8,7 @@ public interface IBoardMembersService
 {
     Task<Result<List<BoardMemberModel>>> GetByBoardAsync(int boardId);
     
-    Task<Result<BoardMemberModel>> GeCurrentAsync(int boardId);
+    Task<Result<BoardMemberModel>> GetCurrentAsync(int boardId);
 
     Task<Result<object>> UpdateRoleAsync(int id, UpdateBoardMemberRoleRequest request);
     

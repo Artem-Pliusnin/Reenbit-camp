@@ -27,4 +27,6 @@ public class Card
     public User? LastUpdatedByUser { get; set; }
     
     public List<CardLabel> Labels { get; set; }
+    
+    public List<CardMember> Members { get; set; }
 }

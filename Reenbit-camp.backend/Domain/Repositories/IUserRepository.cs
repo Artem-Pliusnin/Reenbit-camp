@@ -14,4 +14,9 @@ public interface IUserRepository : IRepository<User, int>
         string? query, 
         int limit = 5, 
         CancellationToken cancellationToken = default);
+    
+    Task<List<User>> GetNotСonnectedToCardAsync(
+        int cardId, 
+        int boardId, 
+        CancellationToken cancellationToken = default);
 }

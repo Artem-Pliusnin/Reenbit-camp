@@ -12,7 +12,9 @@ public class CardMembersRepository :
         : base(context)
     {}
 
-    public async Task<List<CardMember>> GetByCardIdAsync(int cardId, CancellationToken cancellationToken = default)
+    public async Task<List<CardMember>> GetByCardIdAsync(
+        int cardId, 
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.Where(cm => cm.CardId == cardId)
             .Include(cm => cm.User)

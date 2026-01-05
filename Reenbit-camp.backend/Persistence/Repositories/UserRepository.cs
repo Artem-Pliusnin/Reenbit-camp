@@ -53,4 +53,15 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
             .Take(limit)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<List<User>> GetNotСonnectedToCardAsync(
+        int cardId, 
+        int boardId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Where(u => u.Boards.Any(bm => bm.BoardId == boardId))
+            .Where(u => !u.Cards.Any(cm => cm.CardId == cardId))
+            .ToListAsync(cancellationToken);
+    }
 }

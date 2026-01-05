@@ -42,8 +42,16 @@ internal class CreateCardMemberCommandHandler : ICommandHandler<CreateCardMember
             {
                 return Result.Failure<CardMemberDto>(UserErrors.UserDoesNotExist);
             }
+            
+            var boardMemberRepository = _unitOfWork.GetRepository<IBoardMemberRepository>();
 
-            if (!user.Boards.Any(b => b.BoardId == card.List.BoardId))
+            var result = await boardMemberRepository
+                .IsUserMemberOfTheBoardAsync(
+                    user.Id,
+                    card.List.BoardId,
+                    cancellationToken);
+
+            if (!result)
             {
                 return Result.Failure<CardMemberDto>(CardMemberErrors.DoesNotBelongToBoardError);
             }

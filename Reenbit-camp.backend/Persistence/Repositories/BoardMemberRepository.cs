@@ -30,4 +30,14 @@ public class BoardMemberRepository :
             .Include(bm => bm.User)
             .FirstOrDefaultAsync(cancellationToken);
     }
+    
+    public async Task<bool> IsUserMemberOfTheBoardAsync(
+        int userId, 
+        int boardId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.AnyAsync(
+            bm => bm.UserId == userId && bm.BoardId == boardId,
+            cancellationToken);
+    }
 }

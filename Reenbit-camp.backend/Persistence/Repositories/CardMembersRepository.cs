@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Database;
 
 namespace Persistence.Repositories;
 
@@ -8,7 +9,7 @@ public class CardMembersRepository :
     BaseRepository<CardMember, int>,
     ICardMembersRepository
 {
-    public CardMembersRepository(DbContext context)
+    public CardMembersRepository(TrelloAppDbContext context)
         : base(context)
     {}
 

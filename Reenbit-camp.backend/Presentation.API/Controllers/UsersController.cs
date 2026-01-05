@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Application.Boards.Queries.GetUserBoards;
+using Application.CardMembers.Queries.GetNotConnectedToCard;
 using Application.Users.Queries.GetInviteSuggestionUsers;
 using Domain.DTOs.Boards;
 using Domain.DTOs.Shared;
@@ -38,6 +39,23 @@ public class UsersController : AuthorizedContoller
             userId,
             request.Query, 
             request.Limit);
+        
+        Result<List<UserDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("not-connected/card/{id}")]
+    public async Task<IActionResult> GetNotConnectedToCardAsync(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetNotConnectedToCardQuery(id);
         
         Result<List<UserDto>> result = await Sender.Send(query, cancellationToken);
         

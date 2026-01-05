@@ -66,7 +66,7 @@ internal class CreateCardMemberCommandHandler : ICommandHandler<CreateCardMember
         }
         catch
         {
-            return Result.Failure<CardMemberDto>(CardLabelErrors.CreatCardLabelError);
+            return Result.Failure<CardMemberDto>(CardMemberErrors.CreatCardMemberError);
         }
     }
 }

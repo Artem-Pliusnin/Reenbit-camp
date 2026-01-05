@@ -1,3 +1,4 @@
+using Domain.Models.CardMembers;
 using Domain.Models.Labels;
 
 namespace Domain.Models.Cards;
@@ -7,4 +8,5 @@ public sealed record UpdateCardModel(
     bool IsCompleted,
     DateTime? StartDate,
     DateTime? DueDate,
-    List<CardLabelModel> Labels);
+    List<CardLabelModel> Labels,
+    List<CardMemberModel> Members);

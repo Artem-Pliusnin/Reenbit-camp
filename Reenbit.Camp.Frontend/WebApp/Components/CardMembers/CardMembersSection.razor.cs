@@ -81,6 +81,7 @@ public partial class CardMembersSection : ComponentBase
         if (cardMemberResult.IsSuccess)
         {
             CardMembers = cardMemberResult.Value;
+            await OnUpdateMembers.InvokeAsync(CardMembers);
         }
         
         var availableUsersResult = await UsersService

@@ -1,3 +1,4 @@
+using Domain.Models.CardMembers;
 using Domain.Models.Labels;
 
 namespace Domain.Models.Cards;
@@ -16,4 +17,6 @@ public class CardModel
     public DateTime? DueDate { get; set; }
     
     public List<CardLabelModel> Labels { get; set; }
+    
+    public List<CardMemberModel> Members { get; set; }
 }

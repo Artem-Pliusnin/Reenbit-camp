@@ -47,6 +47,7 @@ public partial class SimpleCard : ComponentBase
         Card.StartDate = updateCardModel.StartDate;
         Card.DueDate = updateCardModel.DueDate;
         Card.Labels = updateCardModel.Labels;
+        Card.Members = updateCardModel.Members;
 
         await InvokeAsync(StateHasChanged);
     }

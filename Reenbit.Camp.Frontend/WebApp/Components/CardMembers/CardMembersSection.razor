@@ -1,0 +1,84 @@
+@using Telerik.SvgIcons
+
+<div class="mb-3">
+    <h5 class="fw-semibold mb-2">Members</h5>
+
+    <div class="d-flex align-items-center gap-1 flex-wrap">
+
+        <TelerikButton
+            Icon=@SvgIcon.Plus
+            OnClick=@OpenMembersPopover
+            Class="add-member-button">
+        </TelerikButton>
+
+        @foreach (var member in CardMembers)
+        {
+            <CardMember Member=@member OnDelete=@RemoveMember></CardMember>
+        }
+    </div>
+</div>
+
+<TelerikPopover @ref=@PopoverRef
+                AnchorSelector=".add-member-button"
+                Position=@PopoverPosition.Right
+                ShowCallout=@false
+                Collision=@PopoverCollision.Fit
+                Width="18rem">
+
+    <PopoverContent>
+        <div class="label-popup">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div style="width: 2rem"></div>
+
+                <h6 class="mb-0">Members</h6>
+
+                <TelerikButton
+                    Icon=@SvgIcon.X
+                    Size="small"
+                    OnClick=@CloseMembersPopover
+                    Class="popover-btn">
+                </TelerikButton>
+            </div>
+
+            <small class="text-muted">Card members</small>
+
+            <div class="d-flex flex-column align-items-center gap-2 members-cont">
+                @foreach (var cardMember in CardMembers)
+                {
+                    <CardMemberRow CardMember=@cardMember OnDelete=@RemoveMember ></CardMemberRow>
+                }
+            </div>
+
+            <hr/>
+
+            <small class="text-muted">Board members</small>
+
+            <div class="d-flex flex-column align-items-center gap-2 members-cont">
+                @foreach (var user in AvailableUsers)
+                {
+                    <UserRow User=@user OnAdd=@AddMember></UserRow>
+                }
+            </div>
+        </div>
+    </PopoverContent>
+</TelerikPopover>
+
+
+<style>
+    .k-button-solid-base:focus{
+        box-shadow: none;
+    }
+
+    .add-member-button{
+        width: 2rem;
+        height: 2rem;
+        border-radius: 100%;
+        background-color: rgb(240, 240, 240);
+        border: none;
+        padding: 0;
+    }
+
+    .add-member-button:hover{
+        background-color: rgb(230, 230, 230);
+    }
+</style>

@@ -1,0 +1,12 @@
+<div class="member-info d-flex align-items-center gap-2"
+     @onclick=@AddMember>
+    <TelerikAvatar
+        Type=@AvatarType.Text
+        ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+        @User.UserName[0]
+    </TelerikAvatar>
+
+    <span class="username">
+        @User.UserName
+    </span>
+</div>

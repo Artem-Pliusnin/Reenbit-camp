@@ -1,4 +1,6 @@
+using Domain.Models.Boards;
 using Domain.Models.Cards;
+using Domain.Models.Labels;
 using Domain.Requests.Cards;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -8,7 +10,7 @@ using Services.Abstractions.Services;
 namespace WebApp.Components.Cards;
 
 public partial class CardInfo : ComponentBase
-{
+{   
     [Parameter, EditorRequired]
     public int CardId { get; set; }
     
@@ -21,6 +23,7 @@ public partial class CardInfo : ComponentBase
     private bool isLoading;
     
     private CardInfoModel Card = new();
+    private List<CardLabelModel> CardLabels = new();
     
     private string? InputTitle;
     
@@ -206,6 +209,12 @@ public partial class CardInfo : ComponentBase
                 Card.Title, 
                 Card.IsCompleted, 
                 Card.StartDate, 
-                Card.DueDate));
+                Card.DueDate,
+                CardLabels));
+    }
+
+    private void UpdateCardLabels(List<CardLabelModel> labels)
+    {
+        CardLabels = labels;
     }
 }

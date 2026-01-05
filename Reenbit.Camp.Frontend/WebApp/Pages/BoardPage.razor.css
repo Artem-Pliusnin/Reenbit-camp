@@ -52,3 +52,38 @@
     }
 }
 
+.label-preview {
+    height: 2rem;
+    width: fit-content;
+    min-width: 6rem;
+    max-width: 100%;
+    padding: 0 1rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.labels-cont{
+    height: fit-content;
+    min-height: 2rem;
+    max-height: 14rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.label {
+    height: 2rem;
+    width: 10rem;
+    padding: 0 0.5rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.label-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+

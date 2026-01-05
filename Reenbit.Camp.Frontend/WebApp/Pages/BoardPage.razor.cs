@@ -1,9 +1,12 @@
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
+using Domain.Models.Labels;
 using Domain.Requests.Boards;
+using Domain.Requests.Labels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Services.Abstractions.Services;
+using Telerik.Blazor.Components;
 
 namespace WebApp.Pages;
 
@@ -17,8 +20,13 @@ public partial class BoardPage : ComponentBase
     
     [Inject] 
     public IBoardMembersService BoardMemberService { get; set; } = default!;
+    
+    [Inject] 
+    public ILabelsService LabelsService { get; set; } = default!;
 
     private BoardInfoModel Board = new();
+    
+    private List<LabelModel> Labels = new();
 
     private BoardMemberModel CurrentBoardMember = new();
 
@@ -29,6 +37,42 @@ public partial class BoardPage : ComponentBase
     private bool IsMembersDialogOpen;
     
     private string TitleInput = string.Empty;
+    
+    private TelerikPopover? PopoverRef { get; set; }
+    
+    private bool IsCreateMode = false;
+    private string NewLabelText;
+    private string NewLabelColor;
+    
+    private bool IsEditMode = false;
+    private LabelModel EditLabel;
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        var boardResult = await BoardsService.GetInfoAsync(BoardId);
+
+        if (boardResult.IsSuccess)
+        {
+            Board = boardResult.Value;
+        }
+        
+        var memberResult = await BoardMemberService.GetCurrentAsync(BoardId);
+        
+        if (memberResult.IsSuccess)
+        {
+            CurrentBoardMember = memberResult.Value;
+        }
+        
+        var labelsResult = await LabelsService.GetByBoardAsync(BoardId);
+        
+        if (labelsResult.IsSuccess)
+        {
+            Labels = labelsResult.Value;
+        }
+        
+        isLoading = false;
+    }
     
     private void OpenMembersDialog()
     {
@@ -76,25 +120,106 @@ public partial class BoardPage : ComponentBase
             CancelEdit();
         }
     }
-
-
-    protected override async Task OnParametersSetAsync()
+    
+    private void ResetCreateForm()
     {
-        isLoading = true;
-        var boardResult = await BoardsService.GetInfoAsync(BoardId);
+        NewLabelText = string.Empty;
+        NewLabelColor = "#ffffffff";
+    }
+    
+    private void OpenLabelsMenu()
+    {
+        IsCreateMode = false;
+        ResetCreateForm();
+        PopoverRef?.Show();
+    }
+    
+    private void ClosAddMenu()
+    {
+        ChangeToBaseMode();
+        PopoverRef?.Hide();
+    }
 
-        if (boardResult.IsSuccess)
+    private void ChangeToCreateMode()
+    {
+        IsCreateMode = true;
+        PopoverRef?.Refresh();
+    }
+    
+    private void ChangeToEditMode(LabelModel label)
+    {
+        EditLabel = new LabelModel
         {
-            Board = boardResult.Value;
+            Id = label.Id, 
+            Text = label.Text, 
+            Color = label.Color
+        } ;
+        
+        IsEditMode = true;
+        PopoverRef?.Refresh();
+    }
+    
+    private void ChangeToBaseMode()
+    {
+        IsCreateMode = false;
+        IsEditMode = false;
+        PopoverRef?.Refresh();
+    }
+    
+    private void ColorPickerOnChange(object args)
+    {
+        PopoverRef?.Refresh();
+    }
+    
+    private async Task CreateLabel()
+    { 
+        var result = await LabelsService
+            .CreateAsync(new CreateLabelRequest(Board.Id, NewLabelText, NewLabelColor));
+
+        if (result.IsSuccess)
+        {
+            Labels.Add(result.Value);
         }
         
-        var memberResult = await BoardMemberService.GeCurrentAsync(BoardId);
+        ResetCreateForm();
+        IsCreateMode = false;
         
-        if (memberResult.IsSuccess)
+        PopoverRef?.Refresh();
+    }
+
+    private async Task SaveEditedLabel()
+    {
+        var result = await LabelsService.UpdateAsync(
+            EditLabel.Id, 
+            new UpdateLabelRequest(
+                EditLabel.Id, 
+                EditLabel.Text, 
+                EditLabel.Color));
+
+        if (result.IsSuccess)
         {
-            CurrentBoardMember = memberResult.Value;
+            var label = Labels.FirstOrDefault(l => l.Id == EditLabel.Id);
+            if (label is not null)
+            {
+                label.Text = EditLabel.Text;
+                label.Color = EditLabel.Color;
+            }
+        }
+
+        ChangeToBaseMode();
+        PopoverRef?.Refresh();
+    }
+    
+    private async Task DeleteLabel()
+    {
+        var result = await LabelsService.DeleteAsync(EditLabel.Id);
+
+        if (result.IsSuccess)
+        {
+            Labels.RemoveAll(l => l.Id == EditLabel.Id);
         }
         
-        isLoading = false;
+        ChangeToBaseMode();
+        PopoverRef?.Refresh();
     }
 }

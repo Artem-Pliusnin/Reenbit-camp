@@ -2,10 +2,27 @@
 
 <div class="card simple-card bg-light" @onclick=@OpenCard>
     <div class="card-body simple-card-body d-flex flex-column gap-2">
+        @if (Card.Labels?.Any() == true)
+        {
+            <div class="w-100 card-labels d-flex flex-wrap gap-1">
+                <TelerikTooltip TargetSelector=".card-label-color"
+                                Position=@TooltipPosition.Top/>
+                
+                @foreach (var label in Card.Labels)
+                {
+                    <div class="card-label-color"
+                         style="background:@label.Label.Color"
+                         title=@label.Label.Text
+                         @onclick:stopPropagation>
+                    </div>
+                }
+            </div>
+        }
+
         <div class="simple-card-title">
             @Card.Title
         </div>
-        
+
         <div class="m2 d-flex flex-row gap-1" @onclick:stopPropagation>
             <TelerikCheckBox
                 Class=""
@@ -14,7 +31,7 @@
                 Rounded=@CheckBox.Rounded.Large
                 Size=@CheckBox.Size.Large
                 OnChange=@OnChangeStatus/>
-            
+
             <label for="IsCompleted">
                 @(Card.IsCompleted ? "Completed" : "In progress")
             </label>
@@ -24,10 +41,10 @@
         {
             <div class="simple-card-footer">
                 <span class="badge simple-date-badge @DateBadgeClass">
-                    <TelerikSvgIcon 
-                        Icon=@Telerik.SvgIcons.SvgIcon.Clock 
-                        Size="SvgIconSize.Small" />
-                    
+                    <TelerikSvgIcon
+                        Icon=@Telerik.SvgIcons.SvgIcon.Clock
+                        Size="SvgIconSize.Small"/>
+
                     <span class="ms-1">
                         @Card.DueDate.Value.ToString("dd MMM")
                     </span>
@@ -57,10 +74,12 @@
              style="box-sizing: border-box">
             <div class="row g-3">
                 <div class="col-12 col-lg-7 p-0">
+                    <CascadingValue Value=@Board>
                     <CardInfo
                         @ref=@CardInfoRef
-                        CardId=@Card.Id 
+                        CardId=@Card.Id
                         OnCloseWindow=@HandleCardWindowClose></CardInfo>
+                    </CascadingValue>
                 </div>
                 
                 <div class="col-12 col-lg-5 p-0">

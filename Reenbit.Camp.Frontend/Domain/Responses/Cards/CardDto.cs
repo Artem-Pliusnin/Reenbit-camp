@@ -1,3 +1,5 @@
+using Domain.Responses.Labels;
+
 namespace Domain.Responses.Cards;
 
 public sealed record CardDto(
@@ -6,4 +8,5 @@ public sealed record CardDto(
     int Position,
     bool IsCompleted,
     DateTime? StartDate, 
-    DateTime? DueDate);
+    DateTime? DueDate,
+    List<CardLabelDto> Labels);

@@ -39,3 +39,13 @@
     align-items: center;
     gap: 4px;
 }
+
+.card-labels {
+    min-height: 0.5rem;
+}
+
+.card-label-color {
+    width: 2.5rem;
+    height: 0.5rem;
+    border-radius: 0.25rem;
+}

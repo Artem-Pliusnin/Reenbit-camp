@@ -29,4 +29,6 @@ public class Card
     public List<CardLabel> Labels { get; set; }
     
     public List<CardMember> Members { get; set; }
+    
+    public List<Comment> Comments { get; set; }
 }

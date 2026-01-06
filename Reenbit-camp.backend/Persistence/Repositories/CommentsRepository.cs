@@ -19,6 +19,7 @@ public class CommentsRepository :
         CancellationToken cancellationToken = default)
     {
         return await _dbSet.Where(c => c.CardId == cardId)
+            .Include(c => c.User)
             .ToListAsync(cancellationToken);
     }
 }

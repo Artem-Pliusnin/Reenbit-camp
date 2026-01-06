@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<ILabelsService, LabelsService>();
         services.AddScoped<ICardLabelsService, CardLabelsService>();
+        services.AddScoped<ICardMembersService, CardMembersService>();
         
         services.AddScoped<TokenHandler>();
 
@@ -68,6 +69,10 @@ public static class DependencyInjection
             .AddHttpMessageHandler<TokenHandler>();
         
         services.AddRefitClient<ICardLabelsApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
+        
+        services.AddRefitClient<ICardMembersApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
             .AddHttpMessageHandler<TokenHandler>();
         

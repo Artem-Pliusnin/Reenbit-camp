@@ -26,4 +26,12 @@ public class UsersService : IUsersService
         return response.HandleResultWithMapping(content 
             => _mapper.Map<List<UserModel>>(content));
     }
+
+    public async Task<Result<List<UserModel>>> GetNotConnectedToCardAsync(int cardId)
+    {
+        var response = await _usersApi.GetNotConnectedToCardAsync(cardId);
+        
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<List<UserModel>>(content));
+    }
 }

@@ -1,0 +1,7 @@
+.members-cont{
+    height: fit-content;
+    min-height: 3rem;
+    max-height: 18rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

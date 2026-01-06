@@ -37,6 +37,25 @@
             </label>
         </div>
 
+        @if (Card.Members.Any())
+        {
+            <div class="my-1 d-flex flex-wrap gap-1">
+                <TelerikTooltip TargetSelector=".avatar-wrapper"
+                                Position=@TooltipPosition.Top/>
+                
+                @foreach (var member in Card.Members)
+                {
+                    <div class="avatar-wrapper" title=@member.User.UserName>
+                        <TelerikAvatar
+                            Type=@AvatarType.Text
+                            ThemeColor=@Avatar.ThemeColor.Inverse>
+                            @member.User.UserName[0]
+                        </TelerikAvatar>
+                    </div>
+                }
+            </div>
+        }
+
         @if (Card.DueDate.HasValue)
         {
             <div class="simple-card-footer">

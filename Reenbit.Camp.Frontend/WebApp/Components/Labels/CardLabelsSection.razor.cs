@@ -196,6 +196,7 @@ public partial class CardLabelsSection : ComponentBase
         if (cardLabelsResult.IsSuccess)
         {
             CardLabels = cardLabelsResult.Value;
+            await OnUpdateLabels.InvokeAsync(CardLabels);
         }
     }
 }

@@ -1,4 +1,5 @@
 using Domain.Models.Boards;
+using Domain.Models.CardMembers;
 using Domain.Models.Cards;
 using Domain.Models.Labels;
 using Domain.Requests.Cards;
@@ -24,6 +25,7 @@ public partial class CardInfo : ComponentBase
     
     private CardInfoModel Card = new();
     private List<CardLabelModel> CardLabels = new();
+    private List<CardMemberModel> CardMembers = new();
     
     private string? InputTitle;
     
@@ -210,11 +212,17 @@ public partial class CardInfo : ComponentBase
                 Card.IsCompleted, 
                 Card.StartDate, 
                 Card.DueDate,
-                CardLabels));
+                CardLabels,
+                CardMembers));
     }
 
     private void UpdateCardLabels(List<CardLabelModel> labels)
     {
         CardLabels = labels;
+    }
+    
+    private void UpdateCardMembers(List<CardMemberModel> members)
+    {
+        CardMembers = members;
     }
 }

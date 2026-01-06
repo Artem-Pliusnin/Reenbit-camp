@@ -12,4 +12,7 @@ public interface IUsersApi
     [Get("/Users/invitation/suggestions")]
     Task<ApiResponse<List<UserDto>>> GetInvitationSuggestionsAsync(
         [Query] GetInviteSuggestionRequest request);
+    
+    [Get("/Users/not-connected/card/{id}")]
+    Task<ApiResponse<List<UserDto>>> GetNotConnectedToCardAsync(int id);
 }

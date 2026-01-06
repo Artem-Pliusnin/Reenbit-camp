@@ -1,3 +1,4 @@
+using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Cards;
 using Domain.Models.Lists;
@@ -11,8 +12,11 @@ namespace WebApp.Components.Boards;
 
 public partial class BoardLists : ComponentBase
 {
-    [CascadingParameter]
+    [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
+    
+    [CascadingParameter(Name="CurrentUser")]
+    public BoardMemberModel CurrentUser { get; set; } = default!;
     
     [Inject] 
     public IListsService ListsService { get; set; } = default!;

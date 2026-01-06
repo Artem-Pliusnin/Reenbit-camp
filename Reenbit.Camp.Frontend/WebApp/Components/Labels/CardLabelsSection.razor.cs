@@ -9,7 +9,7 @@ namespace WebApp.Components.Labels;
 
 public partial class CardLabelsSection : ComponentBase
 {
-    [CascadingParameter]
+    [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
     
     [Parameter, EditorRequired] 

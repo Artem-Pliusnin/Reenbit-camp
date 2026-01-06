@@ -23,4 +23,6 @@ public class User
     public List<Invitation> ReceivedInvitations { get; set; }
     
     public List<Invitation> SendedInvitations { get; set; }
+    
+    public List<CardMember> Cards { get; set; }
 }

@@ -15,4 +15,8 @@ public static class UserErrors
     public static readonly Error UserUnauthorized = new(
         "Users.Unauthorized",
         "User is not authorized");
+    
+    public static readonly Error UserDoesNotExist = new(
+        "Users.DoesNotExist",
+        "User with given id does not exist.");
 }

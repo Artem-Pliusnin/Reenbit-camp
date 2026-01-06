@@ -1,4 +1,5 @@
 using Domain.DTOs.CardLabels;
+using Domain.DTOs.CardMembers;
 
 namespace Domain.DTOs.Cards;
 
@@ -17,4 +18,6 @@ public class CardDto
     public required DateTime? DueDate { get; set; }
     
     public required List<CardLabelDto> Labels { get; set; }
+    
+    public required List<CardMemberDto> Members { get; set; }
 }

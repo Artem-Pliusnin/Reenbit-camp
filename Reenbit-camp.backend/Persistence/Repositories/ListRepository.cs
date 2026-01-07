@@ -45,4 +45,16 @@ public class ListRepository :
             newPosition
         );
     }
+
+    public async Task DeleteListAsync(
+        int listId, 
+        int boardId, 
+        CancellationToken cancellationToken = default)
+    {
+        await _dbContext.Database.ExecuteSqlRawAsync(
+            "CALL delete_list_and_reorder({0}, {1})",
+            listId,
+            boardId
+        );
+    }
 }

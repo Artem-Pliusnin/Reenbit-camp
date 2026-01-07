@@ -18,14 +18,18 @@ internal class DeleteListCommandHandler : ICommandHandler<DeleteListCommand>
     {
         var listRepository = _unitOfWork.GetRepository<IListRepository>();
         
-        var list = await listRepository.GetByIdAsync(request.ListId);
+        var list = await listRepository
+            .GetByIdAsync(request.ListId, cancellationToken);
 
         if (list == null)
         {
             return Result.Failure<bool>(ListErrors.ListDoesNotExistError);
         }
         
-        listRepository.Remove(list);
+        await listRepository.DeleteListAsync(
+            list.Id, 
+            list.BoardId,
+            cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

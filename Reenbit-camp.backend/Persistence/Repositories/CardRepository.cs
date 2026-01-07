@@ -53,4 +53,16 @@ public class CardRepository :
             newPosition
         );
     }
+
+    public async Task DeleteCardAsync(
+        int cardId, 
+        int listId, 
+        CancellationToken cancellationToken = default)
+    {
+        await _dbContext.Database.ExecuteSqlRawAsync(
+            "CALL delete_card_and_reorder({0}, {1})",
+            cardId,
+            listId
+        );
+    }
 }

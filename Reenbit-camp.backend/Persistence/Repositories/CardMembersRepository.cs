@@ -21,4 +21,18 @@ public class CardMembersRepository :
             .Include(cm => cm.User)
             .ToListAsync(cancellationToken);
     }
+    
+    public async Task DeleteAllByUserAndBoard(
+        int userId,
+        int boardId,
+        CancellationToken cancellationToken = default)
+    {
+        var cardMembers = await _dbSet
+            .Include(cm => cm.Card)
+                .ThenInclude(c => c.List)
+            .Where(cm => cm.UserId == userId && cm.Card.List.BoardId == boardId)
+            .ToListAsync(cancellationToken);
+        
+        _dbSet.RemoveRange(cardMembers);
+    }
 }

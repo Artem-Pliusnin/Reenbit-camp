@@ -9,14 +9,14 @@ public static class UserErrors
         "The specified email is already taken");
     
     public static readonly Error InvalidCredentials = new(
-        "Users.InvalidCredentials",
+        "User.InvalidCredentials",
         "Invalid credentials");
 
     public static readonly Error UserUnauthorized = new(
-        "Users.Unauthorized",
+        "User.Unauthorized",
         "User is not authorized");
     
-    public static readonly Error UserDoesNotExist = new(
-        "Users.DoesNotExist",
+    public static readonly Error UserDoesNotExistError = new(
+        "User.DoesNotExistError",
         "User with given id does not exist.");
 }

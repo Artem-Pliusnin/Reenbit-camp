@@ -40,7 +40,7 @@ internal class CreateCardMemberCommandHandler : ICommandHandler<CreateCardMember
 
             if (user == null)
             {
-                return Result.Failure<CardMemberDto>(UserErrors.UserDoesNotExist);
+                return Result.Failure<CardMemberDto>(UserErrors.UserDoesNotExistError);
             }
             
             var boardMemberRepository = _unitOfWork.GetRepository<IBoardMemberRepository>();

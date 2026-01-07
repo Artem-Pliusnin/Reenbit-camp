@@ -1,12 +1,14 @@
-<div class="w-100 d-flex flex-column g-2 comments-panel py-2 px-4">
+@using WebApp.Components.Comments
+
+<div class="w-100 d-flex flex-column comments-panel pt-2 pb-4 px-4 gap-2">
     @if (!IsWritingComment)
     {
-        <div class="w-100 comment-field p-2 text-muted fst-italic"
-         @onclick=@StartWritingComment>Add a comment…</div>
+        <span class="comment-field p-2 text-muted fst-italic"
+             @onclick=@StartWritingComment>Add a comment…</span>
     }
     else
     {
-        <div class="description-edit">
+        <div class="comment-edit">
             <textarea class="form-control mb-2"
                       rows="3"
                       maxlength="1000"
@@ -25,5 +27,10 @@
                 </button>
             </div>
         </div>
+    }
+    
+    @foreach (var comment in Comments)
+    {
+        <CommentRow Comment=@comment OnDelete=@DeleteComment></CommentRow>
     }
 </div>

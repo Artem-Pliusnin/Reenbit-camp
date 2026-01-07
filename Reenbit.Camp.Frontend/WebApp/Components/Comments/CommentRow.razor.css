@@ -1,0 +1,42 @@
+.comment-item {
+    align-items: flex-start;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #172b4d;
+}
+
+.comment-date {
+    color: #6b778c;
+}
+
+.edited-tag{
+    font-size: 0.8rem;
+    color: #6b778c;
+}
+
+.comment-text {
+    width: 100%;
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    color: #172b4d;
+    background-color: whitesmoke;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(230, 230, 230);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.comment-actions span{
+    height: fit-content;
+    color: #172b4d;
+}

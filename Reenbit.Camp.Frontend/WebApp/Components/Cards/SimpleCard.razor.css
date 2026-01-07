@@ -49,3 +49,24 @@
     height: 0.5rem;
     border-radius: 0.25rem;
 }
+
+.dialog-content{
+    height: fit-content;
+    overflow: hidden;
+}
+
+.window-section{
+    height: fit-content;
+    overflow-y: unset;
+}
+
+@media (min-width: 992px) {
+    .dialog-content{
+        height: 80vh;
+    }
+    
+    .window-section{
+        height: 100%;
+        overflow-y: scroll;
+    }
+}

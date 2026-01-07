@@ -54,8 +54,10 @@ else
         </div>
 
         <div class="board-content">
-            <CascadingValue Value=@Board>
-                <BoardLists></BoardLists>
+            <CascadingValue Name="Board" Value=@Board>
+                <CascadingValue Name="CurrentUser" Value=@CurrentBoardMember>
+                    <BoardLists></BoardLists>
+                </CascadingValue>
             </CascadingValue>
         </div>
     </div> 

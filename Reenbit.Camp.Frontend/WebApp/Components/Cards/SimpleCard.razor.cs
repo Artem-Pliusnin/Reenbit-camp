@@ -1,3 +1,4 @@
+using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Cards;
 using Domain.Requests.Cards;
@@ -9,8 +10,11 @@ namespace WebApp.Components.Cards;
 
 public partial class SimpleCard : ComponentBase
 {
-    [CascadingParameter]
+    [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
+    
+    [CascadingParameter(Name="CurrentUser")]
+    public BoardMemberModel CurrentUser { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public CardModel Card { get; set; }

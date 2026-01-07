@@ -20,7 +20,7 @@ public partial class ListHeader : ComponentBase
     [Parameter, EditorRequired]
     public EventCallback<MoveListModel> OnMoveList { get; set; }
     
-    [CascadingParameter]
+    [CascadingParameter(Name="Board")]
     public BoardInfoModel BoardInfo { get; set; } = default!;
     
     [Inject] 

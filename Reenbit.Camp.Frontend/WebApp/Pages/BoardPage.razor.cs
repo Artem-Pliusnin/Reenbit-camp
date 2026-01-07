@@ -49,6 +49,11 @@ public partial class BoardPage : ComponentBase
     
     protected override async Task OnParametersSetAsync()
     {
+        await LoadBoardData();
+    }
+
+    private async Task LoadBoardData()
+    {
         isLoading = true;
         var boardResult = await BoardsService.GetInfoAsync(BoardId);
 
@@ -208,6 +213,7 @@ public partial class BoardPage : ComponentBase
 
         ChangeToBaseMode();
         PopoverRef?.Refresh();
+        await LoadBoardData();
     }
     
     private async Task DeleteLabel()
@@ -221,5 +227,6 @@ public partial class BoardPage : ComponentBase
         
         ChangeToBaseMode();
         PopoverRef?.Refresh();
+        await LoadBoardData();
     }
 }

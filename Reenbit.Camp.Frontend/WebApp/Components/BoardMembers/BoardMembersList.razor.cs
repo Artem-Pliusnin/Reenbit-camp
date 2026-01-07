@@ -11,6 +11,9 @@ public partial class BoardMembersList : ComponentBase
     [Parameter, EditorRequired]
     public int BoardId { get; set; }
     
+    [Parameter, EditorRequired]
+    public EventCallback UpdateBoardContent { get; set; }
+    
     [CascadingParameter(Name="CurrentUser")]
     private BoardMemberModel CurrentUser { get; set; }
     
@@ -83,6 +86,7 @@ public partial class BoardMembersList : ComponentBase
         {
             Members.Remove(member);
             StateHasChanged();
+            await UpdateBoardContent.InvokeAsync();
         }
     }
 }

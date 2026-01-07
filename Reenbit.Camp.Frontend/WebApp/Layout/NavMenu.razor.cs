@@ -2,12 +2,10 @@ namespace WebApp.Layout;
 
 public partial class NavMenu
 {
-    private bool collapseNavMenu = true;
+    private bool isOpen;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
+    private void ToggleMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        isOpen = !isOpen;
     }
 }

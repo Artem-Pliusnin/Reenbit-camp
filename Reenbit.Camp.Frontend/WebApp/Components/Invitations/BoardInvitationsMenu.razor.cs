@@ -15,29 +15,35 @@ public partial class BoardInvitationsMenu : ComponentBase
     [Inject] 
     public IInvitationsService InvitationsService { get; set; } = default!;
     
+    [Inject] 
+    public NavigationManager Navigation{ get; set; } = default!;
+    
     private bool IsLoading;
     private bool IsOpen;
 
     private List<InvitationModel> Invitations = new();
-    
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        
+        await LoadInvitations();
+        
+        IsLoading = false;
+    }
+
     private async Task Toggle()
     {
         IsOpen = !IsOpen;
 
         if (IsOpen)
         {
-            IsLoading = true;
             PopoverRef?.Show();
-            await LoadInvitations();
         }
         else
         {
             PopoverRef?.Hide();
-            Invitations.Clear();
         }
-
-        IsLoading = false;
-        PopoverRef?.Refresh();
     }
 
     private async Task LoadInvitations()
@@ -56,7 +62,12 @@ public partial class BoardInvitationsMenu : ComponentBase
         
         if (result.IsSuccess)
         {
-            Invitations.RemoveAll(i => i.Id == invitationId);
+            var acceptedInvitation = Invitations.FirstOrDefault(i => i.Id == invitationId);
+            if (acceptedInvitation is not null)
+            {
+                Invitations.RemoveAll(i => i.Id == invitationId);
+                Navigation.NavigateTo($"/board/{acceptedInvitation.Board.Id}");
+            }
         }
         
         PopoverRef?.Refresh();

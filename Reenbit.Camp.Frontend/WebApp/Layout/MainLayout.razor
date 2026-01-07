@@ -1,14 +1,12 @@
 ﻿@inherits LayoutComponentBase
 <div class="page">
     <TelerikRootComponent>
-        <div class="sidebar">
-            <NavMenu/>
-        </div>
+        <header class="top-navbar">
+            <NavMenu />
+        </header>
 
         <main>
-            <article>
-                @Body
-            </article>
+            @Body
         </main>
     </TelerikRootComponent>
 </div>

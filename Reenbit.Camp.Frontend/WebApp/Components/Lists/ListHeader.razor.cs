@@ -12,10 +12,7 @@ namespace WebApp.Components.Lists;
 public partial class ListHeader : ComponentBase
 {
     [Parameter, EditorRequired]
-    public int ListId { get; set; }
-    
-    [Parameter, EditorRequired]
-    public string ListTitle { get; set; }
+    public ListModel List { get; set; }
     
     [Parameter, EditorRequired]
     public EventCallback<MoveListModel> OnMoveList { get; set; }
@@ -44,17 +41,11 @@ public partial class ListHeader : ComponentBase
     protected override void OnInitialized()
     { 
         DotNetRef = DotNetObjectReference.Create(this);
-        
-        SelectedPosition = BoardInfo.Lists
-            .First(l => l.Id == ListId).Position;
-        
-        Positions = Enumerable.Range(1, BoardInfo.Lists.Count)
-            .ToList();
     }
 
     private void StartEditTitle()
     {
-        TitleInput = ListTitle;
+        TitleInput = List.Title;
         IsEditingTitle = true;
     }
 
@@ -62,11 +53,11 @@ public partial class ListHeader : ComponentBase
     {
         if (!string.IsNullOrWhiteSpace(TitleInput))
         {
-            ListTitle = TitleInput;
+            List.Title = TitleInput;
 
             await ListsService.UpdateAsync(
-                ListId, 
-                new UpdateListRequest(ListId, TitleInput));
+                List.Id, 
+                new UpdateListRequest(List.Id, TitleInput));
         }
         
         IsEditingTitle = false;
@@ -96,7 +87,7 @@ public partial class ListHeader : ComponentBase
         if (IsMenuOpen)
         {
             PopupRef?.Show();
-            await JsRuntime.InvokeVoidAsync("attachClosePopup", DotNetRef, ListId);
+            await JsRuntime.InvokeVoidAsync("attachClosePopup", DotNetRef, List.Id);
         }
         else
         {
@@ -114,13 +105,18 @@ public partial class ListHeader : ComponentBase
     private void StartMove()
     {
         HideMenu();
+        
+        SelectedPosition = List.Position;
+        Positions = Enumerable.Range(1, BoardInfo.Lists.Count)
+            .ToList();
+        
         IsMoveMode = true;
     }
 
     private async Task SubmitMove()
     {
         await OnMoveList.InvokeAsync(
-            new MoveListModel(ListId, SelectedPosition)
+            new MoveListModel(List.Id, SelectedPosition)
         );
         
         IsMoveMode = false;

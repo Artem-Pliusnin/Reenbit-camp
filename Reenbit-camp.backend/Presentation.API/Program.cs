@@ -25,7 +25,7 @@ builder.Services.AddApplication()
     .AddPresentation(builder.Configuration)
     .AddDatabase(builder.Configuration);
 
-var r = builder.Configuration;
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 

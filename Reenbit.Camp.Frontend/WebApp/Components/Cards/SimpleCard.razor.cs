@@ -18,12 +18,17 @@ public partial class SimpleCard : ComponentBase
 
     [Parameter, EditorRequired]
     public CardModel Card { get; set; }
+    
+    [Parameter, EditorRequired]
+    public EventCallback<CardModel> OnDeleteCard { get; set; }
 
     [Inject] private ICardsService CardsService { get; set; } = default!;
     
     private CardInfo? CardInfoRef;
     
     private bool IsCardOpen = false;
+    
+    private bool IsDeleteConfirmOpen = false;
     
     private async Task OnChangeStatus()
     {
@@ -41,7 +46,34 @@ public partial class SimpleCard : ComponentBase
     private void CloseCard()
     {
         CardInfoRef?.UpdateCard();
+        IsDeleteConfirmOpen = false;
         IsCardOpen = false;
+    }
+    
+    private void OpenDeleteConfirm()
+    {
+        IsDeleteConfirmOpen = true;
+        
+        StateHasChanged();
+    }
+
+    private void CancelDelete()
+    {
+        IsDeleteConfirmOpen = false;
+    }
+    
+    private async Task ConfirmDelete()
+    {
+        IsDeleteConfirmOpen = false;
+        
+        IsCardOpen = false;
+        
+        var result = await CardsService.DeleteAsync(Card.Id);
+
+        if (result.IsSuccess)
+        {
+            await OnDeleteCard.InvokeAsync(Card);
+        }
     }
     
     private async Task HandleCardWindowClose(UpdateCardModel updateCardModel)

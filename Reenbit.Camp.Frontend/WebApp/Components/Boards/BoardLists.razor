@@ -25,7 +25,7 @@
                             => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
 
                 <ItemTemplate>
-                    <SimpleCard Card=@context></SimpleCard>
+                    <SimpleCard Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
                 </ItemTemplate>
 
                 <NoDataTemplate>

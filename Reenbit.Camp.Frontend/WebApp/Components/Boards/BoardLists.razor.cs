@@ -218,6 +218,23 @@ public partial class BoardLists : ComponentBase
         
         StateHasChanged();
     }
+    
+    private void RemoveCard(CardModel card)
+    {
+        var list = Board.Lists
+            .FirstOrDefault(l => l.Cards.Any(c => c.Id == card.Id));
+
+        if (list == null)
+        {
+            return;
+        }
+
+        list.Cards.Remove(card);
+        
+        ListBoxRefs[list.Id].Rebind();
+
+        StateHasChanged();
+    }
 
     protected override void OnInitialized()
     {

@@ -51,14 +51,16 @@
             <div class="comment-actions">
                 <TelerikButton
                     OnClick=@EditComment
-                    FillMode=@ThemeConstants.Button.FillMode.Link>
+                    FillMode=@ThemeConstants.Button.FillMode.Link
+                    Class="comment-button">
                     Edit
                 </TelerikButton>
                 <span>•</span>
                 <TelerikButton
                     OnClick=@OpenPopover
                     FillMode=@ThemeConstants.Button.FillMode.Link
-                    Id=@($"delete-{Comment.Id}")>
+                    Id=@($"delete-{Comment.Id}")
+                    Class="comment-button">
                     Delete
                 </TelerikButton>
             </div>
@@ -95,15 +97,15 @@
 </div>
 
 <style>
-    .k-button{
+    .comment-button{
         padding: 0;
     }
 
-    .k-button-link-base:focus{
+    .comment-button .k-button-link-base:focus{
         box-shadow: none;
     }
-    
-    .k-button-text{
+
+    .comment-button .k-button-text{
         font-size: 0.8rem;
     }
     

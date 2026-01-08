@@ -7,9 +7,9 @@
     {
         <div class="d-flex flex-column gap-1 align-items-center list-container">
             <ListHeader
-                ListId=@list.Id
-                ListTitle=@list.Title
-                OnMoveList=@HandleMoveList>
+                List=@list
+                OnMoveList=@HandleMoveList
+                OnDeleteList=@RemoveList>
             </ListHeader>
             <TelerikListBox Width="100%"
                             Class="w-100"
@@ -25,7 +25,7 @@
                             => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
 
                 <ItemTemplate>
-                    <SimpleCard Card=@context></SimpleCard>
+                    <SimpleCard Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
                 </ItemTemplate>
 
                 <NoDataTemplate>

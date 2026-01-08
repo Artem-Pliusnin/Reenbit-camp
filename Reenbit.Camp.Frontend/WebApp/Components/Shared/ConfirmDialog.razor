@@ -1,0 +1,27 @@
+<TelerikDialog @bind-Visible=@IsOpen
+               Width="15rem">
+
+    <DialogTitle>
+        @Title
+    </DialogTitle>
+
+    <DialogContent>
+        <p class="mb-0">
+            @Text
+        </p>
+    </DialogContent>
+
+    <DialogButtons>
+        <TelerikButton OnClick=@Cancel
+                       FillMode="ButtonFillMode.Flat"
+                       ThemeColor=@ThemeConstants.Button.ThemeColor.Base>
+            Cancel
+        </TelerikButton>
+
+        <TelerikButton OnClick=@Confirm
+                       ThemeColor=@ThemeConstants.Button.ThemeColor.Error>
+            Delete
+        </TelerikButton>
+    </DialogButtons>
+
+</TelerikDialog>

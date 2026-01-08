@@ -1,36 +1,105 @@
-﻿@using WebApp.Components.Auth
+﻿@using WebApp.Components.Auth 
 @using WebApp.Components.Invitations
 
-<div class="top-row px-3 navbar navbar-dark">
-    <div class="w-100 d-flex justify-content-between">
-        <div class="d-flex gap-2 justify-content-start">
-            <AuthorizeView>
-                <Authorized>
-                    <Logout></Logout>
+<nav class="navbar">
+    <div class="navbar-left">
+        <TelerikButton 
+            Icon=@Telerik.SvgIcons.SvgIcon.Menu
+            Class="navbar-toggler"
+            OnClick=@ToggleMenu/>
 
-                    <a class="navbar-brand" href="">@context.User.Identity?.Name</a>
+        <span class="brand">Trello</span>
 
-                    <BoardInvitationsMenu></BoardInvitationsMenu>
-                </Authorized>
-
-                <NotAuthorized>
-                    <RedirectToLogin></RedirectToLogin>
-                </NotAuthorized>
-            </AuthorizeView>
+        <div class="navbar-links @(isOpen ? "open" : "")">
+            <NavLink href="/" Match=@NavLinkMatch.All>Boards</NavLink>
         </div>
-
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
     </div>
-</div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    <div class="navbar-right">
+        <AuthorizeView>
+            <Authorized>
+                <BoardInvitationsMenu />
+                
+                <div class="d-flex flex-row gap-1 align-items-center">
+                    <span class="user-name">
+                        @context.User.Identity?.Name
+                    </span>
+
+                    <TelerikAvatar
+                        Type=@AvatarType.Text
+                        Class="avatar"
+                        ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                        @(!string.IsNullOrWhiteSpace(context.User.Identity?.Name)
+                            ? context.User.Identity.Name[0]
+                            : '?')
+                    </TelerikAvatar>
+                </div>
+
+                <Logout />
+            </Authorized>
+
+            <NotAuthorized>
+                <RedirectToLogin />
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</nav>
+
+<style>
+    .navbar-links a {
+        color: #176B87;
+        text-decoration: none;
+        font-size: 1.2rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 4px;
+    }
+    
+    .navbar-links a:hover {
+        background-color: #B4D4FF;
+        color: #176B87;
+    }
+
+    .navbar-links a.active{
+        color: #176B87;
+        background-color: #B4D4FF;
+        border-bottom: 2px solid #176B87;
+    }
+    
+    .avatar{
+        width: 3rem;
+        height: 3rem;
+        flex-basis: 3rem;
+    }
+
+    .avatar .k-avatar-text{
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .navbar-toggler {
+        height: 2.5rem;
+        width: 3rem;
+        border: none;
+        background-color: #B4D4FF;
+        color: #176B87;
+        font-size: 1.3rem;
+        cursor: pointer;
+        display: none;
+    }
+
+    .navbar-toggler:hover {
+        background-color: #86B6F6;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    @@media (max-width: 768px) {
+        .navbar-toggler {
+            display: flex;
+            align-items: center;
+        }
+    }
+</style>

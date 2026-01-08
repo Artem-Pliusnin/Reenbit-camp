@@ -1,10 +1,17 @@
 <div class="position-relative">
     <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Bell
-                   Class="dialog-icon-button"
-                   OnClick="@Toggle" />
+                   Class="invitations-button"
+                   OnClick=@Toggle />
+    
+    @if (Invitations.Any())
+    {
+        <span class="invitations-badge">
+            @Invitations.Count
+        </span>
+    }
 
-    <TelerikPopover @ref="@PopoverRef"
-                    AnchorSelector=".dialog-icon-button"
+    <TelerikPopover @ref=@PopoverRef
+                    AnchorSelector=".invitations-button"
                     Width="20rem"
                     Position=@PopoverPosition.Bottom>
 
@@ -25,7 +32,7 @@
             }
             else
             {
-                <TelerikListView Data="@Invitations">
+                <TelerikListView Data=@Invitations>
                     <Template>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
@@ -38,12 +45,12 @@
                             <div class="d-flex gap-1">
                                 <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.Check"
                                                Size="ButtonSize.Small"
-                                               OnClick="@(() => Accept(context.Id))"/>
+                                               OnClick=@(() => Accept(context.Id))/>
 
                                 <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.X"
                                                Size="ButtonSize.Small"
                                                FillMode="ButtonFillMode.Flat"
-                                               OnClick="@(() => Decline(context.Id))"/>
+                                               OnClick=@(() => Decline(context.Id))/>
                             </div>
                         </div>
                     </Template>
@@ -52,3 +59,27 @@
         </PopoverContent>
     </TelerikPopover>
 </div>
+
+<style>
+    .invitations-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: #176B87;
+        color: #EEF5FF;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .invitations-button:hover {
+        background-color: #1B8AAF;
+    }
+
+    .invitations-button:focus {
+        outline: none;
+        box-shadow: none;
+    }
+</style>

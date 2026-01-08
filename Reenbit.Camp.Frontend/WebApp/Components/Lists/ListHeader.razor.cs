@@ -17,6 +17,9 @@ public partial class ListHeader : ComponentBase
     [Parameter, EditorRequired]
     public EventCallback<MoveListModel> OnMoveList { get; set; }
     
+    [Parameter, EditorRequired]
+    public EventCallback<ListModel> OnDeleteList { get; set; }
+    
     [CascadingParameter(Name="Board")]
     public BoardInfoModel BoardInfo { get; set; } = default!;
     
@@ -37,6 +40,8 @@ public partial class ListHeader : ComponentBase
     private int SelectedPosition;
 
     private List<int> Positions = new List<int>();
+    
+    private bool IsDeleteConfirmOpen = false;
 
     protected override void OnInitialized()
     { 
@@ -127,8 +132,25 @@ public partial class ListHeader : ComponentBase
         IsMoveMode = false;
     }
     
-    public void Dispose()
+    private void OpenDeleteConfirm()
     {
-        DotNetRef?.Dispose();
+        IsDeleteConfirmOpen = true;
+    }
+
+    private void CancelDelete()
+    {
+        IsDeleteConfirmOpen = false;
+    }
+    
+    private async Task ConfirmDelete()
+    {
+        IsDeleteConfirmOpen = false;
+        
+        var result = await ListsService.DeleteAsync(List.Id);
+
+        if (result.IsSuccess)
+        {
+            await OnDeleteList.InvokeAsync(List);
+        }
     }
 }

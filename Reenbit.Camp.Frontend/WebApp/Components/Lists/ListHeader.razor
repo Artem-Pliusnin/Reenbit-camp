@@ -1,3 +1,5 @@
+@using WebApp.Components.Shared
+
 <div class="w-100 d-flex flex-row gap-1 justify-content-between list-header">
     @if (!IsEditingTitle)
     {
@@ -46,7 +48,8 @@
                 Archive
             </button>
 
-            <button class="list-menu-item text-danger">
+            <button class="list-menu-item text-danger"
+                    @onclick=@OpenDeleteConfirm>
                 Delete
             </button>
         </div>
@@ -65,7 +68,7 @@
                 Position
             </label>
 
-            <TelerikDropDownList Data=@Positions                             
+            <TelerikDropDownList Data=@Positions
                                  @bind-Value=@SelectedPosition
                                  Width="100%"/>
 
@@ -82,6 +85,17 @@
         </div>
     </DialogContent>
 </TelerikDialog>
+
+<ConfirmDialog IsOpen=@IsDeleteConfirmOpen
+               Title="Delete list?"
+               Text="This action cannot be undone.
+                    All cards in this list will be deleted."
+               OnCancel=@CancelDelete
+               OnConfirm=@ConfirmDelete>
+
+</ConfirmDialog>
+
+
 
 
 <style>

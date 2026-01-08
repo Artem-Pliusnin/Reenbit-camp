@@ -209,6 +209,16 @@ public partial class BoardLists : ComponentBase
         await InvokeAsync(StateHasChanged);
     }
 
+    private void RemoveList(ListModel listModel)
+    {
+        Board.Lists.Remove(listModel);
+        ListBoxRefs.Remove(listModel.Id);
+        ListBoxSelectedItems.Remove(listModel.Id);
+        NewCardTitles.Remove(listModel.Id);
+        
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
         foreach (var list in Board.Lists)

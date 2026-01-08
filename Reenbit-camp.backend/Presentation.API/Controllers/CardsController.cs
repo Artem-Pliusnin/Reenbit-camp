@@ -151,7 +151,7 @@ public class CardsController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new UpdateCardPositionCommand(id, request.NewListId,request.NewPosition, userId);
+        var command = new UpdateCardPositionCommand(id, request.NewListId, request.NewPosition, userId);
         
         Result result = await Sender.Send(command, cancellationToken);
         

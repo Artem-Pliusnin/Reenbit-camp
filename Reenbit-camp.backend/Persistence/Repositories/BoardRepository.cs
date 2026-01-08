@@ -69,7 +69,7 @@ public class BoardRepository :
         int boardId, 
         CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await _dbSet.AsNoTracking()
             .Include(b => b.Lists.OrderBy(l => l.Position))
                 .ThenInclude(l => l.Cards.OrderBy(c => c.Position))
                     .ThenInclude(c => c.Labels)

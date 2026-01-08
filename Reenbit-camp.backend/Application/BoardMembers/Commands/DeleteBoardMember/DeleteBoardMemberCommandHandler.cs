@@ -27,6 +27,14 @@ internal class DeleteBoardMemberCommandHandler : ICommandHandler<DeleteBoardMemb
         }
         
         boardMemberRepository.Remove(boardMember);
+        
+        var cardMembersRepository = _unitOfWork.GetRepository<ICardMembersRepository>();
+        
+        await cardMembersRepository
+            .DeleteAllByUserAndBoard(
+                boardMember.UserId, 
+                boardMember.BoardId, 
+                cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

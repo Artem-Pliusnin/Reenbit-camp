@@ -26,7 +26,10 @@ internal class DeleteCardCommandHandler : ICommandHandler<DeleteCardCommand>
             return Result.Failure<bool>(CardErrors.CardDoesNotExistError);
         }
         
-        cardRepository.Remove(card);
+        await cardRepository.DeleteCardAsync(
+            card.Id, 
+            card.ListId, 
+            cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

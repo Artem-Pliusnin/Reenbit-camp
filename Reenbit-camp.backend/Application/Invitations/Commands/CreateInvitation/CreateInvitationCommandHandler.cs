@@ -47,8 +47,11 @@ internal class CreateInvitationCommandHandler :
             invitationRepository.Add(invitation);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            var response = _mapper.Map<InvitationDto>(invitation);
+            
+            var fullInvitation = await invitationRepository
+                .GetByIdWithIncludesAsync(invitation.Id, cancellationToken);
+            
+            var response = _mapper.Map<InvitationDto>(fullInvitation);
 
             return response;
         }

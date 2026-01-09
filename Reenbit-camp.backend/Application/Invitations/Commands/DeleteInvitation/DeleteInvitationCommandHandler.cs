@@ -5,7 +5,7 @@ using Domain.Shared;
 
 namespace Application.Invitations.Commands.DeleteInvitation;
 
-internal class DeleteInvitationCommandHandler : ICommandHandler<DeleteInvitationCommand>
+internal class DeleteInvitationCommandHandler : ICommandHandler<DeleteInvitationCommand, int>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -14,7 +14,7 @@ internal class DeleteInvitationCommandHandler : ICommandHandler<DeleteInvitation
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<Result> Handle(DeleteInvitationCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(DeleteInvitationCommand request, CancellationToken cancellationToken)
     {
         var invitationsRepository = _unitOfWork.GetRepository<IInvitationRepository>();
         
@@ -23,13 +23,13 @@ internal class DeleteInvitationCommandHandler : ICommandHandler<DeleteInvitation
 
         if (invitation == null)
         {
-            return Result.Failure<bool>(InvitationErrors.InvitationDoesNotExist);
+            return Result.Failure<int>(InvitationErrors.InvitationDoesNotExist);
         }
         
         invitationsRepository.Remove(invitation);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return Result.Success(true);
+        return Result.Success(invitation.InvitedUserId);
     }
 }

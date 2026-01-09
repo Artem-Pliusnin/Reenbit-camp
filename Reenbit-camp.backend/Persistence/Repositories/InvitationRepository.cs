@@ -13,6 +13,8 @@ public class InvitationRepository :
     public InvitationRepository(TrelloAppDbContext context) 
         : base(context)
     {}
+    
+    
 
     public async Task<List<Invitation>> GetByUserIdAsync(
         int userId, 
@@ -40,5 +42,16 @@ public class InvitationRepository :
             .Include(i => i.InvitedByUser)
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Invitation?> GetByIdWithIncludesAsync(
+        int invitationId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(i => i.Board)
+            .Include(i => i.InvitedUser)
+            .Include(i => i.InvitedByUser)
+            .FirstOrDefaultAsync(i => i.Id == invitationId, cancellationToken);
     }
 }

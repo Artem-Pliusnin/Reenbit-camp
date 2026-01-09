@@ -11,17 +11,22 @@ using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
 using Presentation.API.Contracts.Invitations;
+using Presentation.API.Hubs;
 
 namespace Presentation.API.Controllers;
 
 [Route("api/[controller]")]
 public class InvitationsController : AuthorizedContoller
 {
-    public InvitationsController(ISender sender)
+    private readonly IHubContext<HomeHub> _hubContext;
+    public InvitationsController(ISender sender, IHubContext<HomeHub> hubContext)
         : base(sender)
-    {}
+    {
+        _hubContext = hubContext;
+    }
     
     [HttpGet]
     public async Task<IActionResult> GetByUserAsync(CancellationToken cancellationToken)
@@ -84,6 +89,10 @@ public class InvitationsController : AuthorizedContoller
             return HandleFailure(result);
         }
         
+        await _hubContext.Clients
+            .User(result.Value.InvitedUser.Id.ToString())
+            .SendAsync("AddInvitation", result.Value, cancellationToken);
+            
         return Ok(result.Value);
     }
     
@@ -140,12 +149,16 @@ public class InvitationsController : AuthorizedContoller
     {
         var command = new DeleteInvitationCommand(id);
         
-        Result result = await Sender.Send(command, cancellationToken);
+        Result<int> result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
             return HandleFailure(result);
         }
+        
+        await _hubContext.Clients
+            .User(result.Value.ToString())
+            .SendAsync("DeleteInvitation", id, cancellationToken);
         
         return Ok();
     }

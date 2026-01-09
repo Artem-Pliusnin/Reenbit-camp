@@ -1,20 +1,24 @@
 using Application.Abstractions.Messaging;
+using AutoMapper;
+using Domain.DTOs.Labels;
 using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
 namespace Application.Labels.Commands.UpdateLabel;
 
-internal class UpdateLabelCommandHandler : ICommandHandler<UpdateLabelCommand>
+internal class UpdateLabelCommandHandler : ICommandHandler<UpdateLabelCommand, UpdatedLabelDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public UpdateLabelCommandHandler(IUnitOfWork unitOfWork)
+    public UpdateLabelCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
     
-    public async Task<Result> Handle(
+    public async Task<Result<UpdatedLabelDto>> Handle(
         UpdateLabelCommand request, 
         CancellationToken cancellationToken)
     {
@@ -27,7 +31,7 @@ internal class UpdateLabelCommandHandler : ICommandHandler<UpdateLabelCommand>
 
             if (label == null)
             {
-                return Result.Failure(LabelErrors.LabelDoesNotExistError);
+                return Result.Failure<UpdatedLabelDto>(LabelErrors.LabelDoesNotExistError);
             }
 
             label.Text = request.Text;
@@ -36,12 +40,14 @@ internal class UpdateLabelCommandHandler : ICommandHandler<UpdateLabelCommand>
             labelRepository.Update(label);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            var response = _mapper.Map<UpdatedLabelDto>(label);
 
-            return Result.Success();
+            return Result.Success(response);
         }
         catch
         {
-            return Result.Failure(LabelErrors.UpdateLabelError);
+            return Result.Failure<UpdatedLabelDto>(LabelErrors.UpdateLabelError);
         }
     }
 }

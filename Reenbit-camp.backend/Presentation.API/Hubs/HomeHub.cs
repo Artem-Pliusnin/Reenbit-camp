@@ -26,7 +26,6 @@ public class HomeHub : Hub
     
     public async Task DeleteLabel(int labelId, int boardId)
     {
-        Console.WriteLine(123);
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
             .SendAsync("RemoveLabel", labelId);
     }

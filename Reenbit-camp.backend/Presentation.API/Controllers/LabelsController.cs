@@ -4,20 +4,26 @@ using Application.Labels.Commands.UpdateLabel;
 using Application.Labels.Queries.GetBoardLabels;
 using Application.Labels.Queries.GetLabelsForCard;
 using Domain.DTOs.Labels;
+using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
 using Presentation.API.Contracts.Labels;
+using Presentation.API.Hubs;
 
 namespace Presentation.API.Controllers;
 
 [Route("api/[controller]")]
 public class LabelsController : AuthorizedContoller
 {
-    public LabelsController(ISender sender) 
+    private readonly IHubContext<HomeHub> _hubContext;
+    public LabelsController(ISender sender, IHubContext<HomeHub> hubContext) 
         : base(sender)
-    {}
+    {
+        _hubContext = hubContext;
+    }
     
     [HttpGet("board/{id}")]
     public async Task<IActionResult> GetByBoardAsync(
@@ -79,14 +85,24 @@ public class LabelsController : AuthorizedContoller
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
         var command = new UpdateLabelCommand(id, request.Text, request.Color);
         
-        Result result = await Sender.Send(command, cancellationToken);
+        Result<UpdatedLabelDto> result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
             return HandleFailure(result);
         }
+        
+        await _hubContext.Clients
+            .Group(HomeHub.GetBoardGroupName(result.Value.BoardId))
+            .SendAsync("UpdateLabel", result.Value.Label, cancellationToken);
         
         return Ok();
     }

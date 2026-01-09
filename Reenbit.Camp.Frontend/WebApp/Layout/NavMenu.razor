@@ -16,32 +16,24 @@
     </div>
 
     <div class="navbar-right">
-        <AuthorizeView>
-            <Authorized>
-                <BoardInvitationsMenu />
-                
-                <div class="d-flex flex-row gap-1 align-items-center">
-                    <span class="user-name">
-                        @context.User.Identity?.Name
-                    </span>
+        <BoardInvitationsMenu />
+        
+        <div class="d-flex flex-row gap-1 align-items-center">
+            <span class="user-name">
+                @Username
+            </span>
 
-                    <TelerikAvatar
-                        Type=@AvatarType.Text
-                        Class="avatar"
-                        ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
-                        @(!string.IsNullOrWhiteSpace(context.User.Identity?.Name)
-                            ? context.User.Identity.Name[0]
-                            : '?')
-                    </TelerikAvatar>
-                </div>
+            <TelerikAvatar
+                Type=@AvatarType.Text
+                Class="avatar"
+                ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                @(!string.IsNullOrWhiteSpace(Username)
+                    ? Username[0]
+                    : '?')
+            </TelerikAvatar>
+        </div>
 
-                <Logout />
-            </Authorized>
-
-            <NotAuthorized>
-                <RedirectToLogin />
-            </NotAuthorized>
-        </AuthorizeView>
+        <Logout />
     </div>
 </nav>
 

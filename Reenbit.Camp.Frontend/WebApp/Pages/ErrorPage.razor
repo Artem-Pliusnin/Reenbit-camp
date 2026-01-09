@@ -1,0 +1,17 @@
+@page "/error"
+@layout EmptyLayout
+
+<div class="error-page">
+    <div class="error-card">
+        <h1>Something went wrong</h1>
+
+        <p>
+            We couldn’t connect to the server.<br />
+            Please check your internet connection or try again later.
+        </p>
+
+        <button class="btn btn-primary" @onclick="Reload">
+            Reload page
+        </button>
+    </div>
+</div>

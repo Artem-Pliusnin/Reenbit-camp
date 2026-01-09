@@ -1,9 +1,13 @@
+using AutoMapper;
 using Domain.Models.Boards;
 using Domain.Models.Invitations;
 using Domain.Models.Users;
+using Domain.Responses.Invitations;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Invitations;
@@ -11,9 +15,17 @@ namespace WebApp.Components.Invitations;
 public partial class BoardInvitationsMenu : ComponentBase
 {
     private TelerikPopover? PopoverRef { get; set; }
+
+    [Inject] 
+    public IMapper Mapper { get; set; } = default!;
     
     [Inject] 
     public IInvitationsService InvitationsService { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; }
+
+    private HubConnection HomeHubConnection;
     
     [Inject] 
     public NavigationManager Navigation{ get; set; } = default!;
@@ -25,14 +37,19 @@ public partial class BoardInvitationsMenu : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        
         IsLoading = true;
         
         await LoadInvitations();
         
+        HomeHubConnection.On<InvitationDto>("AddInvitation" ,AddInvitation);
+        HomeHubConnection.On<int>("DeleteInvitation" ,DeleteInvitation);
+
         IsLoading = false;
     }
 
-    private async Task Toggle()
+    private void Toggle()
     {
         IsOpen = !IsOpen;
 
@@ -55,6 +72,25 @@ public partial class BoardInvitationsMenu : ComponentBase
             Invitations = result.Value;
         }
     }
+    
+    private void AddInvitation(InvitationDto invitation)
+    {
+        var model = Mapper.Map<InvitationModel>(invitation);
+        
+        Invitations.Add(model);
+        
+        StateHasChanged();
+        PopoverRef?.Refresh();
+    }
+    
+    private void DeleteInvitation(int invitationId)
+    {
+        Invitations.RemoveAll(i => i.Id == invitationId);
+        
+        StateHasChanged();
+        PopoverRef?.Refresh();
+    }
+
 
     private async Task Accept(int invitationId)
     {

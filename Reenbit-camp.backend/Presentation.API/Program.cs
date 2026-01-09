@@ -3,6 +3,7 @@ using Database;
 using Infrastructure;
 using Persistence;
 using Presentation.API;
+using Presentation.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,5 +48,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<HomeHub>("/homehub");
 
 app.Run();

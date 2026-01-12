@@ -3,8 +3,10 @@ using Domain.Models.Lists;
 using Domain.Requests.Lists;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Lists;
@@ -29,6 +31,11 @@ public partial class ListHeader : ComponentBase
     [Inject]
     public IJSRuntime JsRuntime { get; set; } = default!;
     
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    
     private bool IsEditingTitle = false;
     private string TitleInput = string.Empty;
     
@@ -46,6 +53,7 @@ public partial class ListHeader : ComponentBase
     protected override void OnInitialized()
     { 
         DotNetRef = DotNetObjectReference.Create(this);
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
     }
 
     private void StartEditTitle()
@@ -60,9 +68,18 @@ public partial class ListHeader : ComponentBase
         {
             List.Title = TitleInput;
 
-            await ListsService.UpdateAsync(
+            var result = await ListsService.UpdateAsync(
                 List.Id, 
                 new UpdateListRequest(List.Id, TitleInput));
+
+            if (result.IsSuccess)
+            {
+                await HomeHubConnection
+                    .SendAsync(
+                        "UpdateList" , 
+                        new UpdateListModel(List.Id, List.Title), 
+                        BoardInfo.Id);
+            }
         }
         
         IsEditingTitle = false;
@@ -151,6 +168,9 @@ public partial class ListHeader : ComponentBase
         if (result.IsSuccess)
         {
             await OnDeleteList.InvokeAsync(List);
+            
+            await HomeHubConnection
+                .SendAsync("DeleteList" , List.Id, BoardInfo.Id);
         }
     }
 }

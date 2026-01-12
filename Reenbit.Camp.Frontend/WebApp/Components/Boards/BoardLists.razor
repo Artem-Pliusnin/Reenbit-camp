@@ -3,10 +3,11 @@
 @using WebApp.Components.Lists
 
 <div class="d-flex gap-3 board-lists">
-    @foreach (var list in Board.Lists.OrderBy(l => l.Position))
+    @foreach (var list in Board.Lists)
     {
         <div class="d-flex flex-column gap-1 align-items-center list-container">
             <ListHeader
+                @key=@list.Id
                 List=@list
                 OnMoveList=@HandleMoveList
                 OnDeleteList=@RemoveList>

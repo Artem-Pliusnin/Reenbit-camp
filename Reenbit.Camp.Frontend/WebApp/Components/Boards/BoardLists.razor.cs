@@ -5,12 +5,14 @@ using Domain.Models.Lists;
 using Domain.Requests.Cards;
 using Domain.Requests.Lists;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Boards;
 
-public partial class BoardLists : ComponentBase
+public partial class BoardLists : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
@@ -23,6 +25,12 @@ public partial class BoardLists : ComponentBase
     
     [Inject] 
     public ICardsService CardsService { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    private List<IDisposable> Subscriptions = new();
     
     private Dictionary<int, TelerikListBox<CardModel>> ListBoxRefs { get; set; } = new();
     
@@ -71,20 +79,26 @@ public partial class BoardLists : ComponentBase
         var result = await ListsService
             .CreateAsync(new CreateListRequest(Board.Id, NewListTitle));
 
-        if (result.IsFailure || result.Value == null)
+        if (result.IsSuccess)
         {
-            return;
+            await AddListToBoard(result.Value);
+            
+            await HomeHubConnection
+                .SendAsync("AddList" , result.Value, Board.Id);
         }
-        
-        Board.Lists.Add(result.Value);
+    }
+
+    private async Task AddListToBoard(ListModel listModel)
+    {
+        Board.Lists.Add(listModel);
         
         NewListTitle = string.Empty;
         
-        ListBoxRefs.Add(result.Value.Id, new TelerikListBox<CardModel>());
+        ListBoxRefs.Add(listModel.Id, new TelerikListBox<CardModel>());
             
-        ListBoxSelectedItems.Add(result.Value.Id, new List<CardModel>());
+        ListBoxSelectedItems.Add(listModel.Id, new List<CardModel>());
 
-        NewCardTitles.Add(result.Value.Id, "");
+        NewCardTitles.Add(listModel.Id, "");
         
         foreach (var listBoxRef in ListBoxRefs)
         {
@@ -188,6 +202,22 @@ public partial class BoardLists : ComponentBase
     
     private async Task HandleMoveList(MoveListModel moveListModel)
     {
+        await MoveListOnBoard(moveListModel);
+        
+        await ListsService.UpdatePositionAsync(
+            moveListModel.ListId,
+            new UpdateListPositionRequest(
+                moveListModel.ListId,
+                moveListModel.NewPosition
+            )
+        );
+        
+        await HomeHubConnection
+            .SendAsync("UpdateListPosition" , moveListModel, Board.Id);
+    }
+
+    private async Task MoveListOnBoard(MoveListModel moveListModel)
+    {
         var list = Board.Lists.First(l => l.Id == moveListModel.ListId);
 
         Board.Lists.Remove(list);
@@ -197,15 +227,7 @@ public partial class BoardLists : ComponentBase
         {
             Board.Lists[i].Position = i + 1;
         }
-
-        await ListsService.UpdatePositionAsync(
-            moveListModel.ListId,
-            new UpdateListPositionRequest(
-                moveListModel.ListId,
-                moveListModel.NewPosition
-            )
-        );
-
+        
         await InvokeAsync(StateHasChanged);
     }
 
@@ -216,8 +238,34 @@ public partial class BoardLists : ComponentBase
         ListBoxSelectedItems.Remove(listModel.Id);
         NewCardTitles.Remove(listModel.Id);
         
+        for (int i = 0; i < Board.Lists.Count; i++)
+        {
+            Board.Lists[i].Position = i + 1;
+        }
+        
         StateHasChanged();
     }
+    
+    private void UpdateList(UpdateListModel dto)
+    {
+        var list = Board.Lists.FirstOrDefault(l => l.Id == dto.Id);
+        if (list != null)
+        {
+            list.Title = dto.Title;
+        }
+        
+        StateHasChanged();
+    }
+
+    private void DeleteList(int listId)
+    {
+        var list = Board.Lists.FirstOrDefault(l => l.Id == listId);
+        if (list != null)
+        {
+            RemoveList(list);
+        }
+    }
+    
     
     private void RemoveCard(CardModel card)
     {
@@ -236,7 +284,7 @@ public partial class BoardLists : ComponentBase
         StateHasChanged();
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         foreach (var list in Board.Lists)
         {
@@ -254,6 +302,28 @@ public partial class BoardLists : ComponentBase
             {
                 NewCardTitles[list.Id] = string.Empty;
             }
+        }
+        
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<MoveListModel>("MoveList", MoveListOnBoard));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<int>("DeleteList", DeleteList));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdateListModel>("UpdateList", UpdateList));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<ListModel>("AddList", AddListToBoard));
+    }
+    
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
         }
     }
 }

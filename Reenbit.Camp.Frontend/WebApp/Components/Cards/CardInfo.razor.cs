@@ -1,25 +1,44 @@
+using System.Text.Json;
+using AutoMapper;
 using Domain.Models.Boards;
 using Domain.Models.CardMembers;
 using Domain.Models.Cards;
 using Domain.Models.Labels;
 using Domain.Requests.Cards;
+using Domain.Responses.CardMembers;
+using Domain.Responses.Cards;
+using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 
 
 namespace WebApp.Components.Cards;
 
 public partial class CardInfo : ComponentBase
 {   
+    [CascadingParameter(Name="Board")]
+    public BoardInfoModel Board { get; set; } = default!;
+    
     [Parameter, EditorRequired]
     public int CardId { get; set; }
+    
+    [Parameter, EditorRequired]
+    public EventCallback<UpdateCardModel> OnCloseWindow { get; set; }
     
     [Inject]
     private ICardsService CardsService { get; set; } = default!;
     
-    [Parameter, EditorRequired]
-    public EventCallback<UpdateCardModel> OnCloseWindow { get; set; }
+    [Inject]
+    private IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+
     
     private bool isLoading;
     
@@ -75,6 +94,12 @@ public partial class CardInfo : ComponentBase
                     Card.Id, 
                     Card.Title,
                     Card.Description));
+            
+            await HomeHubConnection
+                .SendAsync(
+                    "UpdateCardTitle", 
+                    new UpdatedCardTitleDto(CardId, Card.Title), 
+                    Board.Id);
         }
         
         IsEditingTitle = false;
@@ -104,6 +129,14 @@ public partial class CardInfo : ComponentBase
             new UpdateCardStatusRequest(
                 Card.Id, 
                 Card.IsCompleted));
+        
+        await HomeHubConnection
+            .SendAsync(
+                "UpdateCardStatus", 
+                new UpdatedCardStatusDto(
+                    Card.Id,
+                    Card.IsCompleted), 
+                Board.Id);
     }
     
     private void StartEditDescription()
@@ -185,6 +218,9 @@ public partial class CardInfo : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        
         var result = await CardsService.GetInfoAsync(CardId);
 
         if (result.IsSuccess)
@@ -202,6 +238,15 @@ public partial class CardInfo : ComponentBase
                 Card.Id,
                 Card.StartDate,
                 Card.DueDate));
+        
+        await HomeHubConnection
+            .SendAsync(
+                "UpdateCardDates", 
+                new UpdatedCardDatesDto(
+                    CardId, 
+                    Card.StartDate, 
+                    Card.DueDate), 
+                Board.Id);
     }
 
     public void UpdateCard()
@@ -216,13 +261,33 @@ public partial class CardInfo : ComponentBase
                 CardMembers));
     }
 
-    private void UpdateCardLabels(List<CardLabelModel> labels)
+    private async Task UpdateCardLabels(List<CardLabelModel> labels)
     {
         CardLabels = labels;
+        
+        var cardLabelDtos = Mapper.Map<List<CardLabelDto>>(labels);
+
+        await HomeHubConnection
+            .SendAsync(
+                "UpdateCardLabels", 
+                new UpdatedCardLabelsDto(
+                    CardId, 
+                    cardLabelDtos), 
+                Board.Id);
     }
     
-    private void UpdateCardMembers(List<CardMemberModel> members)
+    private async Task UpdateCardMembers(List<CardMemberModel> members)
     {
         CardMembers = members;
+        
+        var cardMembersDtos = Mapper.Map<List<CardMemberDto>>(members);
+
+        await HomeHubConnection
+            .SendAsync(
+                "UpdateCardMembers", 
+                new UpdatedCardMembersDto(
+                    CardId, 
+                    cardMembersDtos), 
+                Board.Id);
     }
 }

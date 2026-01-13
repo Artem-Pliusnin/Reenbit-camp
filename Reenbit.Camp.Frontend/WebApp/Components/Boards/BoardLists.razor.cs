@@ -1,9 +1,13 @@
+using AutoMapper;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
+using Domain.Models.CardMembers;
 using Domain.Models.Cards;
+using Domain.Models.Labels;
 using Domain.Models.Lists;
 using Domain.Requests.Cards;
 using Domain.Requests.Lists;
+using Domain.Responses.Cards;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
@@ -26,6 +30,9 @@ public partial class BoardLists : ComponentBase, IDisposable
     [Inject] 
     public ICardsService CardsService { get; set; } = default!;
     
+    [Inject]
+    public IMapper Mapper { get; set; } = default!;
+    
     [Inject] 
     public HubConnectionManager HubConnectionManager { get; set; } = default!;
     
@@ -43,7 +50,7 @@ public partial class BoardLists : ComponentBase, IDisposable
     
     private Dictionary<int, string> NewCardTitles = new();
 
-    private async Task AddCard(int listId)
+    private async Task CreateCard(int listId)
     {
         var title = NewCardTitles[listId];
         
@@ -67,6 +74,9 @@ public partial class BoardLists : ComponentBase, IDisposable
         NewCardTitles[listId] = string.Empty;
 
         ListBoxRefs[listId].Rebind();
+        
+        await HomeHubConnection
+            .SendAsync("AddCard" , result.Value, list.Id, Board.Id);
     }
     
     private async Task AddList()
@@ -134,6 +144,19 @@ public partial class BoardLists : ComponentBase, IDisposable
             args.Items,
             int.Parse(args.DestinationListBoxId),
             destinationIndex
+        );
+        
+        var reorderEvent = new CardsReorderedModel()
+        {
+            BoardId = Board.Id,
+            SourceListId = int.Parse(sourceListBoxId),
+            DestinationListId = int.Parse(args.DestinationListBoxId),
+            OrderedCardIds = destinationData.Select(c => c.Id).ToList()
+        };
+        
+        await HomeHubConnection.SendAsync(
+            "CardsReordered",
+            reorderEvent
         );
     }
 
@@ -230,7 +253,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         
         await InvokeAsync(StateHasChanged);
     }
-
+    
     private void RemoveList(ListModel listModel)
     {
         Board.Lists.Remove(listModel);
@@ -266,6 +289,43 @@ public partial class BoardLists : ComponentBase, IDisposable
         }
     }
     
+    private void ApplyCardsReorder(CardsReorderedModel dto)
+    {
+        var sourceList = Board.Lists.First(l => l.Id == dto.SourceListId);
+        var destinationList = Board.Lists.First(l => l.Id == dto.DestinationListId);
+        
+        var allCards = sourceList.Cards
+            .Concat(destinationList.Cards)
+            .GroupBy(c => c.Id)
+            .ToDictionary(g => g.Key, g => g.First());
+        
+        if (sourceList.Id == destinationList.Id)
+        {
+            sourceList.Cards.Clear();
+            sourceList.Cards.AddRange(
+                dto.OrderedCardIds
+                    .Where(id => allCards.ContainsKey(id))
+                    .Select(id => allCards[id])
+            );
+        }
+        else
+        {
+            sourceList.Cards.RemoveAll(c => 
+                dto.OrderedCardIds.Any(id => id == c.Id));
+            
+            destinationList.Cards.Clear();
+            destinationList.Cards.AddRange(
+                dto.OrderedCardIds
+                    .Where(id => allCards.ContainsKey(id))
+                    .Select(id => allCards[id])
+            );
+        }
+        
+        ListBoxRefs[dto.SourceListId].Rebind();
+        ListBoxRefs[dto.DestinationListId].Rebind();
+        StateHasChanged();
+    }
+
     
     private void RemoveCard(CardModel card)
     {
@@ -283,7 +343,94 @@ public partial class BoardLists : ComponentBase, IDisposable
 
         StateHasChanged();
     }
+    
+    private void HandelRemovingCard(int cardId)
+    {
+        var list = Board.Lists
+            .FirstOrDefault(l => l.Cards.Any(c => c.Id == cardId));
 
+        if (list == null)
+        {
+            return;
+        }
+
+        list.Cards.RemoveAll(c => c.Id == cardId);
+        
+        ListBoxRefs[list.Id].Rebind();
+
+        StateHasChanged();
+    }
+    
+    private void AddCard(CreatedCardDto dto)
+    {
+        var list = Board.Lists.First(l => l.Id == dto.ListId);
+        
+        var card = Mapper.Map<CardModel>(dto.Card);
+        
+        list.Cards.Add(card);
+
+        ListBoxRefs[list.Id].Rebind();
+        
+        StateHasChanged();
+    }
+
+    private CardModel FindCard(int cardId)
+    {
+        return Board.Lists
+            .SelectMany(l => l.Cards)
+            .First(c => c.Id == cardId);
+    }
+
+    private void UpdateCardTitle(UpdatedCardTitleDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        card.Title = dto.Title;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardDates(UpdatedCardDatesDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        card.StartDate = dto.StartDate;
+        card.DueDate = dto.DueDate;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardStatus(UpdatedCardStatusDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        card.IsCompleted = dto.IsCompleted;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardLabels(UpdatedCardLabelsDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        var cardLabelModels = Mapper.Map<List<CardLabelModel>>(dto.Labels);
+
+        card.Labels = cardLabelModels;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardMembers(UpdatedCardMembersDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        var cardMemberModels = Mapper.Map<List<CardMemberModel>>(dto.Members);
+
+        card.Members = cardMemberModels;
+        
+        StateHasChanged();
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         foreach (var list in Board.Lists)
@@ -317,6 +464,30 @@ public partial class BoardLists : ComponentBase, IDisposable
         
         Subscriptions.Add(HomeHubConnection
             .On<ListModel>("AddList", AddListToBoard));
+
+        Subscriptions.Add(HomeHubConnection
+            .On<CardsReorderedModel>("CardsReordered", ApplyCardsReorder));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<CreatedCardDto>("AddCard", AddCard));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<int>("RemoveCard", HandelRemovingCard));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardTitleDto>("UpdateCardTitle", UpdateCardTitle));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardDatesDto>("UpdateCardDates", UpdateCardDates));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardStatusDto>("UpdateCardStatus", UpdateCardStatus));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardLabelsDto>("UpdateCardLabels", UpdateCardLabels));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardMembersDto>("UpdateCardMembers", UpdateCardMembers));
     }
     
     public void Dispose()

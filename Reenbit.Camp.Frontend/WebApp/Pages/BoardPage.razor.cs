@@ -36,6 +36,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     public HubConnectionManager HubConnectionManager { get; set; } = default!;
     
     private HubConnection HomeHubConnection;
+    
     private List<IDisposable> Subscriptions = new();
 
     private BoardInfoModel Board = new();
@@ -87,6 +88,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     private async Task LoadBoardData()
     {
         isLoading = true;
+        Console.WriteLine("Loading data");
         var boardResult = await BoardsService.GetInfoAsync(BoardId);
 
         if (boardResult.IsSuccess)
@@ -177,7 +179,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         PopoverRef?.Refresh();
     }
     
-    private void UpdateLabel(LabelDto label)
+    private async Task UpdateLabel(LabelDto label)
     {
         var updatedLabel = Labels.FirstOrDefault(l => l.Id == label.Id);
 
@@ -186,14 +188,18 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
             updatedLabel.Text = label.Text;
             updatedLabel.Color = label.Color;
         }
-
+        
+        await LoadBoardData();
+        StateHasChanged();
         PopoverRef?.Refresh();
     }
     
-    private void RemoveLabel(int labelId)
+    private async Task RemoveLabel(int labelId)
     {
         Labels.RemoveAll(l => l.Id == labelId);
         
+        await LoadBoardData();
+        StateHasChanged();
         PopoverRef?.Refresh();
     }
     

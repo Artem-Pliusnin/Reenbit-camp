@@ -2,8 +2,11 @@ using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Cards;
 using Domain.Requests.Cards;
+using Domain.Responses.Cards;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor;
 
 namespace WebApp.Components.Cards;
@@ -22,14 +25,20 @@ public partial class SimpleCard : ComponentBase
     [Parameter, EditorRequired]
     public EventCallback<CardModel> OnDeleteCard { get; set; }
 
-    [Inject] private ICardsService CardsService { get; set; } = default!;
+    [Inject] 
+    private ICardsService CardsService { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
     
     private CardInfo? CardInfoRef;
     
     private bool IsCardOpen = false;
     
     private bool IsDeleteConfirmOpen = false;
-    
+
     private async Task OnChangeStatus()
     {
         await CardsService.UpdateStatusAsync(
@@ -37,6 +46,14 @@ public partial class SimpleCard : ComponentBase
             new UpdateCardStatusRequest(
                 Card.Id, 
                 Card.IsCompleted));
+        
+        await HomeHubConnection
+            .SendAsync(
+                "UpdateCardStatus", 
+                new UpdatedCardStatusDto(
+                    Card.Id,
+                    Card.IsCompleted), 
+                Board.Id);
     }
 
     private void OpenCard()
@@ -73,6 +90,8 @@ public partial class SimpleCard : ComponentBase
         if (result.IsSuccess)
         {
             await OnDeleteCard.InvokeAsync(Card);
+            await HomeHubConnection
+                .SendAsync("DeleteCard", Card.Id, Board.Id);
         }
     }
     
@@ -92,4 +111,9 @@ public partial class SimpleCard : ComponentBase
         (Card.DueDate < DateTime.UtcNow && !Card.IsCompleted)
             ? "bg-danger text-white"
             : "bg-success text-white";
+    
+    protected override void OnInitialized()
+    {
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+    }
 }

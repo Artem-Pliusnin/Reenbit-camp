@@ -26,7 +26,7 @@
                             => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
 
                 <ItemTemplate>
-                    <SimpleCard Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
+                    <SimpleCard @key=@context.Id Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
                 </ItemTemplate>
 
                 <NoDataTemplate>
@@ -46,7 +46,7 @@
 
                 <button class="btn btn-sm btn-outline-dark"
                         disabled=@string.IsNullOrWhiteSpace(NewCardTitles[list.Id])
-                        @onclick=@(() => AddCard(list.Id))>
+                        @onclick=@(() => CreateCard(list.Id))>
                     Add
                 </button>
             </div>

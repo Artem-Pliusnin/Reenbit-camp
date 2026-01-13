@@ -8,6 +8,6 @@ public class CardMemberProfile : Profile
 {
     public CardMemberProfile()
     {
-        CreateMap<CardMemberDto, CardMemberModel>();
+        CreateMap<CardMemberDto, CardMemberModel>().ReverseMap();
     }
 }

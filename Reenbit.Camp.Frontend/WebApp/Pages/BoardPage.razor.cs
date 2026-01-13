@@ -1,9 +1,12 @@
+using System.Text.Json;
 using AutoMapper;
+using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Labels;
 using Domain.Requests.Boards;
 using Domain.Requests.Labels;
+using Domain.Responses.BoardMembers;
 using Domain.Responses.Invitations;
 using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
@@ -22,6 +25,9 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     
     [Inject] 
     public IMapper Mapper { get; set; } = default!;
+    
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
     
     [Inject] 
     public IBoardsService BoardsService { get; set; } = default!;
@@ -65,30 +71,57 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     protected override async Task OnParametersSetAsync()
     {
         isLoading = true;
-
+        
         HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
             
+        var result = await LoadBoardData();
+
+        if (result)
+        {
+            await HomeHubConnection.SendAsync("AddToBoardGroup", BoardId);
+            
+            Subscriptions.Add(HomeHubConnection
+                .On<string>("UpdateBoardTitle", UpdateBoardTitle));
+
+            Subscriptions.Add(HomeHubConnection
+                .On<LabelDto>("AddNewLabel", AddNewLabel));
+
+            Subscriptions.Add(HomeHubConnection
+                .On<LabelDto>("UpdateLabel", UpdateLabel));
+
+            Subscriptions.Add(HomeHubConnection
+                .On<int>("RemoveLabel", RemoveLabel));
+            
+            Subscriptions.Add(HomeHubConnection
+                .On<int>("DeletedMember", OnDeletedMember));
+            
+            Subscriptions.Add(HomeHubConnection
+                .On<UpdatedCardMemberRoleDto>("UpdateMemberRole", OnUpdateMemberRole));
+        }
+    }
+
+    private async Task OnDeletedMember(int memberId)
+    {
+        if (CurrentBoardMember.Id == memberId)
+        {
+            NavigationManager.NavigateTo($"/");
+        }
         await LoadBoardData();
-        
-        await HomeHubConnection.SendAsync("AddToBoardGroup", BoardId);
-        
-        Subscriptions.Add(HomeHubConnection
-            .On<string>("UpdateBoardTitle", UpdateBoardTitle));
-        
-        Subscriptions.Add(HomeHubConnection
-            .On<LabelDto>("AddNewLabel", AddNewLabel));
-        
-        Subscriptions.Add(HomeHubConnection
-            .On<LabelDto>("UpdateLabel", UpdateLabel));
-        
-        Subscriptions.Add(HomeHubConnection
-            .On<int>("RemoveLabel", RemoveLabel));
+        StateHasChanged();
     }
     
-    private async Task LoadBoardData()
+    private void OnUpdateMemberRole(UpdatedCardMemberRoleDto dto)
+    {
+        if (CurrentBoardMember.Id == dto.MemberId)
+        {
+            CurrentBoardMember.Role = (BoardRole)dto.RoleId;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task<bool> LoadBoardData()
     {
         isLoading = true;
-        Console.WriteLine("Loading data");
         var boardResult = await BoardsService.GetInfoAsync(BoardId);
 
         if (boardResult.IsSuccess)
@@ -102,6 +135,11 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         {
             CurrentBoardMember = memberResult.Value;
         }
+        else
+        {
+            NavigationManager.NavigateTo($"/");
+            return false;
+        }
         
         var labelsResult = await LabelsService.GetByBoardAsync(BoardId);
         
@@ -111,6 +149,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         }
         
         isLoading = false;
+        return true;
     }
     
     private void OpenMembersDialog()

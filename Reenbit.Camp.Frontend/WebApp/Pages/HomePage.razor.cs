@@ -59,6 +59,11 @@ public partial class HomePage : ComponentBase, IDisposable
     {
         await LoadBoardsAsync();
     }
+
+    private async void OnOnlyMyBoardsChanged()
+    {
+        await LoadBoardsAsync();
+    }
     
     private async Task LoadBoardsAsync()
     {

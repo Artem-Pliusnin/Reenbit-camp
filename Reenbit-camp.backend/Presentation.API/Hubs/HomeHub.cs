@@ -33,6 +33,20 @@ public class HomeHub : Hub
             .SendAsync("RemoveLabel", labelId);
     }
     
+
+    public async Task DeleteMember(int memberId, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("DeletedMember", memberId);
+    }
+    
+    public async Task UpdateMemberRole(UpdatedCardMemberRoleDto dto, int boardId)
+    {
+        Console.WriteLine(JsonSerializer.Serialize(dto));
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("UpdateMemberRole", dto);
+    }
+    
     public async Task UpdateListPosition(MoveListDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))

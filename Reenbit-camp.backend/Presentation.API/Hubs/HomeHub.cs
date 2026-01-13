@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Text.Json;
+using Domain.DTOs.Cards;
 using Domain.DTOs.Labels;
 using Domain.DTOs.Lists;
 using Microsoft.AspNetCore.Authorization;
@@ -39,7 +41,6 @@ public class HomeHub : Hub
     
     public async Task DeleteList(int listId, int boardId)
     {
-        Console.WriteLine(listId);
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
             .SendAsync("DeleteList", listId);
     }
@@ -54,6 +55,61 @@ public class HomeHub : Hub
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
             .SendAsync("AddList", list);
+    }
+    
+    public async Task CardsReordered(CardsReorderedDto dto)
+    {
+        await Clients
+            .OthersInGroup(GetBoardGroupName(dto.BoardId))
+            .SendAsync("CardsReordered", dto);
+    }
+    
+    public async Task AddCard(CardDto card, int listId,  int boardId)
+    {
+        var dto = new CreatedCardDto()
+        {
+            ListId = listId,
+            Card = card
+        };
+        
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("AddCard", dto);
+    }
+    
+    public async Task DeleteCard(int cardId, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("RemoveCard", cardId);
+    }
+    
+    public async Task UpdateCardTitle(UpdatedCardTitleDto dto, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("UpdateCardTitle", dto);
+    }
+    
+    public async Task UpdateCardDates(UpdatedCardDatesDto dto, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("UpdateCardDates", dto);
+    }
+    
+    public async Task UpdateCardStatus(UpdatedCardStatusDto dto, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("UpdateCardStatus", dto);
+    }
+    
+    public async Task UpdateCardLabels(UpdatedCardLabelsDto dto, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("UpdateCardLabels", dto);
+    }
+    
+    public async Task UpdateCardMembers(UpdatedCardMembersDto dto, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("UpdateCardMembers", dto);
     }
     
     public static string GetBoardGroupName(int boardId)

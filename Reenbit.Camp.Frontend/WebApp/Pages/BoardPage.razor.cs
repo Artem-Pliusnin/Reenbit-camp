@@ -94,16 +94,16 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
                 .On<int>(SubscribeHomeHubConstants.RemoveLabel, RemoveLabel));
             
             Subscriptions.Add(HomeHubConnection
-                .On<int>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
+                .On<BoardMemberDto>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
             
             Subscriptions.Add(HomeHubConnection
                 .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
         }
     }
 
-    private async Task OnDeletedMember(int memberId)
+    private async Task OnDeletedMember(BoardMemberDto member)
     {
-        if (CurrentBoardMember.Id == memberId)
+        if (CurrentBoardMember.Id == member.Id)
         {
             NavigationManager.NavigateTo($"/");
         }

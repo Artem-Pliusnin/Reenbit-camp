@@ -12,7 +12,7 @@ using Telerik.Blazor;
 
 namespace WebApp.Components.Cards;
 
-public partial class SimpleCard : ComponentBase
+public partial class SimpleCard : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
@@ -33,6 +33,9 @@ public partial class SimpleCard : ComponentBase
     public HubConnectionManager HubConnectionManager { get; set; } = default!;
     
     private HubConnection HomeHubConnection;
+    private HubConnection TaskHubConnection;
+    
+    private List<IDisposable> Subscriptions = new();
     
     private CardInfo? CardInfoRef;
     
@@ -116,5 +119,14 @@ public partial class SimpleCard : ComponentBase
     protected override void OnInitialized()
     {
         HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
+    }
+
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
+        }
     }
 }

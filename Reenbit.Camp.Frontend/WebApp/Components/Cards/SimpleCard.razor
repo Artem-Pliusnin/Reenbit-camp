@@ -91,26 +91,28 @@
         </div>
     </DialogTitle>
     <DialogContent>
-        <div class="container-fluid p-0 overflow-hidden" 
+        <div class="container-fluid p-0 overflow-hidden"
              style="box-sizing: border-box">
-            <div class="row g-3 dialog-content">
-                <div class="col-12 col-lg-7 p-0 window-section">
-                    <CascadingValue Name="Board" Value=@Board>
-                        <CascadingValue Name="CurrentUser" Value=@CurrentUser>
-                            <CardInfo
-                                @ref=@CardInfoRef
-                                CardId=@Card.Id
-                                OnCloseWindow=@HandleCardWindowClose></CardInfo>
+            <TaskHubConnectionContext CardId=@Card.Id>
+                <div class="row g-3 dialog-content">
+                    <div class="col-12 col-lg-7 p-0 window-section">
+                        <CascadingValue Name="Board" Value=@Board>
+                            <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                                <CardInfo
+                                    @ref=@CardInfoRef
+                                    CardId=@Card.Id
+                                    OnCloseWindow=@HandleCardWindowClose></CardInfo>
+                            </CascadingValue>
                         </CascadingValue>
-                    </CascadingValue>
+                    </div>
+
+                    <div class="col-12 col-lg-5 p-0 window-section">
+                        <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                            <CardComments CardId=@Card.Id></CardComments>
+                        </CascadingValue>
+                    </div>
                 </div>
-                
-                <div class="col-12 col-lg-5 p-0 window-section">
-                    <CascadingValue Name="CurrentUser" Value=@CurrentUser>
-                        <CardComments CardId=@Card.Id></CardComments>
-                    </CascadingValue>
-                </div>
-            </div>
+            </TaskHubConnectionContext>
         </div>
     </DialogContent>
 </TelerikDialog>

@@ -40,8 +40,6 @@ public class HubConnectionManager
             })
             .Build();
         
-        hub.StartAsync();
-        
         _connections[type] = hub;
         return hub;
     }

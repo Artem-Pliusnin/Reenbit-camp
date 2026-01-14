@@ -1,13 +1,19 @@
+using System.Text.Json;
+using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Models.Boards;
 using Domain.Models.Labels;
 using Domain.Requests.Labels;
+using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Labels;
 
-public partial class CardLabelsSection : ComponentBase
+public partial class CardLabelsSection : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
@@ -17,16 +23,27 @@ public partial class CardLabelsSection : ComponentBase
     
     [Parameter, EditorRequired] 
     public EventCallback<List<CardLabelModel>> OnUpdateLabels { get; set; }
-
-    private List<CardLabelModel> CardLabels { get; set; } = new();
-    
-    private List<LabelModel> AvailableLabels { get; set; } = new();
     
     [Inject] 
     private ILabelsService LabelsService { get; set; } = default!;
     
     [Inject] 
     private ICardLabelsService CardLabelsService { get; set; } = default!;
+    
+    [Inject] 
+    private IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    private HubConnection TaskHubConnection;
+    
+    private List<IDisposable> Subscriptions = new();
+    
+    private List<CardLabelModel> CardLabels { get; set; } = new();
+    
+    private List<LabelModel> AvailableLabels { get; set; } = new();
     
     private TelerikPopover? PopoverRef { get; set; }
     
@@ -36,6 +53,44 @@ public partial class CardLabelsSection : ComponentBase
     
     private bool IsEditMode = false;
     private LabelModel EditLabel;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
+        
+        var availableLabelsResult = await LabelsService
+            .GetNotConnectedAsync(CardId);
+
+        if (availableLabelsResult.IsSuccess)
+        {
+            AvailableLabels = availableLabelsResult.Value;
+        }
+        
+        var cardLabelsResult = await CardLabelsService
+            .GetByCardAsync(CardId);
+
+        if (cardLabelsResult.IsSuccess)
+        {
+            CardLabels = cardLabelsResult.Value;
+            await OnUpdateLabels.InvokeAsync(CardLabels);
+        }
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<LabelDto>(SubscribeHomeHubConstants.AddNewLabel, AddNewLabel));
+
+        Subscriptions.Add(HomeHubConnection
+            .On<LabelDto>(SubscribeHomeHubConstants.UpdateLabel, UpdateLabel));
+
+        Subscriptions.Add(HomeHubConnection
+            .On<int>(SubscribeHomeHubConstants.RemoveLabel, RemoveLabel));
+        
+        Subscriptions.Add(TaskHubConnection
+            .On<CardLabelDto>(SubscribeTaskHubConstants.AddCardLabel, AddCardLabel));
+
+        Subscriptions.Add(TaskHubConnection
+            .On<CardLabelDto>(SubscribeTaskHubConstants.DeleteCardLabel, RemoveCardLabel));
+    }
 
     private void ResetCreateForm()
     {
@@ -97,6 +152,12 @@ public partial class CardLabelsSection : ComponentBase
             CardLabels.Remove(cardLabel);
             AvailableLabels.Add(cardLabel.Label);
             await OnUpdateLabels.InvokeAsync(CardLabels);
+            
+            await TaskHubConnection
+                .SendAsync(
+                    SendTaskHubConstants.DeleteCardLabel , 
+                    cardLabel, 
+                    CardId);
         }
         
         PopoverRef?.Refresh();
@@ -112,6 +173,12 @@ public partial class CardLabelsSection : ComponentBase
             AvailableLabels.Remove(label);
             CardLabels.Add(result.Value);
             await OnUpdateLabels.InvokeAsync(CardLabels);
+            
+            await TaskHubConnection
+                .SendAsync(
+                    SendTaskHubConstants.AddCardLabel , 
+                    result.Value, 
+                    CardId);
         }
         
         PopoverRef?.Refresh();
@@ -125,6 +192,12 @@ public partial class CardLabelsSection : ComponentBase
         if (result.IsSuccess)
         {
             AvailableLabels.Add(result.Value);
+            
+            await HomeHubConnection
+                .SendAsync(
+                    SendHomeHubConstants.AddNewLabel , 
+                    result.Value, 
+                    Board.Id);
         }
         
         ResetCreateForm();
@@ -173,30 +246,100 @@ public partial class CardLabelsSection : ComponentBase
             CardLabels.RemoveAll(cl => cl.Label.Id == EditLabel.Id);
             AvailableLabels.RemoveAll(l => l.Id == EditLabel.Id);
             await OnUpdateLabels.InvokeAsync(CardLabels);
+            
+            await HomeHubConnection
+                .SendAsync(
+                    SendHomeHubConstants.DeleteLabel, 
+                    EditLabel.Id, 
+                    Board.Id);
         }
         
         ChangeToBaseMode();
         PopoverRef?.Refresh();
     }
     
-
-    protected override async Task OnInitializedAsync()
+    private void AddNewLabel(LabelDto newLabel)
     {
-        var availableLabelsResult = await LabelsService
-            .GetNotConnectedAsync(CardId);
+        var labelModel = Mapper.Map<LabelModel>(newLabel);
 
-        if (availableLabelsResult.IsSuccess)
+        if (!AvailableLabels.Any(l => l.Id == labelModel.Id))
         {
-            AvailableLabels = availableLabelsResult.Value;
+            AvailableLabels.Add(labelModel);
         }
         
-        var cardLabelsResult = await CardLabelsService
-            .GetByCardAsync(CardId);
+        PopoverRef?.Refresh();
+    }
+    
+    private void UpdateLabel(LabelDto label)
+    {
+        var updatedLabel = AvailableLabels.FirstOrDefault(l => l.Id == label.Id);
 
-        if (cardLabelsResult.IsSuccess)
+        if (updatedLabel != null)
         {
-            CardLabels = cardLabelsResult.Value;
-            await OnUpdateLabels.InvokeAsync(CardLabels);
+            updatedLabel.Text = label.Text;
+            updatedLabel.Color = label.Color;
+        }
+        else
+        {
+            var updatedLabelModel = CardLabels.FirstOrDefault(l => l.Label.Id == label.Id);
+
+            if (updatedLabelModel != null)
+            {
+                updatedLabelModel.Label.Text = label.Text;
+                updatedLabelModel.Label.Color = label.Color;
+            }
+        }
+        
+        StateHasChanged();
+        PopoverRef?.Refresh();
+    }
+    
+    private void RemoveLabel(int labelId)
+    {
+        AvailableLabels.RemoveAll(l => l.Id == labelId);
+        CardLabels.RemoveAll(l => l.Label.Id == labelId);
+        
+        StateHasChanged();
+        PopoverRef?.Refresh();
+    }
+
+    private void AddCardLabel(CardLabelDto dto)
+    {
+        var cardLabel = Mapper.Map<CardLabelModel>(dto);
+        
+        AvailableLabels.RemoveAll(l => l.Id == dto.Label.Id);
+
+        if (!CardLabels.Any(cl => cl.Id == dto.Id))
+        {
+            CardLabels.Add(cardLabel);
+            StateHasChanged();
+        }
+        
+        PopoverRef?.Refresh();
+    }
+    
+    private void RemoveCardLabel(CardLabelDto dto)
+    {
+        Console.WriteLine(JsonSerializer.Serialize(dto));
+        var cardLabel = Mapper.Map<CardLabelModel>(dto);
+        Console.WriteLine(JsonSerializer.Serialize(cardLabel));
+        
+        CardLabels.RemoveAll(cl => cl.Id == dto.Id);
+        
+        if (!AvailableLabels.Any(l => l.Id == dto.Label.Id))
+        {
+            AvailableLabels.Add(cardLabel.Label);
+        }
+        
+        StateHasChanged();
+        PopoverRef?.Refresh();
+    }
+
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
         }
     }
 }

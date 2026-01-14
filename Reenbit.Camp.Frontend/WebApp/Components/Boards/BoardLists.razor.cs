@@ -1,16 +1,23 @@
+using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
+using Domain.Models.CardMembers;
 using Domain.Models.Cards;
+using Domain.Models.Labels;
 using Domain.Models.Lists;
 using Domain.Requests.Cards;
 using Domain.Requests.Lists;
+using Domain.Responses.Cards;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Boards;
 
-public partial class BoardLists : ComponentBase
+public partial class BoardLists : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
@@ -24,6 +31,15 @@ public partial class BoardLists : ComponentBase
     [Inject] 
     public ICardsService CardsService { get; set; } = default!;
     
+    [Inject]
+    public IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    private List<IDisposable> Subscriptions = new();
+    
     private Dictionary<int, TelerikListBox<CardModel>> ListBoxRefs { get; set; } = new();
     
     private Dictionary<int, IEnumerable<CardModel>> ListBoxSelectedItems { get; set; } = new();
@@ -35,7 +51,7 @@ public partial class BoardLists : ComponentBase
     
     private Dictionary<int, string> NewCardTitles = new();
 
-    private async Task AddCard(int listId)
+    private async Task CreateCard(int listId)
     {
         var title = NewCardTitles[listId];
         
@@ -59,6 +75,9 @@ public partial class BoardLists : ComponentBase
         NewCardTitles[listId] = string.Empty;
 
         ListBoxRefs[listId].Rebind();
+        
+        await HomeHubConnection
+            .SendAsync(SendHomeHubConstants.AddCard, result.Value, list.Id, Board.Id);
     }
     
     private async Task AddList()
@@ -71,20 +90,26 @@ public partial class BoardLists : ComponentBase
         var result = await ListsService
             .CreateAsync(new CreateListRequest(Board.Id, NewListTitle));
 
-        if (result.IsFailure || result.Value == null)
+        if (result.IsSuccess)
         {
-            return;
+            await AddListToBoard(result.Value);
+            
+            await HomeHubConnection
+                .SendAsync(SendHomeHubConstants.AddList , result.Value, Board.Id);
         }
-        
-        Board.Lists.Add(result.Value);
+    }
+
+    private async Task AddListToBoard(ListModel listModel)
+    {
+        Board.Lists.Add(listModel);
         
         NewListTitle = string.Empty;
         
-        ListBoxRefs.Add(result.Value.Id, new TelerikListBox<CardModel>());
+        ListBoxRefs.Add(listModel.Id, new TelerikListBox<CardModel>());
             
-        ListBoxSelectedItems.Add(result.Value.Id, new List<CardModel>());
+        ListBoxSelectedItems.Add(listModel.Id, new List<CardModel>());
 
-        NewCardTitles.Add(result.Value.Id, "");
+        NewCardTitles.Add(listModel.Id, "");
         
         foreach (var listBoxRef in ListBoxRefs)
         {
@@ -120,6 +145,19 @@ public partial class BoardLists : ComponentBase
             args.Items,
             int.Parse(args.DestinationListBoxId),
             destinationIndex
+        );
+        
+        var reorderEvent = new CardsReorderedModel()
+        {
+            BoardId = Board.Id,
+            SourceListId = int.Parse(sourceListBoxId),
+            DestinationListId = int.Parse(args.DestinationListBoxId),
+            OrderedCardIds = destinationData.Select(c => c.Id).ToList()
+        };
+        
+        await HomeHubConnection.SendAsync(
+            SendHomeHubConstants.CardsReordered,
+            reorderEvent
         );
     }
 
@@ -188,6 +226,22 @@ public partial class BoardLists : ComponentBase
     
     private async Task HandleMoveList(MoveListModel moveListModel)
     {
+        await MoveListOnBoard(moveListModel);
+        
+        await ListsService.UpdatePositionAsync(
+            moveListModel.ListId,
+            new UpdateListPositionRequest(
+                moveListModel.ListId,
+                moveListModel.NewPosition
+            )
+        );
+        
+        await HomeHubConnection
+            .SendAsync(SendHomeHubConstants.UpdateListPosition, moveListModel, Board.Id);
+    }
+
+    private async Task MoveListOnBoard(MoveListModel moveListModel)
+    {
         var list = Board.Lists.First(l => l.Id == moveListModel.ListId);
 
         Board.Lists.Remove(list);
@@ -197,18 +251,10 @@ public partial class BoardLists : ComponentBase
         {
             Board.Lists[i].Position = i + 1;
         }
-
-        await ListsService.UpdatePositionAsync(
-            moveListModel.ListId,
-            new UpdateListPositionRequest(
-                moveListModel.ListId,
-                moveListModel.NewPosition
-            )
-        );
-
+        
         await InvokeAsync(StateHasChanged);
     }
-
+    
     private void RemoveList(ListModel listModel)
     {
         Board.Lists.Remove(listModel);
@@ -216,8 +262,71 @@ public partial class BoardLists : ComponentBase
         ListBoxSelectedItems.Remove(listModel.Id);
         NewCardTitles.Remove(listModel.Id);
         
+        for (int i = 0; i < Board.Lists.Count; i++)
+        {
+            Board.Lists[i].Position = i + 1;
+        }
+        
         StateHasChanged();
     }
+    
+    private void UpdateList(UpdateListModel dto)
+    {
+        var list = Board.Lists.FirstOrDefault(l => l.Id == dto.Id);
+        if (list != null)
+        {
+            list.Title = dto.Title;
+        }
+        
+        StateHasChanged();
+    }
+
+    private void DeleteList(int listId)
+    {
+        var list = Board.Lists.FirstOrDefault(l => l.Id == listId);
+        if (list != null)
+        {
+            RemoveList(list);
+        }
+    }
+    
+    private void ApplyCardsReorder(CardsReorderedModel dto)
+    {
+        var sourceList = Board.Lists.First(l => l.Id == dto.SourceListId);
+        var destinationList = Board.Lists.First(l => l.Id == dto.DestinationListId);
+        
+        var allCards = sourceList.Cards
+            .Concat(destinationList.Cards)
+            .GroupBy(c => c.Id)
+            .ToDictionary(g => g.Key, g => g.First());
+        
+        if (sourceList.Id == destinationList.Id)
+        {
+            sourceList.Cards.Clear();
+            sourceList.Cards.AddRange(
+                dto.OrderedCardIds
+                    .Where(id => allCards.ContainsKey(id))
+                    .Select(id => allCards[id])
+            );
+        }
+        else
+        {
+            sourceList.Cards.RemoveAll(c => 
+                dto.OrderedCardIds.Any(id => id == c.Id));
+            
+            destinationList.Cards.Clear();
+            destinationList.Cards.AddRange(
+                dto.OrderedCardIds
+                    .Where(id => allCards.ContainsKey(id))
+                    .Select(id => allCards[id])
+            );
+        }
+        
+        ListBoxRefs[dto.SourceListId].Rebind();
+        ListBoxRefs[dto.DestinationListId].Rebind();
+        StateHasChanged();
+    }
+
     
     private void RemoveCard(CardModel card)
     {
@@ -235,8 +344,95 @@ public partial class BoardLists : ComponentBase
 
         StateHasChanged();
     }
+    
+    private void HandelRemovingCard(int cardId)
+    {
+        var list = Board.Lists
+            .FirstOrDefault(l => l.Cards.Any(c => c.Id == cardId));
 
-    protected override void OnInitialized()
+        if (list == null)
+        {
+            return;
+        }
+
+        list.Cards.RemoveAll(c => c.Id == cardId);
+        
+        ListBoxRefs[list.Id].Rebind();
+
+        StateHasChanged();
+    }
+    
+    private void AddCard(CreatedCardDto dto)
+    {
+        var list = Board.Lists.First(l => l.Id == dto.ListId);
+        
+        var card = Mapper.Map<CardModel>(dto.Card);
+        
+        list.Cards.Add(card);
+
+        ListBoxRefs[list.Id].Rebind();
+        
+        StateHasChanged();
+    }
+
+    private CardModel FindCard(int cardId)
+    {
+        return Board.Lists
+            .SelectMany(l => l.Cards)
+            .First(c => c.Id == cardId);
+    }
+
+    private void UpdateCardTitle(UpdatedCardTitleDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        card.Title = dto.Title;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardDates(UpdatedCardDatesDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        card.StartDate = dto.StartDate;
+        card.DueDate = dto.DueDate;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardStatus(UpdatedCardStatusDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        card.IsCompleted = dto.IsCompleted;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardLabels(UpdatedCardLabelsDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        var cardLabelModels = Mapper.Map<List<CardLabelModel>>(dto.Labels);
+
+        card.Labels = cardLabelModels;
+        
+        StateHasChanged();
+    }
+    
+    private void UpdateCardMembers(UpdatedCardMembersDto dto)
+    {
+        var card = FindCard(dto.CardId);
+        
+        var cardMemberModels = Mapper.Map<List<CardMemberModel>>(dto.Members);
+
+        card.Members = cardMemberModels;
+        
+        StateHasChanged();
+    }
+    
+    protected override async Task OnInitializedAsync()
     {
         foreach (var list in Board.Lists)
         {
@@ -254,6 +450,52 @@ public partial class BoardLists : ComponentBase
             {
                 NewCardTitles[list.Id] = string.Empty;
             }
+        }
+        
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<MoveListModel>(SubscribeHomeHubConstants.MoveList, MoveListOnBoard));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<int>(SubscribeHomeHubConstants.DeleteList, DeleteList));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdateListModel>(SubscribeHomeHubConstants.UpdateList, UpdateList));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<ListModel>(SubscribeHomeHubConstants.AddList, AddListToBoard));
+
+        Subscriptions.Add(HomeHubConnection
+            .On<CardsReorderedModel>(SubscribeHomeHubConstants.CardsReordered, ApplyCardsReorder));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<CreatedCardDto>(SubscribeHomeHubConstants.AddCard, AddCard));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<int>(SubscribeHomeHubConstants.RemoveCard, HandelRemovingCard));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardTitleDto>(SubscribeHomeHubConstants.UpdateCardTitle, UpdateCardTitle));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardDatesDto>(SubscribeHomeHubConstants.UpdateCardDates, UpdateCardDates));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardStatusDto>(SubscribeHomeHubConstants.UpdateCardStatus, UpdateCardStatus));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardLabelsDto>(SubscribeHomeHubConstants.UpdateCardLabels, UpdateCardLabels));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardMembersDto>(SubscribeHomeHubConstants.UpdateCardMembers, UpdateCardMembers));
+    }
+    
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
         }
     }
 }

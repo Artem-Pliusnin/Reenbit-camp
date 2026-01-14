@@ -8,6 +8,6 @@ public class InvitationProfile : Profile
 {
     public InvitationProfile()
     {
-        CreateMap<InvitationDto, InvitationModel>();
+        CreateMap<InvitationDto, InvitationModel>().ReverseMap();
     }
 }

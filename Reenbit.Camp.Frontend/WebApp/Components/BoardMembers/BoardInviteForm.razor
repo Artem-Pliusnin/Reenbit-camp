@@ -8,7 +8,7 @@
         <input class="form-control mb-3"
                placeholder="Username or email"
                @bind=@InputUser
-                                                                                        @bind:event="oninput"
+               @bind:event="oninput"
                @onkeyup=@ResetTimer/>
 
         @if (Suggestions.Any())

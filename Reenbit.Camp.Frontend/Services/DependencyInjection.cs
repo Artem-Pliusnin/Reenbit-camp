@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
-using WebApp.Authentication;
 using Services.Abstractions.Services;
 using Services.API;
 using Services.APIServices;
+using Services.Authentication;
 using Services.Handlers;
+using Services.HubServices;
 
 namespace Services;
 
@@ -32,6 +33,10 @@ public static class DependencyInjection
         services.AddScoped<ICardLabelsService, CardLabelsService>();
         services.AddScoped<ICardMembersService, CardMembersService>();
         services.AddScoped<ICommentsService, CommentsService>();
+        
+        services.AddScoped<ITokenProvider, LocalStorageTokenProvider>();
+        
+        services.AddScoped<HubConnectionManager>();
         
         services.AddScoped<TokenHandler>();
 

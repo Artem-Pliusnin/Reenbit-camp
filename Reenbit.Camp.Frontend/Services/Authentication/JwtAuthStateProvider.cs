@@ -6,7 +6,7 @@ using Domain.Requests.Auth;
 using Domain.Responses.Auth;
 using Services.Abstractions.Services;
 
-namespace WebApp.Authentication;
+namespace Services.Authentication;
 
 public class JwtAuthStateProvider : AuthenticationStateProvider 
 {

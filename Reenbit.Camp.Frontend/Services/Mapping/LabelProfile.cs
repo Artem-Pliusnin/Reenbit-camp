@@ -9,6 +9,6 @@ public class LabelProfile : Profile
 {
     public LabelProfile()
     {
-        CreateMap<LabelDto, LabelModel>();
+        CreateMap<LabelDto, LabelModel>().ReverseMap();
     }
 }

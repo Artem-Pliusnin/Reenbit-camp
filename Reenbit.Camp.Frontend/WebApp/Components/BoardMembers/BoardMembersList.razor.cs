@@ -1,12 +1,19 @@
+using System.Text.Json;
+using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Requests.BoardMembers;
+using Domain.Responses.BoardMembers;
+using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 
 namespace WebApp.Components.BoardMembers;
 
-public partial class BoardMembersList : ComponentBase
+public partial class BoardMembersList : ComponentBase, IDisposable
 {
     [Parameter, EditorRequired]
     public int BoardId { get; set; }
@@ -20,6 +27,19 @@ public partial class BoardMembersList : ComponentBase
     [Inject] 
     public IBoardMembersService BoardMembersService { get; set; } = default!;
     
+    [Inject] 
+    public IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public NavigationManager NavigationManager { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    
+    private List<IDisposable> Subscriptions = new();
+    
     private bool IsLoading;
     
     private List<BoardMemberModel> Members = new();
@@ -27,6 +47,9 @@ public partial class BoardMembersList : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
+
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+            
         var result = await BoardMembersService.GetByBoardAsync(BoardId);
         
         if (result.IsSuccess)
@@ -35,13 +58,22 @@ public partial class BoardMembersList : ComponentBase
         }
 
         IsLoading = false;
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<BoardMemberDto>(SubscribeHomeHubConstants.AddMember, AddMember));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<int>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
     }
     
     private IEnumerable<BoardRole> GetAvailableRoles(BoardMemberModel member)
     {
-        if (member.Role == BoardRole.Owner)
+        if (!CanChangeRole(member))
         {
-            return new List<BoardRole>(){ BoardRole.Owner };
+            return  Enum.GetValues<BoardRole>().ToList();
         }
         
         return Enum.GetValues<BoardRole>()
@@ -65,15 +97,64 @@ public partial class BoardMembersList : ComponentBase
                 CurrentUser.Role == BoardRole.Admin ) &&
                (int)CurrentUser.Role < (int)member.Role;
     }
+
+    private void AddMember(BoardMemberDto member)
+    {
+        if (!Members.Any(m => m.Id == member.Id))
+        {
+            var memberModel = Mapper.Map<BoardMemberModel>(member);
+ 
+            Members.Add(memberModel);
+            StateHasChanged();
+        }
+    }
+
+    private void OnDeletedMember(int memberId)
+    {
+        if (CurrentUser.Id == memberId)
+        {
+            NavigationManager.NavigateTo($"/");
+            return;
+        }
+        
+        Members.RemoveAll(m => m.Id == memberId);
+        
+        StateHasChanged();
+    }
+    
+    private void OnUpdateMemberRole(UpdatedCardMemberRoleDto dto)
+    {
+        var member = Members.Find(m => m.Id == dto.MemberId);
+
+        if (member is not null)
+        {
+            member.Role = (BoardRole)dto.RoleId;
+            if (CurrentUser.Id == dto.MemberId)
+            {
+                CurrentUser.Role = (BoardRole)dto.RoleId;
+            }
+            StateHasChanged();
+        }
+    }
+    
     
     private async Task OnRoleChanged(BoardMemberModel member)
     {
-            await BoardMembersService.UpdateRoleAsync(
+        var result = await BoardMembersService.UpdateRoleAsync(
             member.Id,
             new UpdateBoardMemberRoleRequest(
                 member.Id, 
                 member.Role)
         );
+
+        if (result.IsSuccess)
+        {
+            await HomeHubConnection
+                .SendAsync(
+                    SendHomeHubConstants.UpdateMemberRole, 
+                    new UpdatedCardMemberRoleDto(member.Id, (int)member.Role), 
+                    BoardId);
+        }
         
         StateHasChanged();
     }
@@ -85,8 +166,20 @@ public partial class BoardMembersList : ComponentBase
         if (result.IsSuccess)
         {
             Members.Remove(member);
+            
             StateHasChanged();
             await UpdateBoardContent.InvokeAsync();
+            
+            await HomeHubConnection
+                .SendAsync(SendHomeHubConstants.DeleteMember, member.Id, BoardId);
+        }
+    }
+    
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
         }
     }
 }

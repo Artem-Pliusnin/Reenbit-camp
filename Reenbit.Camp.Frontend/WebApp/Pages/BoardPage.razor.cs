@@ -1,19 +1,34 @@
+using System.Text.Json;
+using AutoMapper;
+using Domain.Constants.HubConstants;
+using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Labels;
 using Domain.Requests.Boards;
 using Domain.Requests.Labels;
+using Domain.Responses.BoardMembers;
+using Domain.Responses.Invitations;
+using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 
 namespace WebApp.Pages;
 
-public partial class BoardPage : ComponentBase
+public partial class BoardPage : ComponentBase, IAsyncDisposable
 {
     [Parameter]
     public int BoardId { get; set; }
+    
+    [Inject] 
+    public IMapper Mapper { get; set; } = default!;
+    
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = default!;
     
     [Inject] 
     public IBoardsService BoardsService { get; set; } = default!;
@@ -23,6 +38,13 @@ public partial class BoardPage : ComponentBase
     
     [Inject] 
     public ILabelsService LabelsService { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    
+    private List<IDisposable> Subscriptions = new();
 
     private BoardInfoModel Board = new();
     
@@ -49,10 +71,56 @@ public partial class BoardPage : ComponentBase
     
     protected override async Task OnParametersSetAsync()
     {
-        await LoadBoardData();
+        isLoading = true;
+        
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+            
+        var result = await LoadBoardData();
+
+        if (result)
+        {
+            await HomeHubConnection.SendAsync(SendHomeHubConstants.AddToBoardGroup, BoardId);
+            
+            Subscriptions.Add(HomeHubConnection
+                .On<string>(SubscribeHomeHubConstants.UpdateBoardTitle, UpdateBoardTitle));
+
+            Subscriptions.Add(HomeHubConnection
+                .On<LabelDto>(SubscribeHomeHubConstants.AddNewLabel, AddNewLabel));
+
+            Subscriptions.Add(HomeHubConnection
+                .On<LabelDto>(SubscribeHomeHubConstants.UpdateLabel, UpdateLabel));
+
+            Subscriptions.Add(HomeHubConnection
+                .On<int>(SubscribeHomeHubConstants.RemoveLabel, RemoveLabel));
+            
+            Subscriptions.Add(HomeHubConnection
+                .On<int>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
+            
+            Subscriptions.Add(HomeHubConnection
+                .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
+        }
     }
 
-    private async Task LoadBoardData()
+    private async Task OnDeletedMember(int memberId)
+    {
+        if (CurrentBoardMember.Id == memberId)
+        {
+            NavigationManager.NavigateTo($"/");
+        }
+        await LoadBoardData();
+        StateHasChanged();
+    }
+    
+    private void OnUpdateMemberRole(UpdatedCardMemberRoleDto dto)
+    {
+        if (CurrentBoardMember.Id == dto.MemberId)
+        {
+            CurrentBoardMember.Role = (BoardRole)dto.RoleId;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task<bool> LoadBoardData()
     {
         isLoading = true;
         var boardResult = await BoardsService.GetInfoAsync(BoardId);
@@ -68,6 +136,11 @@ public partial class BoardPage : ComponentBase
         {
             CurrentBoardMember = memberResult.Value;
         }
+        else
+        {
+            NavigationManager.NavigateTo($"/");
+            return false;
+        }
         
         var labelsResult = await LabelsService.GetByBoardAsync(BoardId);
         
@@ -77,6 +150,7 @@ public partial class BoardPage : ComponentBase
         }
         
         isLoading = false;
+        return true;
     }
     
     private void OpenMembersDialog()
@@ -124,6 +198,49 @@ public partial class BoardPage : ComponentBase
         {
             CancelEdit();
         }
+    }
+
+    private async Task UpdateBoardTitle(string newTitle)
+    {
+        Board.Title = newTitle;
+        
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task AddNewLabel(LabelDto newLabel)
+    {
+        var labelModel = Mapper.Map<LabelModel>(newLabel);
+
+        if (!Labels.Any(l => l.Id == labelModel.Id))
+        {
+            Labels.Add(labelModel);
+        }
+        
+        PopoverRef?.Refresh();
+    }
+    
+    private async Task UpdateLabel(LabelDto label)
+    {
+        var updatedLabel = Labels.FirstOrDefault(l => l.Id == label.Id);
+
+        if (updatedLabel != null)
+        {
+            updatedLabel.Text = label.Text;
+            updatedLabel.Color = label.Color;
+        }
+        
+        await LoadBoardData();
+        StateHasChanged();
+        PopoverRef?.Refresh();
+    }
+    
+    private async Task RemoveLabel(int labelId)
+    {
+        Labels.RemoveAll(l => l.Id == labelId);
+        
+        await LoadBoardData();
+        StateHasChanged();
+        PopoverRef?.Refresh();
     }
     
     private void ResetCreateForm()
@@ -179,11 +296,17 @@ public partial class BoardPage : ComponentBase
     private async Task CreateLabel()
     { 
         var result = await LabelsService
-            .CreateAsync(new CreateLabelRequest(Board.Id, NewLabelText, NewLabelColor));
+            .CreateAsync(
+                new CreateLabelRequest(
+                    Board.Id, 
+                    NewLabelText, 
+                    NewLabelColor));
 
         if (result.IsSuccess)
         {
             Labels.Add(result.Value);
+            await HomeHubConnection
+                .SendAsync(SendHomeHubConstants.AddNewLabel , result.Value, BoardId);
         }
         
         ResetCreateForm();
@@ -223,10 +346,22 @@ public partial class BoardPage : ComponentBase
         if (result.IsSuccess)
         {
             Labels.RemoveAll(l => l.Id == EditLabel.Id);
+            await HomeHubConnection
+                .SendAsync(SendHomeHubConstants.DeleteLabel, EditLabel.Id, BoardId);
         }
         
         ChangeToBaseMode();
         PopoverRef?.Refresh();
         await LoadBoardData();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await HomeHubConnection.SendAsync(SendHomeHubConstants.DeleteFromBoardGroup, BoardId);
+
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
+        }
     }
 }

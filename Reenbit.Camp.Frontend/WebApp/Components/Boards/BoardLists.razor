@@ -3,10 +3,11 @@
 @using WebApp.Components.Lists
 
 <div class="d-flex gap-3 board-lists">
-    @foreach (var list in Board.Lists.OrderBy(l => l.Position))
+    @foreach (var list in Board.Lists)
     {
         <div class="d-flex flex-column gap-1 align-items-center list-container">
             <ListHeader
+                @key=@list.Id
                 List=@list
                 OnMoveList=@HandleMoveList
                 OnDeleteList=@RemoveList>
@@ -25,7 +26,7 @@
                             => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
 
                 <ItemTemplate>
-                    <SimpleCard Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
+                    <SimpleCard @key=@context.Id Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
                 </ItemTemplate>
 
                 <NoDataTemplate>
@@ -45,7 +46,7 @@
 
                 <button class="btn btn-sm btn-outline-dark"
                         disabled=@string.IsNullOrWhiteSpace(NewCardTitles[list.Id])
-                        @onclick=@(() => AddCard(list.Id))>
+                        @onclick=@(() => CreateCard(list.Id))>
                     Add
                 </button>
             </div>

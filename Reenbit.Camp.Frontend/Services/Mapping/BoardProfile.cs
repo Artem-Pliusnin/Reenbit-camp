@@ -8,7 +8,7 @@ public class BoardProfile : Profile
 {
     public BoardProfile()
     {
-        CreateMap<BoardDto, BoardModel>();
+        CreateMap<BoardDto, BoardModel>().ReverseMap();
         
         CreateMap<BoardInfoDto, BoardInfoModel>();
     }

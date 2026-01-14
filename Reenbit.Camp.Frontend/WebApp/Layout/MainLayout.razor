@@ -1,12 +1,26 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <TelerikRootComponent>
-        <header class="top-navbar">
-            <NavMenu />
-        </header>
+@using WebApp.Components.Shared
+@using WebApp.Components.Auth
 
-        <main>
-            @Body
-        </main>
-    </TelerikRootComponent>
+
+<div class="page">
+    <AuthorizeView>
+        <Authorized>
+            <SocketHubContext>
+                <TelerikRootComponent>
+                    <header class="top-navbar">
+                        <NavMenu Username=@context.User.Identity?.Name/>
+                    </header>
+
+                    <main>
+                        @Body
+                    </main>
+                </TelerikRootComponent>
+            </SocketHubContext>
+        </Authorized>
+
+        <NotAuthorized>
+            <RedirectToLogin />
+        </NotAuthorized>
+    </AuthorizeView>
 </div>

@@ -8,6 +8,6 @@ public class CardLabelProfile : Profile
 {
     public CardLabelProfile()
     {
-        CreateMap<CardLabelDto, CardLabelModel>();
+        CreateMap<CardLabelDto, CardLabelModel>().ReverseMap();
     }
 }

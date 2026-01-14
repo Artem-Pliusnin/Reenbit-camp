@@ -63,7 +63,8 @@
                     <div class="form-check">
                         <InputCheckbox class="form-check-input"
                                        id="myBoards"
-                                       @bind-Value=@filter.OnlyMyBoards/>
+                                       @bind-Value=@filter.OnlyMyBoards
+                                       @bind-Value:after=@OnOnlyMyBoardsChanged/>
                         <label class="form-check-label" for="myBoards">
                             Only my boards
                         </label>

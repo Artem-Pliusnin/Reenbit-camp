@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using WebApp.Authentication;
 using Services.Abstractions.Services;
+using Services.Authentication;
 
 namespace WebApp.Components.Auth;
 

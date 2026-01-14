@@ -3,6 +3,7 @@ using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetBoardData;
 using Application.Boards.Queries.GetUserBoards;
+using Domain.Constants.HubConstants;
 using Domain.DTOs.Boards;
 using Domain.DTOs.Shared;
 using Domain.Errors;
@@ -122,7 +123,7 @@ public class BoardsController : AuthorizedContoller
         }
         
         await _hubContext.Clients.Group(HomeHub.GetBoardGroupName(id))
-            .SendAsync("UpdateBoardTitle", request.Title);
+            .SendAsync(HomeHubConstants.UpdateBoardTitle, request.Title);
         
         return Ok();
     }

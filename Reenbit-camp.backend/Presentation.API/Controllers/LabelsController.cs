@@ -3,6 +3,7 @@ using Application.Labels.Commands.DeleteLabel;
 using Application.Labels.Commands.UpdateLabel;
 using Application.Labels.Queries.GetBoardLabels;
 using Application.Labels.Queries.GetLabelsForCard;
+using Domain.Constants.HubConstants;
 using Domain.DTOs.Labels;
 using Domain.Errors;
 using Domain.Shared;
@@ -102,7 +103,7 @@ public class LabelsController : AuthorizedContoller
         
         await _hubContext.Clients
             .Group(HomeHub.GetBoardGroupName(result.Value.BoardId))
-            .SendAsync("UpdateLabel", result.Value.Label, cancellationToken);
+            .SendAsync(HomeHubConstants.UpdateLabel, result.Value.Label, cancellationToken);
         
         return Ok();
     }

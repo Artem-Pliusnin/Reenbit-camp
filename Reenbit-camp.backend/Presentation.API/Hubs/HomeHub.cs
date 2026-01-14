@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json;
+using Domain.Constants.HubConstants;
 using Domain.DTOs.BoardMembers;
 using Domain.DTOs.Cards;
 using Domain.DTOs.Invitations;
@@ -26,64 +27,64 @@ public class HomeHub : Hub
     public async Task AddInvitation(InvitationDto invitation, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("AddInvitation", invitation);
+            .SendAsync(HomeHubConstants.AddInvitation, invitation);
     }
     
     public async Task AddNewLabel(LabelDto label, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("AddNewLabel", label);
+            .SendAsync(HomeHubConstants.AddNewLabel, label);
     }
     
     public async Task DeleteLabel(int labelId, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("RemoveLabel", labelId);
+            .SendAsync(HomeHubConstants.RemoveLabel, labelId);
     }
     
 
     public async Task DeleteMember(int memberId, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("DeletedMember", memberId);
+            .SendAsync(HomeHubConstants.DeletedMember, memberId);
     }
     
     public async Task UpdateMemberRole(UpdatedCardMemberRoleDto dto, int boardId)
     {
         Console.WriteLine(JsonSerializer.Serialize(dto));
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateMemberRole", dto);
+            .SendAsync(HomeHubConstants.UpdateMemberRole, dto);
     }
     
     public async Task UpdateListPosition(MoveListDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("MoveList", dto);
+            .SendAsync(HomeHubConstants.MoveList, dto);
     }
     
     public async Task DeleteList(int listId, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("DeleteList", listId);
+            .SendAsync(HomeHubConstants.DeleteList, listId);
     }
     
     public async Task UpdateList(UpdateListDto list, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateList", list);
+            .SendAsync(HomeHubConstants.UpdateList, list);
     }
     
     public async Task AddList(ListDto list, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("AddList", list);
+            .SendAsync(HomeHubConstants.AddList, list);
     }
     
     public async Task CardsReordered(CardsReorderedDto dto)
     {
         await Clients
             .OthersInGroup(GetBoardGroupName(dto.BoardId))
-            .SendAsync("CardsReordered", dto);
+            .SendAsync(HomeHubConstants.CardsReordered, dto);
     }
     
     public async Task AddCard(CardDto card, int listId,  int boardId)
@@ -95,43 +96,43 @@ public class HomeHub : Hub
         };
         
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("AddCard", dto);
+            .SendAsync(HomeHubConstants.AddCard, dto);
     }
     
     public async Task DeleteCard(int cardId, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("RemoveCard", cardId);
+            .SendAsync(HomeHubConstants.RemoveCard, cardId);
     }
     
     public async Task UpdateCardTitle(UpdatedCardTitleDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateCardTitle", dto);
+            .SendAsync(HomeHubConstants.UpdateCardTitle, dto);
     }
     
     public async Task UpdateCardDates(UpdatedCardDatesDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateCardDates", dto);
+            .SendAsync(HomeHubConstants.UpdateCardDates, dto);
     }
     
     public async Task UpdateCardStatus(UpdatedCardStatusDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateCardStatus", dto);
+            .SendAsync(HomeHubConstants.UpdateCardStatus, dto);
     }
     
     public async Task UpdateCardLabels(UpdatedCardLabelsDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateCardLabels", dto);
+            .SendAsync(HomeHubConstants.UpdateCardLabels, dto);
     }
     
     public async Task UpdateCardMembers(UpdatedCardMembersDto dto, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync("UpdateCardMembers", dto);
+            .SendAsync(HomeHubConstants.UpdateCardMembers, dto);
     }
     
     public static string GetBoardGroupName(int boardId)

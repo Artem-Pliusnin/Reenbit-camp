@@ -5,6 +5,7 @@ using Application.Invitations.Commands.DeclinedInvitation;
 using Application.Invitations.Commands.DeleteInvitation;
 using Application.Invitations.Queries.GetInvitationsByBoard;
 using Application.Invitations.Queries.GetUserInvitations;
+using Domain.Constants.HubConstants;
 using Domain.DTOs.Invitations;
 using Domain.Errors;
 using Domain.Shared;
@@ -91,7 +92,10 @@ public class InvitationsController : AuthorizedContoller
         
         await _hubContext.Clients
             .User(result.Value.InvitedUser.Id.ToString())
-            .SendAsync("AddUserInvitation", result.Value, cancellationToken);
+            .SendAsync(
+                HomeHubConstants.AddUserInvitation, 
+                result.Value, 
+                cancellationToken);
             
         return Ok(result.Value);
     }
@@ -118,11 +122,11 @@ public class InvitationsController : AuthorizedContoller
         
         await _hubContext.Clients
             .Group(HomeHub.GetBoardGroupName(result.Value.BoardId))
-            .SendAsync("AddMember", result.Value, cancellationToken);
+            .SendAsync(HomeHubConstants.AddMember, result.Value, cancellationToken);
         
         await _hubContext.Clients
             .Group(HomeHub.GetBoardGroupName(result.Value.BoardId))
-            .SendAsync("DeleteInvitation", id, cancellationToken);
+            .SendAsync(HomeHubConstants.DeleteInvitation, id, cancellationToken);
         
         return Ok();
     }
@@ -149,7 +153,7 @@ public class InvitationsController : AuthorizedContoller
         
         await _hubContext.Clients
             .Group(HomeHub.GetBoardGroupName(result.Value.Board.Id))
-            .SendAsync("DeleteInvitation", result.Value.Id, cancellationToken);
+            .SendAsync(HomeHubConstants.DeleteInvitation, result.Value.Id, cancellationToken);
         
         return Ok();
     }
@@ -170,11 +174,11 @@ public class InvitationsController : AuthorizedContoller
         
         await _hubContext.Clients
             .User(result.Value.InvitedUser.Id.ToString())
-            .SendAsync("DeleteUserInvitation", id, cancellationToken);
+            .SendAsync(HomeHubConstants.DeleteUserInvitation, id, cancellationToken);
         
         await _hubContext.Clients
             .Group(HomeHub.GetBoardGroupName(result.Value.Board.Id))
-            .SendAsync("DeleteInvitation", result.Value.Id, cancellationToken);
+            .SendAsync(HomeHubConstants.DeleteInvitation, result.Value.Id, cancellationToken);
         
         return Ok();
     }

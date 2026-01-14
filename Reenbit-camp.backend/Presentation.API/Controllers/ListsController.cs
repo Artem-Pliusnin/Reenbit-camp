@@ -10,17 +10,22 @@ using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
 using Presentation.API.Contracts.List;
+using Presentation.API.Hubs;
 
 namespace Presentation.API.Controllers;
 
 [Route("api/[controller]")]
 public class ListsController : AuthorizedContoller
 {
-    public ListsController(ISender sender)
+    private readonly IHubContext<HomeHub> _hubContext;
+    public ListsController(ISender sender, IHubContext<HomeHub> hubContext)
         : base(sender)
-    {}
+    {
+        _hubContext = hubContext;
+    }
     
     [HttpGet("board/{id}")]
     public async Task<IActionResult> GetByBoardAsync(
@@ -107,6 +112,8 @@ public class ListsController : AuthorizedContoller
         {
             return HandleFailure(result);
         }
+        
+        
         
         return Ok();
     }

@@ -1,4 +1,6 @@
 using Application.Abstractions.Messaging;
+using AutoMapper;
+using Domain.DTOs.BoardMembers;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Errors;
@@ -7,16 +9,18 @@ using Domain.Shared;
 
 namespace Application.Invitations.Commands.AcceptInvitation;
 
-internal class AcceptInvitationCommandHandler : ICommandHandler<AcceptInvitationCommand>
+internal class AcceptInvitationCommandHandler : ICommandHandler<AcceptInvitationCommand, BoardMemberDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public AcceptInvitationCommandHandler(IUnitOfWork unitOfWork)
+    public AcceptInvitationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
     
-    public async Task<Result> Handle(
+    public async Task<Result<BoardMemberDto>> Handle(
         AcceptInvitationCommand request, 
         CancellationToken cancellationToken)
     {
@@ -26,12 +30,21 @@ internal class AcceptInvitationCommandHandler : ICommandHandler<AcceptInvitation
         
         if (invitation == null)
         {
-            return Result.Failure(InvitationErrors.InvitationDoesNotExist);
+            return Result.Failure<BoardMemberDto>(InvitationErrors.InvitationDoesNotExist);
         }
 
         if (invitation.InvitedUserId != request.UserId)
         {
-            return Result.Failure(InvitationErrors.InvitationDoesNotBelongsToUserError);
+            return Result.Failure<BoardMemberDto>(InvitationErrors.InvitationDoesNotBelongsToUserError);
+        }
+        
+        var userRepository = _unitOfWork.GetRepository<IUserRepository>();
+            
+        var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+        
+        if (user is null)
+        {
+            return Result.Failure<BoardMemberDto>(UserErrors.UserDoesNotExistError);
         }
         
         try
@@ -46,19 +59,21 @@ internal class AcceptInvitationCommandHandler : ICommandHandler<AcceptInvitation
             var boardMember = new BoardMember()
             {
                 BoardId = invitation.BoardId,
-                UserId = invitation.InvitedUserId,
+                User = user,
                 Role = BoardRole.Member
             };
 
             boardMemberRepository.Add(boardMember);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            var response = _mapper.Map<BoardMemberDto>(boardMember);
 
-            return Result.Success();
+            return response;
         }
         catch
         {
-            return Result.Failure(InvitationErrors.UpdateInvitationError);
+            return Result.Failure<BoardMemberDto>(InvitationErrors.UpdateInvitationError);
         }
     }
 }

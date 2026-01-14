@@ -3,6 +3,7 @@ using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetBoardData;
 using Application.Boards.Queries.GetUserBoards;
+using Domain.Constants.HubConstants;
 using Domain.DTOs.Boards;
 using Domain.DTOs.Shared;
 using Domain.Errors;
@@ -11,17 +12,24 @@ using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
 using Presentation.API.Contracts.Boards;
+using Presentation.API.Hubs;
 
 namespace Presentation.API.Controllers;
 
 [Route("api/[controller]")]
 public class BoardsController : AuthorizedContoller
 {
-    public BoardsController(ISender sender)
+    private readonly IHubContext<HomeHub> _hubContext;
+    public BoardsController(
+        ISender sender, 
+        IHubContext<HomeHub> hubContext)
         : base(sender)
-    {}
+    {
+        _hubContext = hubContext;
+    }
     
     [HttpPost]
     public async Task<IActionResult> CreateAsync(
@@ -113,6 +121,9 @@ public class BoardsController : AuthorizedContoller
         {
             return HandleFailure(result);
         }
+        
+        await _hubContext.Clients.Group(HomeHub.GetBoardGroupName(id))
+            .SendAsync(HomeHubConstants.UpdateBoardTitle, request.Title);
         
         return Ok();
     }

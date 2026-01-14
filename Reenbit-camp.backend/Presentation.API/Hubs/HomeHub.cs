@@ -42,11 +42,10 @@ public class HomeHub : Hub
             .SendAsync(HomeHubConstants.RemoveLabel, labelId);
     }
     
-
-    public async Task DeleteMember(int memberId, int boardId)
+    public async Task DeleteMember(BoardMemberDto member, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))
-            .SendAsync(HomeHubConstants.DeletedMember, memberId);
+            .SendAsync(HomeHubConstants.DeletedMember, member);
     }
     
     public async Task UpdateMemberRole(UpdatedCardMemberRoleDto dto, int boardId)
@@ -137,6 +136,6 @@ public class HomeHub : Hub
     
     public static string GetBoardGroupName(int boardId)
     {
-        return $"chat_{boardId}";
+        return $"board_{boardId}";
     }
 }

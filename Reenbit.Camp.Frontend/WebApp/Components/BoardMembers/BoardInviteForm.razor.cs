@@ -1,18 +1,23 @@
 using System.Timers;
+using AutoMapper;
 using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Models.Invitations;
 using Domain.Models.Users;
 using Domain.Requests.Invitations;
 using Domain.Requests.Users;
+using Domain.Responses.BoardMembers;
+using Domain.Responses.Invitations;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 
 
 namespace WebApp.Components.BoardMembers;
 
-public partial class BoardInviteForm : ComponentBase
+public partial class BoardInviteForm : ComponentBase, IDisposable
 {
     [Parameter, EditorRequired]
     public int BoardId { get; set; }
@@ -25,6 +30,15 @@ public partial class BoardInviteForm : ComponentBase
     
     [Inject] 
     public IInvitationsService InvitationsService { get; set; } = default!;
+    
+    [Inject] 
+    public IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection HomeHubConnection;
+    private List<IDisposable> Subscriptions = new();
 
     private string? InputUser = string.Empty;
     private List<UserModel> Suggestions = new();
@@ -37,11 +51,24 @@ public partial class BoardInviteForm : ComponentBase
     
     protected override async Task OnInitializedAsync()
     {
+        IsInvitationsLoading = true;
+        
+        HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        
         await LoadInvitations();
         
         aTimer = new System.Timers.Timer(300);
         aTimer.Elapsed += OnTimerElapsed;
         aTimer.AutoReset = false;
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<InvitationDto>("AddInvitation", AddInvitation));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<int>("DeleteInvitation", DeleteInvitation));
+        
+        Subscriptions.Add(HomeHubConnection
+            .On<UpdatedCardMemberRoleDto>("UpdateMemberRole", OnUpdateMemberRole));
     }
 
     private void ResetTimer(KeyboardEventArgs e)
@@ -74,7 +101,15 @@ public partial class BoardInviteForm : ComponentBase
 
         if (result.IsSuccess)
         {
-            await LoadInvitations();
+            PendingInvitations.Add(result.Value);
+            
+            var inviattionDto = Mapper.Map<InvitationDto>(result.Value);
+            
+            await HomeHubConnection
+                .SendAsync(
+                    "AddInvitation", 
+                    inviattionDto, 
+                    BoardId);
         }
         
         Suggestions.RemoveAll(u => u.Id == userId);
@@ -107,6 +142,41 @@ public partial class BoardInviteForm : ComponentBase
         {
             PendingInvitations.Remove(invitation);
             StateHasChanged();
+        }
+    }
+
+    private void AddInvitation(InvitationDto invitation)
+    {
+        if (!PendingInvitations.Any(i => i.Id == invitation.Id))
+        {
+            var invitationModel = Mapper.Map<InvitationModel>(invitation);
+            PendingInvitations.Add(invitationModel);
+            Suggestions.RemoveAll(u => u.Id == invitation.InvitedUser.Id);
+            StateHasChanged();
+        }
+    }
+    
+    private void DeleteInvitation(int invitationId)
+    {
+        if(PendingInvitations.RemoveAll(i => i.Id == invitationId) > 0){
+            StateHasChanged();
+        }
+    }
+    
+    private void OnUpdateMemberRole(UpdatedCardMemberRoleDto dto)
+    {
+        if (CurrentUser.Id == dto.MemberId)
+        {
+            CurrentUser.Role = (BoardRole)dto.RoleId;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
         }
     }
 }

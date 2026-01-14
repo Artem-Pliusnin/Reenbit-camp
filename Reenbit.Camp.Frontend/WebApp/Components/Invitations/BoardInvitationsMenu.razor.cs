@@ -12,7 +12,7 @@ using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Invitations;
 
-public partial class BoardInvitationsMenu : ComponentBase
+public partial class BoardInvitationsMenu : ComponentBase, IDisposable
 {
     private TelerikPopover? PopoverRef { get; set; }
 
@@ -23,12 +23,14 @@ public partial class BoardInvitationsMenu : ComponentBase
     public IInvitationsService InvitationsService { get; set; } = default!;
     
     [Inject] 
+    public NavigationManager Navigation{ get; set; } = default!;
+    
+    [Inject] 
     public HubConnectionManager HubConnectionManager { get; set; }
 
     private HubConnection HomeHubConnection;
     
-    [Inject] 
-    public NavigationManager Navigation{ get; set; } = default!;
+    private List<IDisposable> Subscriptions = new();
     
     private bool IsLoading;
     private bool IsOpen;
@@ -42,9 +44,12 @@ public partial class BoardInvitationsMenu : ComponentBase
         IsLoading = true;
         
         await LoadInvitations();
+
+        Subscriptions.Add(HomeHubConnection
+            .On<InvitationDto>("AddUserInvitation", AddInvitation));
         
-        HomeHubConnection.On<InvitationDto>("AddInvitation" ,AddInvitation);
-        HomeHubConnection.On<int>("DeleteInvitation" ,DeleteInvitation);
+        Subscriptions.Add(HomeHubConnection
+            .On<int>("DeleteUserInvitation", DeleteInvitation));
 
         IsLoading = false;
     }
@@ -119,5 +124,13 @@ public partial class BoardInvitationsMenu : ComponentBase
         }
         
         PopoverRef?.Refresh();
+    }
+    
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
@@ -78,25 +79,25 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
 
         if (result)
         {
-            await HomeHubConnection.SendAsync("AddToBoardGroup", BoardId);
+            await HomeHubConnection.SendAsync(SendHomeHubConstants.AddToBoardGroup, BoardId);
             
             Subscriptions.Add(HomeHubConnection
-                .On<string>("UpdateBoardTitle", UpdateBoardTitle));
+                .On<string>(SubscribeHomeHubConstants.UpdateBoardTitle, UpdateBoardTitle));
 
             Subscriptions.Add(HomeHubConnection
-                .On<LabelDto>("AddNewLabel", AddNewLabel));
+                .On<LabelDto>(SubscribeHomeHubConstants.AddNewLabel, AddNewLabel));
 
             Subscriptions.Add(HomeHubConnection
-                .On<LabelDto>("UpdateLabel", UpdateLabel));
+                .On<LabelDto>(SubscribeHomeHubConstants.UpdateLabel, UpdateLabel));
 
             Subscriptions.Add(HomeHubConnection
-                .On<int>("RemoveLabel", RemoveLabel));
+                .On<int>(SubscribeHomeHubConstants.RemoveLabel, RemoveLabel));
             
             Subscriptions.Add(HomeHubConnection
-                .On<int>("DeletedMember", OnDeletedMember));
+                .On<int>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
             
             Subscriptions.Add(HomeHubConnection
-                .On<UpdatedCardMemberRoleDto>("UpdateMemberRole", OnUpdateMemberRole));
+                .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
         }
     }
 
@@ -305,7 +306,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         {
             Labels.Add(result.Value);
             await HomeHubConnection
-                .SendAsync("AddNewLabel" , result.Value, BoardId);
+                .SendAsync(SendHomeHubConstants.AddNewLabel , result.Value, BoardId);
         }
         
         ResetCreateForm();
@@ -346,7 +347,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         {
             Labels.RemoveAll(l => l.Id == EditLabel.Id);
             await HomeHubConnection
-                .SendAsync("DeleteLabel", EditLabel.Id, BoardId);
+                .SendAsync(SendHomeHubConstants.DeleteLabel, EditLabel.Id, BoardId);
         }
         
         ChangeToBaseMode();
@@ -356,7 +357,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await HomeHubConnection.SendAsync("DeleteFromBoardGroup", BoardId);
+        await HomeHubConnection.SendAsync(SendHomeHubConstants.DeleteFromBoardGroup, BoardId);
 
         foreach (var subscription in Subscriptions)
         {

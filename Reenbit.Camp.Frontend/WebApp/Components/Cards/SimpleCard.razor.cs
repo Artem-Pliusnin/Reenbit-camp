@@ -1,3 +1,4 @@
+using Domain.Constants.HubConstants;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Cards;
@@ -49,7 +50,7 @@ public partial class SimpleCard : ComponentBase
         
         await HomeHubConnection
             .SendAsync(
-                "UpdateCardStatus", 
+                SendHomeHubConstants.UpdateCardStatus, 
                 new UpdatedCardStatusDto(
                     Card.Id,
                     Card.IsCompleted), 
@@ -91,7 +92,7 @@ public partial class SimpleCard : ComponentBase
         {
             await OnDeleteCard.InvokeAsync(Card);
             await HomeHubConnection
-                .SendAsync("DeleteCard", Card.Id, Board.Id);
+                .SendAsync(SendHomeHubConstants.DeleteCard, Card.Id, Board.Id);
         }
     }
     

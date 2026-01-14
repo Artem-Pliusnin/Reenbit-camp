@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Models.Boards;
 using Domain.Models.CardMembers;
 using Domain.Models.Cards;
@@ -97,7 +98,7 @@ public partial class CardInfo : ComponentBase
             
             await HomeHubConnection
                 .SendAsync(
-                    "UpdateCardTitle", 
+                    SendHomeHubConstants.UpdateCardTitle, 
                     new UpdatedCardTitleDto(CardId, Card.Title), 
                     Board.Id);
         }
@@ -132,7 +133,7 @@ public partial class CardInfo : ComponentBase
         
         await HomeHubConnection
             .SendAsync(
-                "UpdateCardStatus", 
+                SendHomeHubConstants.UpdateCardStatus, 
                 new UpdatedCardStatusDto(
                     Card.Id,
                     Card.IsCompleted), 
@@ -241,7 +242,7 @@ public partial class CardInfo : ComponentBase
         
         await HomeHubConnection
             .SendAsync(
-                "UpdateCardDates", 
+                SendHomeHubConstants.UpdateCardDates, 
                 new UpdatedCardDatesDto(
                     CardId, 
                     Card.StartDate, 
@@ -269,7 +270,7 @@ public partial class CardInfo : ComponentBase
 
         await HomeHubConnection
             .SendAsync(
-                "UpdateCardLabels", 
+                SendHomeHubConstants.UpdateCardLabels, 
                 new UpdatedCardLabelsDto(
                     CardId, 
                     cardLabelDtos), 
@@ -284,7 +285,7 @@ public partial class CardInfo : ComponentBase
 
         await HomeHubConnection
             .SendAsync(
-                "UpdateCardMembers", 
+                SendHomeHubConstants.UpdateCardMembers, 
                 new UpdatedCardMembersDto(
                     CardId, 
                     cardMembersDtos), 

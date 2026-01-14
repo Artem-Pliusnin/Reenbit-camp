@@ -1,3 +1,4 @@
+using Domain.Constants.HubConstants;
 using Domain.Models.Boards;
 using Domain.Models.Lists;
 using Domain.Requests.Lists;
@@ -76,7 +77,7 @@ public partial class ListHeader : ComponentBase
             {
                 await HomeHubConnection
                     .SendAsync(
-                        "UpdateList" , 
+                        SendHomeHubConstants.UpdateList , 
                         new UpdateListModel(List.Id, List.Title), 
                         BoardInfo.Id);
             }
@@ -170,7 +171,7 @@ public partial class ListHeader : ComponentBase
             await OnDeleteList.InvokeAsync(List);
             
             await HomeHubConnection
-                .SendAsync("DeleteList" , List.Id, BoardInfo.Id);
+                .SendAsync(SendHomeHubConstants.DeleteList , List.Id, BoardInfo.Id);
         }
     }
 }

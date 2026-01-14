@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Requests.BoardMembers;
@@ -59,13 +60,13 @@ public partial class BoardMembersList : ComponentBase, IDisposable
         IsLoading = false;
         
         Subscriptions.Add(HomeHubConnection
-            .On<BoardMemberDto>("AddMember", AddMember));
+            .On<BoardMemberDto>(SubscribeHomeHubConstants.AddMember, AddMember));
         
         Subscriptions.Add(HomeHubConnection
-            .On<int>("DeletedMember", OnDeletedMember));
+            .On<int>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardMemberRoleDto>("UpdateMemberRole", OnUpdateMemberRole));
+            .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
     }
     
     private IEnumerable<BoardRole> GetAvailableRoles(BoardMemberModel member)
@@ -150,7 +151,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
         {
             await HomeHubConnection
                 .SendAsync(
-                    "UpdateMemberRole", 
+                    SendHomeHubConstants.UpdateMemberRole, 
                     new UpdatedCardMemberRoleDto(member.Id, (int)member.Role), 
                     BoardId);
         }
@@ -170,7 +171,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
             await UpdateBoardContent.InvokeAsync();
             
             await HomeHubConnection
-                .SendAsync("DeleteMember", member.Id, BoardId);
+                .SendAsync(SendHomeHubConstants.DeleteMember, member.Id, BoardId);
         }
     }
     

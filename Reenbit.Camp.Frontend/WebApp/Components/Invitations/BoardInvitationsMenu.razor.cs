@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Models.Boards;
 using Domain.Models.Invitations;
 using Domain.Models.Users;
@@ -46,10 +47,10 @@ public partial class BoardInvitationsMenu : ComponentBase, IDisposable
         await LoadInvitations();
 
         Subscriptions.Add(HomeHubConnection
-            .On<InvitationDto>("AddUserInvitation", AddInvitation));
+            .On<InvitationDto>(SubscribeHomeHubConstants.AddUserInvitation, AddInvitation));
         
         Subscriptions.Add(HomeHubConnection
-            .On<int>("DeleteUserInvitation", DeleteInvitation));
+            .On<int>(SubscribeHomeHubConstants.DeleteUserInvitation, DeleteInvitation));
 
         IsLoading = false;
     }

@@ -1,5 +1,6 @@
 using System.Timers;
 using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Models.Invitations;
@@ -62,13 +63,13 @@ public partial class BoardInviteForm : ComponentBase, IDisposable
         aTimer.AutoReset = false;
         
         Subscriptions.Add(HomeHubConnection
-            .On<InvitationDto>("AddInvitation", AddInvitation));
+            .On<InvitationDto>(SubscribeHomeHubConstants.AddInvitation, AddInvitation));
         
         Subscriptions.Add(HomeHubConnection
-            .On<int>("DeleteInvitation", DeleteInvitation));
+            .On<int>(SubscribeHomeHubConstants.DeleteInvitation, DeleteInvitation));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardMemberRoleDto>("UpdateMemberRole", OnUpdateMemberRole));
+            .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
     }
 
     private void ResetTimer(KeyboardEventArgs e)
@@ -107,7 +108,7 @@ public partial class BoardInviteForm : ComponentBase, IDisposable
             
             await HomeHubConnection
                 .SendAsync(
-                    "AddInvitation", 
+                    SendHomeHubConstants.AddInvitation, 
                     inviattionDto, 
                     BoardId);
         }

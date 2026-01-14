@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.CardMembers;
@@ -76,7 +77,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         ListBoxRefs[listId].Rebind();
         
         await HomeHubConnection
-            .SendAsync("AddCard" , result.Value, list.Id, Board.Id);
+            .SendAsync(SendHomeHubConstants.AddCard, result.Value, list.Id, Board.Id);
     }
     
     private async Task AddList()
@@ -94,7 +95,7 @@ public partial class BoardLists : ComponentBase, IDisposable
             await AddListToBoard(result.Value);
             
             await HomeHubConnection
-                .SendAsync("AddList" , result.Value, Board.Id);
+                .SendAsync(SendHomeHubConstants.AddList , result.Value, Board.Id);
         }
     }
 
@@ -155,7 +156,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         };
         
         await HomeHubConnection.SendAsync(
-            "CardsReordered",
+            SendHomeHubConstants.CardsReordered,
             reorderEvent
         );
     }
@@ -236,7 +237,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         );
         
         await HomeHubConnection
-            .SendAsync("UpdateListPosition" , moveListModel, Board.Id);
+            .SendAsync(SendHomeHubConstants.UpdateListPosition, moveListModel, Board.Id);
     }
 
     private async Task MoveListOnBoard(MoveListModel moveListModel)
@@ -454,40 +455,40 @@ public partial class BoardLists : ComponentBase, IDisposable
         HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
         
         Subscriptions.Add(HomeHubConnection
-            .On<MoveListModel>("MoveList", MoveListOnBoard));
+            .On<MoveListModel>(SubscribeHomeHubConstants.MoveList, MoveListOnBoard));
         
         Subscriptions.Add(HomeHubConnection
-            .On<int>("DeleteList", DeleteList));
+            .On<int>(SubscribeHomeHubConstants.DeleteList, DeleteList));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdateListModel>("UpdateList", UpdateList));
+            .On<UpdateListModel>(SubscribeHomeHubConstants.UpdateList, UpdateList));
         
         Subscriptions.Add(HomeHubConnection
-            .On<ListModel>("AddList", AddListToBoard));
+            .On<ListModel>(SubscribeHomeHubConstants.AddList, AddListToBoard));
 
         Subscriptions.Add(HomeHubConnection
-            .On<CardsReorderedModel>("CardsReordered", ApplyCardsReorder));
+            .On<CardsReorderedModel>(SubscribeHomeHubConstants.CardsReordered, ApplyCardsReorder));
         
         Subscriptions.Add(HomeHubConnection
-            .On<CreatedCardDto>("AddCard", AddCard));
+            .On<CreatedCardDto>(SubscribeHomeHubConstants.AddCard, AddCard));
         
         Subscriptions.Add(HomeHubConnection
-            .On<int>("RemoveCard", HandelRemovingCard));
+            .On<int>(SubscribeHomeHubConstants.RemoveCard, HandelRemovingCard));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardTitleDto>("UpdateCardTitle", UpdateCardTitle));
+            .On<UpdatedCardTitleDto>(SubscribeHomeHubConstants.UpdateCardTitle, UpdateCardTitle));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardDatesDto>("UpdateCardDates", UpdateCardDates));
+            .On<UpdatedCardDatesDto>(SubscribeHomeHubConstants.UpdateCardDates, UpdateCardDates));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardStatusDto>("UpdateCardStatus", UpdateCardStatus));
+            .On<UpdatedCardStatusDto>(SubscribeHomeHubConstants.UpdateCardStatus, UpdateCardStatus));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardLabelsDto>("UpdateCardLabels", UpdateCardLabels));
+            .On<UpdatedCardLabelsDto>(SubscribeHomeHubConstants.UpdateCardLabels, UpdateCardLabels));
         
         Subscriptions.Add(HomeHubConnection
-            .On<UpdatedCardMembersDto>("UpdateCardMembers", UpdateCardMembers));
+            .On<UpdatedCardMembersDto>(SubscribeHomeHubConstants.UpdateCardMembers, UpdateCardMembers));
     }
     
     public void Dispose()

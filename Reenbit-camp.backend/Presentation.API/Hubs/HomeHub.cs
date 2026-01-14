@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using System.Text.Json;
+using Domain.DTOs.BoardMembers;
 using Domain.DTOs.Cards;
+using Domain.DTOs.Invitations;
 using Domain.DTOs.Labels;
 using Domain.DTOs.Lists;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +21,12 @@ public class HomeHub : Hub
     public async Task DeleteFromBoardGroup(int boardId)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetBoardGroupName(boardId));
+    }
+    
+    public async Task AddInvitation(InvitationDto invitation, int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync("AddInvitation", invitation);
     }
     
     public async Task AddNewLabel(LabelDto label, int boardId)

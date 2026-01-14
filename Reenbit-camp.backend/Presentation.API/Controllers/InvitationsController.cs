@@ -91,7 +91,7 @@ public class InvitationsController : AuthorizedContoller
         
         await _hubContext.Clients
             .User(result.Value.InvitedUser.Id.ToString())
-            .SendAsync("AddInvitation", result.Value, cancellationToken);
+            .SendAsync("AddUserInvitation", result.Value, cancellationToken);
             
         return Ok(result.Value);
     }
@@ -109,12 +109,20 @@ public class InvitationsController : AuthorizedContoller
 
         var command = new AcceptInvitationCommand(userId, id);
         
-        Result result = await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
             return HandleFailure(result);
         }
+        
+        await _hubContext.Clients
+            .Group(HomeHub.GetBoardGroupName(result.Value.BoardId))
+            .SendAsync("AddMember", result.Value, cancellationToken);
+        
+        await _hubContext.Clients
+            .Group(HomeHub.GetBoardGroupName(result.Value.BoardId))
+            .SendAsync("DeleteInvitation", id, cancellationToken);
         
         return Ok();
     }
@@ -132,12 +140,16 @@ public class InvitationsController : AuthorizedContoller
 
         var command = new DeclineInvitationCommand(userId, id);
         
-        Result result = await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
             return HandleFailure(result);
         }
+        
+        await _hubContext.Clients
+            .Group(HomeHub.GetBoardGroupName(result.Value.Board.Id))
+            .SendAsync("DeleteInvitation", result.Value.Id, cancellationToken);
         
         return Ok();
     }
@@ -149,7 +161,7 @@ public class InvitationsController : AuthorizedContoller
     {
         var command = new DeleteInvitationCommand(id);
         
-        Result<int> result = await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -157,8 +169,12 @@ public class InvitationsController : AuthorizedContoller
         }
         
         await _hubContext.Clients
-            .User(result.Value.ToString())
-            .SendAsync("DeleteInvitation", id, cancellationToken);
+            .User(result.Value.InvitedUser.Id.ToString())
+            .SendAsync("DeleteUserInvitation", id, cancellationToken);
+        
+        await _hubContext.Clients
+            .Group(HomeHub.GetBoardGroupName(result.Value.Board.Id))
+            .SendAsync("DeleteInvitation", result.Value.Id, cancellationToken);
         
         return Ok();
     }

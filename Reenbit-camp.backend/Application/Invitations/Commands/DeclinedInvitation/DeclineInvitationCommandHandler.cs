@@ -1,5 +1,6 @@
 using Application.Abstractions.Messaging;
-using Domain.Entities;
+using AutoMapper;
+using Domain.DTOs.Invitations;
 using Domain.Enums;
 using Domain.Errors;
 using Domain.Repositories;
@@ -7,31 +8,35 @@ using Domain.Shared;
 
 namespace Application.Invitations.Commands.DeclinedInvitation;
 
-internal class DeclineInvitationCommandHandler : ICommandHandler<DeclineInvitationCommand>
+internal class DeclineInvitationCommandHandler : 
+    ICommandHandler<DeclineInvitationCommand, InvitationDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public DeclineInvitationCommandHandler(IUnitOfWork unitOfWork)
+    public DeclineInvitationCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
     
-    public async Task<Result> Handle(
+    public async Task<Result<InvitationDto>> Handle(
         DeclineInvitationCommand request, 
         CancellationToken cancellationToken)
     {
         var invitationRepository = _unitOfWork.GetRepository<IInvitationRepository>();
         
-        var invitation = await invitationRepository.GetByIdAsync(request.InvitationId);
+        var invitation = await invitationRepository
+            .GetByIdWithIncludedBoardAsync(request.InvitationId, cancellationToken);
         
         if (invitation == null)
         {
-            return Result.Failure(InvitationErrors.InvitationDoesNotExist);
+            return Result.Failure<InvitationDto>(InvitationErrors.InvitationDoesNotExist);
         }
 
         if (invitation.InvitedUserId != request.UserId)
         {
-            return Result.Failure(InvitationErrors.InvitationDoesNotBelongsToUserError);
+            return Result.Failure<InvitationDto>(InvitationErrors.InvitationDoesNotBelongsToUserError);
         }
         
         try
@@ -42,12 +47,14 @@ internal class DeclineInvitationCommandHandler : ICommandHandler<DeclineInvitati
             invitationRepository.Update(invitation);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            var response = _mapper.Map<InvitationDto>(invitation);
 
-            return Result.Success();
+            return response;
         }
         catch
         {
-            return Result.Failure(InvitationErrors.UpdateInvitationError);
+            return Result.Failure<InvitationDto>(InvitationErrors.UpdateInvitationError);
         }
     }
 }

@@ -10,6 +10,9 @@ public partial class CardMember : ComponentBase
     public CardMemberModel Member { get; set; } = default!;
     
     [Parameter, EditorRequired] 
+    public bool CanDelete { get; set; }
+    
+    [Parameter, EditorRequired] 
     public EventCallback<CardMemberModel> OnDelete { get; set; }
     
     private TelerikPopover? PopoverRef { get; set; }

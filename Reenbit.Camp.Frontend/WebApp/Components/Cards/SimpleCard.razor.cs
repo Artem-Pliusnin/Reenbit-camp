@@ -1,4 +1,6 @@
 using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Cards;
@@ -42,6 +44,10 @@ public partial class SimpleCard : ComponentBase, IDisposable
     private bool IsCardOpen = false;
     
     private bool IsDeleteConfirmOpen = false;
+    
+    private bool CheckCardDeletingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
+    private bool CheckCardUpdatePermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
 
     private async Task OnChangeStatus()
     {

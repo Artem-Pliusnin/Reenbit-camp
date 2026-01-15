@@ -20,14 +20,17 @@
             <div class="py-2">
                 <strong>@Member.User.UserName</strong>
                 <div class="text-muted small">@Member.User.Email</div>
+                
+                @if (CanDelete)
+                {
+                    <hr/>
 
-                <hr />
-
-                <TelerikButton
-                    OnClick=@DeletMember
-                    Class="btn-light btn-sm w-100">
-                    Remove from card
-                </TelerikButton>
+                    <TelerikButton
+                        OnClick=@DeletMember
+                        Class="btn-light btn-sm w-100">
+                        Remove from card
+                    </TelerikButton>
+                }
             </div>
         </PopoverContent>
 

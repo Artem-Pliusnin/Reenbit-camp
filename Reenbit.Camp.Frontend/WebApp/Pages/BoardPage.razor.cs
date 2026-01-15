@@ -2,6 +2,7 @@ using System.Text.Json;
 using AutoMapper;
 using Domain.Constants.HubConstants;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Labels;
@@ -152,6 +153,16 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         isLoading = false;
         return true;
     }
+
+    private bool CheckRenameBoardPermision()
+    {
+        return CurrentBoardMember.Role.HasAtLeast(BoardRole.Admin);
+    }
+    
+    private bool CheckManageLabelsPermision()
+    {
+        return CurrentBoardMember.Role.HasAtLeast(BoardRole.Member);
+    }
     
     private void OpenMembersDialog()
     {
@@ -165,8 +176,11 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
 
     private void StartEditTitle()
     {
-        TitleInput = Board.Title;
-        IsEditingTitle = true;
+        if (CheckRenameBoardPermision())
+        {
+            TitleInput = Board.Title;
+            IsEditingTitle = true;
+        }
     }
 
     private async Task SaveTitle()

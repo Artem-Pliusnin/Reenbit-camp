@@ -42,12 +42,15 @@ else
                         OnClick=@OpenMembersDialog>
                         Members
                     </DropDownButtonItem>
-
-                    <DropDownButtonItem
-                        Icon=@Telerik.SvgIcons.SvgIcon.Highlight
-                        OnClick=@OpenLabelsMenu>
-                        Labels
-                    </DropDownButtonItem>
+                    
+                    @if(CheckManageLabelsPermision())
+                    {
+                        <DropDownButtonItem
+                            Icon=@Telerik.SvgIcons.SvgIcon.Highlight
+                            OnClick=@OpenLabelsMenu>
+                            Labels
+                        </DropDownButtonItem>
+                    }
                 </DropDownButtonItems>
 
             </TelerikDropDownButton>

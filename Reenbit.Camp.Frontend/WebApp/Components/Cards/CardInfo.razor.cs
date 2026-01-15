@@ -2,6 +2,9 @@ using System.Text.Json;
 using AutoMapper;
 using Domain.Constants.HubConstants;
 using Domain.DTOs.Cards;
+using Domain.Enums;
+using Domain.Extensions;
+using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.CardMembers;
 using Domain.Models.Cards;
@@ -23,6 +26,9 @@ public partial class CardInfo : ComponentBase, IDisposable
 {   
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
+    
+    [CascadingParameter(Name="CurrentUser")]
+    public BoardMemberModel CurrentUser { get; set; } = default!;
     
     [Parameter, EditorRequired]
     public int CardId { get; set; }
@@ -80,6 +86,8 @@ public partial class CardInfo : ComponentBase, IDisposable
             ? "bg-danger text-white"
             : "bg-success text-white";
     
+    private bool CheckCardUpdatingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
@@ -118,8 +126,11 @@ public partial class CardInfo : ComponentBase, IDisposable
     
     private void StartEditTitle()
     {
-        InputTitle = Card.Title;
-        IsEditingTitle = true;
+        if (CheckCardUpdatingPermision())
+        {
+            InputTitle = Card.Title;
+            IsEditingTitle = true;
+        }
     }
 
     private async Task SaveTitle()
@@ -195,8 +206,11 @@ public partial class CardInfo : ComponentBase, IDisposable
     
     private void StartEditDescription()
     {
-        InputDescription = Card.Description;
-        IsEditingDescription = true;
+        if (CheckCardUpdatingPermision())
+        {
+            InputDescription = Card.Description;
+            IsEditingDescription = true;
+        }
     }
 
     private async Task SaveDescription()
@@ -239,12 +253,18 @@ public partial class CardInfo : ComponentBase, IDisposable
     
     private void OnStartDateStateChange(bool value)
     {
-        IsEditingStartDate = value;
+        if (CheckCardUpdatingPermision())
+        {
+            IsEditingStartDate = value;
+        }
     }
     
     private void OnDueDateStateChange(bool value)
     {
-        IsEditingDueDate = value;
+        if (CheckCardUpdatingPermision())
+        {
+            IsEditingDueDate = value;
+        }
     }
 
     private async Task OnStartDateChanged(object value)

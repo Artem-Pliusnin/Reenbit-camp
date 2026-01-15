@@ -1,6 +1,9 @@
 using System.Text.Json;
 using AutoMapper;
 using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
+using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Labels;
 using Domain.Requests.Labels;
@@ -17,6 +20,9 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
+    
+    [CascadingParameter(Name="CurrentUser")]
+    public BoardMemberModel CurrentUser { get; set; } = default!;
     
     [Parameter, EditorRequired] 
     public int CardId { get; set; }
@@ -91,6 +97,8 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
         Subscriptions.Add(TaskHubConnection
             .On<CardLabelDto>(SubscribeTaskHubConstants.DeleteCardLabel, RemoveCardLabel));
     }
+    
+    private bool CheckCardLabelsManagingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
 
     private void ResetCreateForm()
     {
@@ -100,9 +108,12 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
     
     private void OpenAddMenu()
     {
-        IsCreateMode = false;
-        ResetCreateForm();
-        PopoverRef?.Show();
+        if (CheckCardLabelsManagingPermision())
+        {
+            IsCreateMode = false;
+            ResetCreateForm();
+            PopoverRef?.Show();
+        }
     }
     
     private void ClosAddMenu()

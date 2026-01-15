@@ -1,5 +1,7 @@
 using AutoMapper;
 using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.CardMembers;
@@ -18,8 +20,11 @@ namespace WebApp.Components.CardMembers;
 
 public partial class CardMembersSection : ComponentBase
 {
-    [CascadingParameter]
+    [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
+    
+    [CascadingParameter(Name="CurrentUser")]
+    public BoardMemberModel CurrentUser { get; set; } = default!;
     
     [Parameter, EditorRequired] 
     public int CardId { get; set; }
@@ -85,6 +90,8 @@ public partial class CardMembersSection : ComponentBase
             .On<CardMemberDto>(SubscribeTaskHubConstants.DeleteCardMember, RemoveCardMember));
         
     }
+    
+    private bool CheckCardMembersManagingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
     
     private void OpenMembersPopover()
     {

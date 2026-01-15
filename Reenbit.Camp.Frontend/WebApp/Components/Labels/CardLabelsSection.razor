@@ -4,12 +4,15 @@
     <h5 class="fw-semibold mb-2">Labels</h5>
 
     <div class="d-flex flex-wrap gap-2 align-items-center">
-        <TelerikButton
-            OnClick=@OpenAddMenu
-            Class="add-button">
-            + Add
-        </TelerikButton>
-        
+        @if (CheckCardLabelsManagingPermision())
+        {
+            <TelerikButton
+                OnClick=@OpenAddMenu
+                Class="add-button">
+                + Add
+            </TelerikButton>
+        }
+
         @foreach (var cardLabel in CardLabels)
         {
             <div class="d-flex align-items-center label"

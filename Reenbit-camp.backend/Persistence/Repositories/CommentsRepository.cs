@@ -20,6 +20,7 @@ public class CommentsRepository :
     {
         return await _dbSet.Where(c => c.CardId == cardId)
             .Include(c => c.User)
+            .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 }

@@ -1,8 +1,13 @@
+using AutoMapper;
+using Domain.Constants.HubConstants;
 using Domain.Models.BoardMembers;
 using Domain.Models.Comments;
 using Domain.Requests.Comments;
+using Domain.Responses.Comments;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 using Telerik.Blazor.Components;
 using Telerik.Windows.Documents.Spreadsheet.Expressions.Functions;
 
@@ -14,6 +19,9 @@ public partial class CommentRow : ComponentBase
     public BoardMemberModel CurrentUser { get; set; } = default!;
     
     [Parameter, EditorRequired]
+    public int CardId { get; set; }
+    
+    [Parameter, EditorRequired]
     public CommentModel Comment { get; set; }
     
     [Parameter, EditorRequired] 
@@ -22,11 +30,24 @@ public partial class CommentRow : ComponentBase
     [Inject]
     private ICommentsService CommentsService { get; set; } = default!;
     
+    [Inject]
+    private IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection TaskHubConnection;
+    
     private bool IsEditing { get; set; }
     
     private string? InputComment = string.Empty;
     
     private TelerikPopover? PopoverRef { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
+    }
 
     private void EditComment()
     {
@@ -45,6 +66,13 @@ public partial class CommentRow : ComponentBase
             {
                 Comment.Text = InputComment;
                 Comment.IsEdited = true;
+                
+                var dto = Mapper.Map<CommentDto>(Comment);
+                await TaskHubConnection
+                    .SendAsync(
+                        SendTaskHubConstants.UpdateComment, 
+                        dto,
+                        CardId);
             }
         }
         else

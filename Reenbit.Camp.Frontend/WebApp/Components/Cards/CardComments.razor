@@ -31,6 +31,6 @@
     
     @foreach (var comment in Comments)
     {
-        <CommentRow Comment=@comment OnDelete=@DeleteComment></CommentRow>
+        <CommentRow @key=@comment.Id CardId=@CardId Comment=@comment OnDelete=@DeleteComment></CommentRow>
     }
 </div>

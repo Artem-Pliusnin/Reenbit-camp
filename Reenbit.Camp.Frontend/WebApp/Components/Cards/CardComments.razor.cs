@@ -1,14 +1,21 @@
+using AutoMapper;
+using Domain.Constants.HubConstants;
+using Domain.DTOs.Cards;
 using Domain.Models.BoardMembers;
 using Domain.Models.Comments;
 using Domain.Models.Users;
 using Domain.Requests.Comments;
+using Domain.Responses.Cards;
+using Domain.Responses.Comments;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
+using Services.HubServices;
 
 namespace WebApp.Components.Cards;
 
-public partial class CardComments : ComponentBase
+public partial class CardComments : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="CurrentUser")]
     public BoardMemberModel CurrentUser { get; set; } = default!;
@@ -19,6 +26,16 @@ public partial class CardComments : ComponentBase
     [Inject]
     private ICommentsService CommentsService { get; set; } = default!;
     
+    [Inject]
+    private IMapper Mapper { get; set; } = default!;
+    
+    [Inject] 
+    public HubConnectionManager HubConnectionManager { get; set; } = default!;
+    
+    private HubConnection TaskHubConnection;
+
+    private List<IDisposable> Subscriptions = new();
+    
     private bool isLoading;
     
     private List<CommentModel> Comments = new();
@@ -26,6 +43,34 @@ public partial class CardComments : ComponentBase
     private bool IsWritingComment;
     
     private string? InputComment = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
+        
+        var commentsResult = await CommentsService
+            .GetByCardAsync(CardId);
+
+        if (commentsResult.IsSuccess)
+        {
+            Comments = commentsResult.Value;
+        }
+        
+        Subscriptions.Add(TaskHubConnection
+            .On<CommentDto>(
+                SubscribeTaskHubConstants.AddComment, 
+                AddComment));
+        
+        Subscriptions.Add(TaskHubConnection
+            .On<int>(
+                SubscribeTaskHubConstants.DeleteComment, 
+                RemoveComment));
+        
+        Subscriptions.Add(TaskHubConnection
+            .On<CommentDto>(
+                SubscribeTaskHubConstants.UpdateComment, 
+                UpdateComment));
+    }
     
     private void StartWritingComment()
     {
@@ -42,10 +87,17 @@ public partial class CardComments : ComponentBase
             if (result.IsSuccess)
             {
                 Comments.Insert(0,result.Value);
+                
+                var dto = Mapper.Map<CommentDto>(result.Value);
+                await TaskHubConnection
+                    .SendAsync(
+                        SendTaskHubConstants.AddComment, 
+                        dto,
+                        CardId);
             }
         }
         
-        InputComment =string.Empty;
+        InputComment = string.Empty;
         IsWritingComment = false;
     }
 
@@ -67,19 +119,51 @@ public partial class CardComments : ComponentBase
         }
     }
 
-    private void DeleteComment(CommentModel comment)
+    private async Task DeleteComment(CommentModel comment)
     {
         Comments.Remove(comment);
+        await TaskHubConnection
+            .SendAsync(
+                SendTaskHubConstants.DeleteComment,
+                comment.Id,
+                CardId);
+    }
+
+    private void AddComment(CommentDto comment)
+    {
+        if (!Comments.Any(c => c.Id == comment.Id))
+        {
+            var commentModel = Mapper.Map<CommentModel>(comment);
+            Comments.Insert(0,commentModel);
+            
+            StateHasChanged();
+        }
     }
     
-    protected override async Task OnInitializedAsync()
+    private void UpdateComment(CommentDto comment)
     {
-        var commentsResult = await CommentsService
-            .GetByCardAsync(CardId);
-
-        if (commentsResult.IsSuccess)
+        var updatedComment = Comments.FirstOrDefault(l => l.Id == comment.Id);
+        
+        if (updatedComment is not null)
         {
-            Comments = commentsResult.Value;
+            updatedComment.Text = comment.Text;
+            updatedComment.IsEdited = comment.IsEdited;
+            
+            StateHasChanged();
+        }
+    }
+
+    private void RemoveComment(int commentId)
+    {
+        Comments.RemoveAll(c => c.Id == commentId);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
         }
     }
 }

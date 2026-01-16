@@ -21,6 +21,15 @@ public class CardRepository :
             .Include(c => c.List)
             .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken);
     }
+    
+    public async Task<Card?> GetByIdWithAttachmentsAsync(
+        int cardId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(c => c.Attachments)
+            .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken);
+    }
 
     public async Task<List<Card>> GetByListIdAsync(
         int listId, 

@@ -1,3 +1,4 @@
+using AutoMapper.Execution;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,16 @@ public class TrelloAppDbContext : DbContext
     DbSet<Card> Cards { get; set; }
     
     DbSet<Invitation> Invitations { get; set; }
+    
+    DbSet<Label> Labels { get; set; }
+    
+    DbSet<Comment> Comments { get; set; }
+    
+    DbSet<CardLabel> CardLabels { get; set; }
+    
+    DbSet<CardMember> CardMembers { get; set; }
+    
+    DbSet<CardAttachment> CardAttachments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

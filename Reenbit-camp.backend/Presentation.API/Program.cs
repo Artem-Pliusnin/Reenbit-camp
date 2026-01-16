@@ -49,5 +49,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<HomeHub>("/homehub");
+app.MapHub<TaskHub>("/taskhub");
 
 app.Run();

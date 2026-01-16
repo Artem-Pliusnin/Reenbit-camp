@@ -29,6 +29,7 @@
                 Class=""
                 Id="IsCompleted"
                 @bind-Value=@Card.IsCompleted
+                Enabled=@CheckCardUpdatePermision()
                 Rounded=@CheckBox.Rounded.Large
                 Size=@CheckBox.Size.Large
                 OnChange=@OnChangeStatus/>
@@ -78,39 +79,44 @@
     <DialogTitle>
         <div class="w-100 d-flex flex-row justify-content-end">
             <div class="d-flex flex-row gap-1">
-                <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.Trash"
-                               FillMode="ButtonFillMode.Flat"
-                               Class="dialog-icon-button"
-                               OnClick=@OpenDeleteConfirm/>
+                @if (CheckCardDeletingPermision())
+                {
+                    <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.Trash"
+                                   FillMode="ButtonFillMode.Flat"
+                                   Class="dialog-icon-button"
+                                   OnClick=@OpenDeleteConfirm/>
+                }
 
                 <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.X"
                                FillMode="ButtonFillMode.Flat"
                                Class="dialog-icon-button"
-                               OnClick=@CloseCard />
+                               OnClick=@CloseCard/>
             </div>
         </div>
     </DialogTitle>
     <DialogContent>
-        <div class="container-fluid p-0 overflow-hidden" 
+        <div class="container-fluid p-0 overflow-hidden"
              style="box-sizing: border-box">
-            <div class="row g-3 dialog-content">
-                <div class="col-12 col-lg-7 p-0 window-section">
-                    <CascadingValue Name="Board" Value=@Board>
-                        <CascadingValue Name="CurrentUser" Value=@CurrentUser>
-                            <CardInfo
-                                @ref=@CardInfoRef
-                                CardId=@Card.Id
-                                OnCloseWindow=@HandleCardWindowClose></CardInfo>
+            <TaskHubConnectionContext CardId=@Card.Id>
+                <div class="row g-3 dialog-content">
+                    <div class="col-12 col-lg-7 p-0 window-section">
+                        <CascadingValue Name="Board" Value=@Board>
+                            <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                                <CardInfo
+                                    @ref=@CardInfoRef
+                                    CardId=@Card.Id
+                                    OnCloseWindow=@HandleCardWindowClose></CardInfo>
+                            </CascadingValue>
                         </CascadingValue>
-                    </CascadingValue>
+                    </div>
+
+                    <div class="col-12 col-lg-5 p-0 window-section">
+                        <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                            <CardComments CardId=@Card.Id></CardComments>
+                        </CascadingValue>
+                    </div>
                 </div>
-                
-                <div class="col-12 col-lg-5 p-0 window-section">
-                    <CascadingValue Name="CurrentUser" Value=@CurrentUser>
-                        <CardComments CardId=@Card.Id></CardComments>
-                    </CascadingValue>
-                </div>
-            </div>
+            </TaskHubConnectionContext>
         </div>
     </DialogContent>
 </TelerikDialog>

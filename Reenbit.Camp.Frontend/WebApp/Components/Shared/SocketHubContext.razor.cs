@@ -22,6 +22,7 @@ public partial class SocketHubContext : ComponentBase, IAsyncDisposable
         try
         {
             await HubConnectionManager.StartAsync(HubType.HomeHub);
+            await HubConnectionManager.StartAsync(HubType.TaskHub);
 
             isConnected = true;
         }

@@ -5,7 +5,6 @@ using Domain.Enums;
 using Domain.Models.BoardMembers;
 using Domain.Requests.BoardMembers;
 using Domain.Responses.BoardMembers;
-using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
@@ -63,7 +62,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
             .On<BoardMemberDto>(SubscribeHomeHubConstants.AddMember, AddMember));
         
         Subscriptions.Add(HomeHubConnection
-            .On<int>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
+            .On<BoardMemberDto>(SubscribeHomeHubConstants.DeletedMember, OnDeletedMember));
         
         Subscriptions.Add(HomeHubConnection
             .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
@@ -109,15 +108,15 @@ public partial class BoardMembersList : ComponentBase, IDisposable
         }
     }
 
-    private void OnDeletedMember(int memberId)
+    private void OnDeletedMember(BoardMemberDto member)
     {
-        if (CurrentUser.Id == memberId)
+        if (CurrentUser.Id == member.Id)
         {
             NavigationManager.NavigateTo($"/");
             return;
         }
         
-        Members.RemoveAll(m => m.Id == memberId);
+        Members.RemoveAll(m => m.Id == member.Id);
         
         StateHasChanged();
     }
@@ -171,7 +170,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
             await UpdateBoardContent.InvokeAsync();
             
             await HomeHubConnection
-                .SendAsync(SendHomeHubConstants.DeleteMember, member.Id, BoardId);
+                .SendAsync(SendHomeHubConstants.DeleteMember, member, BoardId);
         }
     }
     

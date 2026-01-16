@@ -1,4 +1,7 @@
 using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
+using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Lists;
 using Domain.Requests.Lists;
@@ -14,6 +17,12 @@ namespace WebApp.Components.Lists;
 
 public partial class ListHeader : ComponentBase
 {
+    [CascadingParameter(Name="Board")]
+    public BoardInfoModel BoardInfo { get; set; } = default!;
+    
+    [CascadingParameter(Name="CurrentUser")]
+    public BoardMemberModel CurrentUser { get; set; } = default!;
+    
     [Parameter, EditorRequired]
     public ListModel List { get; set; }
     
@@ -22,9 +31,6 @@ public partial class ListHeader : ComponentBase
     
     [Parameter, EditorRequired]
     public EventCallback<ListModel> OnDeleteList { get; set; }
-    
-    [CascadingParameter(Name="Board")]
-    public BoardInfoModel BoardInfo { get; set; } = default!;
     
     [Inject] 
     public IListsService ListsService { get; set; } = default!;
@@ -56,11 +62,18 @@ public partial class ListHeader : ComponentBase
         DotNetRef = DotNetObjectReference.Create(this);
         HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
     }
-
+    
+    private bool CheckListTitleEditPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
+    private bool CheckListManagingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
     private void StartEditTitle()
     {
-        TitleInput = List.Title;
-        IsEditingTitle = true;
+        if (CheckListTitleEditPermision())
+        {
+            TitleInput = List.Title;
+            IsEditingTitle = true;
+        }
     }
 
     private async Task SaveTitle()

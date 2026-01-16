@@ -1,6 +1,6 @@
 namespace Domain.Constants.HubConstants;
 
-public class SendHomeHubConstants
+public static class SendHomeHubConstants
 {
     public const string AddToBoardGroup = "AddToBoardGroup";
     public const string DeleteFromBoardGroup = "DeleteFromBoardGroup";

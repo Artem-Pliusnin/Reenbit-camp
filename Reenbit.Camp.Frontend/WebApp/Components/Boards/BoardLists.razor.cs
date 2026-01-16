@@ -1,5 +1,7 @@
 using AutoMapper;
 using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.CardMembers;
@@ -50,6 +52,12 @@ public partial class BoardLists : ComponentBase, IDisposable
     private string NewListTitle = string.Empty;
     
     private Dictionary<int, string> NewCardTitles = new();
+
+    private bool CheckListCreatingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
+    private bool CheckCardCreatingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
+    private bool CheckCardMovingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
 
     private async Task CreateCard(int listId)
     {

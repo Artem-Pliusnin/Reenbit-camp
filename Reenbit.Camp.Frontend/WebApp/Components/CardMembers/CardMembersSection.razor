@@ -5,15 +5,21 @@
 
     <div class="d-flex align-items-center gap-1 flex-wrap">
 
-        <TelerikButton
-            Icon=@SvgIcon.Plus
-            OnClick=@OpenMembersPopover
-            Class="add-member-button">
-        </TelerikButton>
+        @if (CheckCardMembersManagingPermision())
+        {
+            <TelerikButton
+                Icon=@SvgIcon.Plus
+                OnClick=@OpenMembersPopover
+                Class="add-member-button">
+            </TelerikButton>
+        }
 
         @foreach (var member in CardMembers)
         {
-            <CardMember Member=@member OnDelete=@RemoveMember></CardMember>
+            <CardMember 
+                Member=@member 
+                CanDelete=@CheckCardMembersManagingPermision() 
+                OnDelete=@RemoveMember></CardMember>
         }
     </div>
 </div>

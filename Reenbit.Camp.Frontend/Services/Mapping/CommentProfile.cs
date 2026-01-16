@@ -8,6 +8,6 @@ public class CommentProfile : Profile
 {
     public CommentProfile()
     {
-        CreateMap<CommentDto, CommentModel>();
+        CreateMap<CommentDto, CommentModel>().ReverseMap();
     }
 }

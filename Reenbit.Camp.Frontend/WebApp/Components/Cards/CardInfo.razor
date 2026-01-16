@@ -17,6 +17,7 @@ else
                 Class=""
                 Id="IsCompleted"
                 @bind-Value=@Card.IsCompleted
+                Enabled=@CheckCardUpdatingPermision()
                 Rounded=@ThemeConstants.CheckBox.Rounded.Large
                 Size=@ThemeConstants.CheckBox.Size.Large
                 OnChange=@OnChangeStatus/>
@@ -49,7 +50,14 @@ else
                      @onclick=@StartEditDescription>
                     @if (string.IsNullOrWhiteSpace(Card.Description))
                     {
-                        <p class="text-muted fst-italic description-field px-2">Add a description…</p>
+                        @if (CheckCardUpdatingPermision())
+                        {
+                            <p class="text-muted fst-italic description-field px-2">Add a description…</p>
+                        }
+                        else
+                        {
+                            <p class="text-muted fst-italic description-field px-2">No description</p>
+                        }
                     }
                     else
                     {
@@ -119,7 +127,14 @@ else
                         }
                         else
                         {
-                            <span class="ms-1">Add date</span>
+                            @if (CheckCardUpdatingPermision())
+                            {
+                                <span class="ms-1">Add date</span>
+                            }
+                            else
+                            {
+                                <span class="ms-1">Not specified</span>
+                            }
                         }
                     </span>
                 }
@@ -167,7 +182,14 @@ else
                     }
                     else
                     {
-                        <span class="ms-1">Add date</span>
+                        @if (CheckCardUpdatingPermision())
+                        {
+                            <span class="ms-1">Add date</span>
+                        }
+                        else
+                        {
+                            <span class="ms-1">Not specified</span>
+                        }
                     }
                 </span>
             }

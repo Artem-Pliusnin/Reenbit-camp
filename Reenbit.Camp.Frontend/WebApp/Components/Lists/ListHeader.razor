@@ -18,10 +18,13 @@
                maxlength=50
                autofocus />
     }
-
-    <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.MoreHorizontal
-                   Class=@($"menu-button menu-button-{List.Id}")
-                   OnClick=@ToggleMenu />
+    
+    @if(CheckListManagingPermision())
+    {
+        <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.MoreHorizontal
+                       Class=@($"menu-button menu-button-{List.Id}")
+                       OnClick=@ToggleMenu/>
+    }
 </div>
 
 <TelerikPopup @ref=@PopupRef

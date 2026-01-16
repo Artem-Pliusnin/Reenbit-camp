@@ -1,4 +1,6 @@
 using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
 using Domain.Models.Cards;
@@ -12,7 +14,7 @@ using Telerik.Blazor;
 
 namespace WebApp.Components.Cards;
 
-public partial class SimpleCard : ComponentBase
+public partial class SimpleCard : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="Board")]
     public BoardInfoModel Board { get; set; } = default!;
@@ -33,12 +35,19 @@ public partial class SimpleCard : ComponentBase
     public HubConnectionManager HubConnectionManager { get; set; } = default!;
     
     private HubConnection HomeHubConnection;
+    private HubConnection TaskHubConnection;
+    
+    private List<IDisposable> Subscriptions = new();
     
     private CardInfo? CardInfoRef;
     
     private bool IsCardOpen = false;
     
     private bool IsDeleteConfirmOpen = false;
+    
+    private bool CheckCardDeletingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
+    
+    private bool CheckCardUpdatePermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
 
     private async Task OnChangeStatus()
     {
@@ -116,5 +125,14 @@ public partial class SimpleCard : ComponentBase
     protected override void OnInitialized()
     {
         HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
+        TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
+    }
+
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
+        }
     }
 }

@@ -20,7 +20,7 @@
                             Id=@list.Id.ToString()
                             SelectionMode=@ListBoxSelectionMode.Multiple
                             @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
-                            Draggable=@true
+                            Draggable=@CheckCardMovingPermision()
                             DropSources=@ListBoxDropSources
                             OnDrop=@((ListBoxDropEventArgs<CardModel> args) 
                             => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
@@ -36,35 +36,41 @@
                     <ListBoxToolBar Visible=@false/>
                 </ListBoxToolBarSettings>
             </TelerikListBox>
+            
+            @if (CheckCardCreatingPermision())
+            {
+                <div class="add-card-footer d-flex align-items-center gap-2">
+                    <input class="form-control form-control-sm flex-grow-1"
+                           placeholder="Add a task..."
+                           maxlength=255
+                           @bind=@NewCardTitles[list.Id]
+                           @bind:event="oninput"/>
 
-            <div class="add-card-footer d-flex align-items-center gap-2">
-                <input class="form-control form-control-sm flex-grow-1"
-                       placeholder="Add a task..."
-                       maxlength=255
-                       @bind=@NewCardTitles[list.Id]
-                       @bind:event="oninput" />
-
-                <button class="btn btn-sm btn-outline-dark"
-                        disabled=@string.IsNullOrWhiteSpace(NewCardTitles[list.Id])
-                        @onclick=@(() => CreateCard(list.Id))>
-                    Add
-                </button>
-            </div>
+                    <button class="btn btn-sm btn-outline-dark"
+                            disabled=@string.IsNullOrWhiteSpace(NewCardTitles[list.Id])
+                            @onclick=@(() => CreateCard(list.Id))>
+                        Add
+                    </button>
+                </div>
+            }
         </div>
     }
-    <div class="d-flex flex-column gap-2 list-container">
-        <input class="form-control form-control-sm flex-grow-1"
-               placeholder="List title ..."
-               maxlength=50
-               @bind=@NewListTitle
-               @bind:event="oninput" />
+    @if (CheckListCreatingPermision())
+    {
+        <div class="d-flex flex-column gap-2 list-container">
+            <input class="form-control form-control-sm flex-grow-1"
+                   placeholder="List title ..."
+                   maxlength=50
+                   @bind=@NewListTitle
+                   @bind:event="oninput"/>
 
-        <button class="btn btn-sm btn-outline-dark"
-                disabled=@string.IsNullOrWhiteSpace(NewListTitle)
-                @onclick=@AddList>
-            Create list
-        </button>
-    </div>
+            <button class="btn btn-sm btn-outline-dark"
+                    disabled=@string.IsNullOrWhiteSpace(NewListTitle)
+                    @onclick=@AddList>
+                Create list
+            </button>
+        </div>
+    }
 </div>
 
 <style>

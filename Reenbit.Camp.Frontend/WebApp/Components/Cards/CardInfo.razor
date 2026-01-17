@@ -1,6 +1,7 @@
 @using Telerik.SvgIcons
 @using WebApp.Components.Labels
 @using WebApp.Components.CardMembers
+@using WebApp.Components.Attachments
 
 @if (isLoading)
 {
@@ -33,12 +34,20 @@ else
             {
                 <input class="form-control form-control-sm task-title-input"
                        @bind=@InputTitle
-                       @bind:event="oninput"
+                                              @bind:event="oninput"
                        @onblur=@SaveTitle                   
-                       @onkeydown=@OnTitleKeyDown
+                                              @onkeydown=@OnTitleKeyDown
                        maxlength=50
                        autofocus/>
             }
+        </div>
+
+        <div class="mb-3">
+            <CardMembersSection CardId=@CardId OnUpdateMembers=@UpdateCardMembers></CardMembersSection>
+        </div>
+
+        <div class="mb-3">
+            <CardLabelsSection OnUpdateLabels=@UpdateCardLabels CardId=@CardId></CardLabelsSection>
         </div>
 
         <div class="mb-3">
@@ -89,12 +98,9 @@ else
         </div>
 
         <div class="mb-3">
-            <CardMembersSection CardId=@CardId OnUpdateMembers=@UpdateCardMembers></CardMembersSection>
+            <AttachmentsSection CardId=@CardId></AttachmentsSection>
         </div>
-
-        <div class="mb-3">
-            <CardLabelsSection OnUpdateLabels=@UpdateCardLabels CardId=@CardId></CardLabelsSection>
-        </div>
+        
     </div>
         
     <div class="row g-3 mb-3">

@@ -16,4 +16,7 @@ public static class SubscribeTaskHubConstants
     public const string AddComment = "AddComment";
     public const string DeleteComment = "DeleteComment";
     public const string UpdateComment = "UpdateComment";
+    
+    public const string AddAttachment = "AddAttachment";
+    public const string DeleteAttachment = "DeleteAttachment";
 }

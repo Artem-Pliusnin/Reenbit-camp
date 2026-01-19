@@ -3,12 +3,14 @@
 <div class="mb-3">
     <div class="d-flex flex-row gap-2 mb-3">
         <h5 class="fw-semibold mb-2">Attachments</h5>
-
-        <TelerikButton
-            Class="add-file-button"
-            OnClick=@OpenAddMenu>
-            + Add
-        </TelerikButton>
+        @if (CheckCardAttachmentsManagingPermision())
+        {
+            <TelerikButton
+                Class="add-file-button"
+                OnClick=@OpenAddMenu>
+                + Add
+            </TelerikButton>
+        }
     </div>
 
     <div class="d-flex flex-column gap-3">
@@ -33,11 +35,14 @@
             </a>
             }
 
-            <TelerikButton
-                Icon=@SvgIcon.Trash
-                Class="attachment-delete-btn"
-                Size="small"
-                OnClick=@(() => DeleteAttachment(attachment)) />
+            @if (CheckCardAttachmentsManagingPermision())
+            {
+                <TelerikButton
+                    Icon=@SvgIcon.Trash
+                    Class="attachment-delete-btn"
+                    Size="small"
+                    OnClick=@(() => DeleteAttachment(attachment))/>
+            }
         </div>
         }
     </div>

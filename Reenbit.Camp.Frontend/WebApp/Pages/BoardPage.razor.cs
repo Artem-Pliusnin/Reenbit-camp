@@ -371,7 +371,12 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await HomeHubConnection.SendAsync(SendHomeHubConstants.DeleteFromBoardGroup, BoardId);
+        if (HomeHubConnection?.State == HubConnectionState.Connected)
+        {
+            await HomeHubConnection.SendAsync(
+                SendHomeHubConstants.DeleteFromBoardGroup,
+                BoardId);
+        }
 
         foreach (var subscription in Subscriptions)
         {

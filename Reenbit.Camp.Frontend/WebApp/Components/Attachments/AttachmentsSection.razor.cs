@@ -1,8 +1,13 @@
 using AutoMapper;
 using Domain.Constants.FileConstants;
+using Domain.Constants.HubConstants;
+using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.CardAttachments;
 using Domain.Models.Labels;
+using Domain.Responses.CardAttachments;
+using Domain.Responses.Comments;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -13,7 +18,7 @@ using Telerik.Blazor.Components;
 
 namespace WebApp.Components.Attachments;
 
-public partial class AttachmentsSection : ComponentBase
+public partial class AttachmentsSection : ComponentBase, IDisposable
 {
     [CascadingParameter(Name="CurrentUser")]
     public BoardMemberModel CurrentUser { get; set; } = default!;
@@ -51,12 +56,27 @@ public partial class AttachmentsSection : ComponentBase
         {
             Attachments = result.Value;
         }
+        
+        Subscriptions.Add(TaskHubConnection
+            .On<CardAttachmentDto>(
+                SubscribeTaskHubConstants.AddAttachment, 
+                AddAttachment));
+        
+        Subscriptions.Add(TaskHubConnection
+            .On<int>(
+                SubscribeTaskHubConstants.DeleteAttachment, 
+                RemoveAttachment));
     }
+    
+    private bool CheckCardAttachmentsManagingPermision() => CurrentUser.Role.HasAtLeast(BoardRole.Member);
 
     private void OpenAddMenu()
     {
-        SelectedFile = null;
-        PopoverRef?.Show();
+        if (CheckCardAttachmentsManagingPermision())
+        {
+            SelectedFile = null;
+            PopoverRef?.Show();
+        }
     }
 
     private void CloseAddMenu()
@@ -88,6 +108,13 @@ public partial class AttachmentsSection : ComponentBase
         if (result.IsSuccess)
         {
             Attachments.Insert(0, result.Value);
+            
+            var dto = Mapper.Map<CardAttachmentDto>(result.Value);
+            await TaskHubConnection
+                .SendAsync(
+                    SendTaskHubConstants.AddAttachment, 
+                    dto,
+                    CardId);
         }
         
         CloseAddMenu();
@@ -100,10 +127,39 @@ public partial class AttachmentsSection : ComponentBase
         if (result.IsSuccess)
         {
             Attachments.Remove(attachment);
+            await TaskHubConnection
+                .SendAsync(
+                    SendTaskHubConstants.DeleteAttachment,
+                    attachment.Id,
+                    CardId);
         }
     }
 
     bool IsImage(CardAttachmentModel attachment)
         => attachment.ContentType.StartsWith("image/");
 
+    private void AddAttachment(CardAttachmentDto attachment)
+    {
+        if (!Attachments.Any(ca => ca.Id == attachment.Id))
+        {
+            var attachmentModel = Mapper.Map<CardAttachmentModel>(attachment);
+            Attachments.Insert(0, attachmentModel);
+            
+            StateHasChanged();
+        }
+    }
+    
+    private void RemoveAttachment(int attachmentId)
+    {
+        Attachments.RemoveAll(ca => ca.Id == attachmentId);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        foreach (var subscription in Subscriptions)
+        {
+            subscription.Dispose();
+        }
+    }
 }

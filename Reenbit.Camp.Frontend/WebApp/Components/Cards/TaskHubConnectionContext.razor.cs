@@ -28,8 +28,12 @@ public partial class TaskHubConnectionContext : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await TaskHubConnection
-            .SendAsync(SendTaskHubConstants.DeleteFromTaskGroup, CardId);
+        if (TaskHubConnection is not null &&
+            TaskHubConnection.State == HubConnectionState.Connected)
+        {
+            await TaskHubConnection
+                .SendAsync(SendTaskHubConstants.DeleteFromTaskGroup, CardId);
+        }
     }
 
 

@@ -1,3 +1,4 @@
+using Domain.Models.CardAttachments;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<ICardLabelsService, CardLabelsService>();
         services.AddScoped<ICardMembersService, CardMembersService>();
         services.AddScoped<ICommentsService, CommentsService>();
+        services.AddScoped<ICardAttachmentService, CardAttachmentsService>();
         
         services.AddScoped<ITokenProvider, LocalStorageTokenProvider>();
         
@@ -83,6 +85,10 @@ public static class DependencyInjection
             .AddHttpMessageHandler<TokenHandler>();
         
         services.AddRefitClient<ICommentsApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
+            .AddHttpMessageHandler<TokenHandler>();
+        
+        services.AddRefitClient<ICardAttachmentsApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl))
             .AddHttpMessageHandler<TokenHandler>();
         

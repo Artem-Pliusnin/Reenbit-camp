@@ -108,12 +108,12 @@ public partial class BoardInvitationsMenu : ComponentBase, IDisposable
             if (acceptedInvitation is not null)
             {
                 Invitations.RemoveAll(i => i.Id == invitationId);
+                StateHasChanged();
+                PopoverRef?.Hide();
                 Navigation.NavigateTo($"/board/{acceptedInvitation.Board.Id}");
             }
         }
-        
-        PopoverRef?.Refresh();
-    }
+    }   
 
     private async Task Decline(int invitationId)
     {
@@ -122,9 +122,9 @@ public partial class BoardInvitationsMenu : ComponentBase, IDisposable
         if (result.IsSuccess)
         {
             Invitations.RemoveAll(i => i.Id == invitationId);
+            StateHasChanged();
+            PopoverRef?.Refresh();
         }
-        
-        PopoverRef?.Refresh();
     }
     
     public void Dispose()

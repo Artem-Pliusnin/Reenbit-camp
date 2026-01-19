@@ -6,6 +6,8 @@ public interface ICardRepository : IRepository<Card, int>
 {
     Task<Card?> GetByIdWithListAsync(int cardId, CancellationToken cancellationToken = default);
     
+    Task<Card?> GetByIdWithAttachmentsAsync(int cardId, CancellationToken cancellationToken = default);
+    
     Task<List<Card>> GetByListIdAsync(int listId, CancellationToken cancellationToken = default);
     
     Task<Card?> GetLastListsCard(int listId, CancellationToken cancellationToken = default);

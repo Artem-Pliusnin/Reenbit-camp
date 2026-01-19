@@ -1,5 +1,7 @@
 using Application.Abstractions.Services;
 using Infrastructure.Authentication;
+using Infrastructure.Services;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -11,10 +13,19 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        var storageConnectionString = configuration["AzureStorage:ConnectionString"];
+        
+        services.AddAzureClients(azureBuilder =>
+        {
+            azureBuilder.AddBlobServiceClient(storageConnectionString);
+        });
+        
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
         
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<ITokenProvider, TokenProvider>();
+        
+        services.AddScoped<IFileService, AzureFileService>();
         
         return services;
     }

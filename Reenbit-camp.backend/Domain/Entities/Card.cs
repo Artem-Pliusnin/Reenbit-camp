@@ -30,5 +30,7 @@ public class Card
     
     public List<CardMember> Members { get; set; }
     
+    public List<CardAttachment> Attachments { get; set; }
+    
     public List<Comment> Comments { get; set; }
 }

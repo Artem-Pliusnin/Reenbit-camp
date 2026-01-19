@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<ICardLabelsRepository, CardLabelsRepository>();
         services.AddScoped<ICardMembersRepository, CardMembersRepository>();
         services.AddScoped<ICommentsRepository, CommentsRepository>();
+        services.AddScoped<ICardAttachmentRepository, CardAttachmentRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         

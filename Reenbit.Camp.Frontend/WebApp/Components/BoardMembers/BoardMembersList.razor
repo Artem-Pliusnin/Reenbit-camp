@@ -30,6 +30,13 @@
                                    Size="ButtonSize.Small"
                                    OnClick=@(() => RemoveMember(member))/>
                     }
+                    else if(member.Id == CurrentUser.Id)
+                    {
+                        <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Logout
+                                       Class="delete-button"
+                                       Size="ButtonSize.Small"
+                                       OnClick=@LeaveBoard/>
+                    }
                 </div>
             </div>
         }

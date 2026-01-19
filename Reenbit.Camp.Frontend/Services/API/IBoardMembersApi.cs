@@ -18,5 +18,5 @@ public interface IBoardMembersApi
         [Body] UpdateBoardMemberRoleRequest request);
     
     [Delete("/BoardMembers/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    Task<ApiResponse<DeleteBoardMemberDto>> DeleteAsync(int id);
 }

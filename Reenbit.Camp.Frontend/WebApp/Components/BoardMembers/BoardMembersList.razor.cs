@@ -173,6 +173,30 @@ public partial class BoardMembersList : ComponentBase, IDisposable
                 .SendAsync(SendHomeHubConstants.DeleteMember, member, BoardId);
         }
     }
+
+    private async Task LeaveBoard()
+    {
+        var result = await BoardMembersService.DeleteAsync(CurrentUser.Id);
+
+        if (result.IsSuccess)
+        {
+            if (result.Value.NewOwner != null)
+            {
+                await HomeHubConnection
+                    .SendAsync(
+                        SendHomeHubConstants.UpdateMemberRole, 
+                        new UpdatedCardMemberRoleDto(
+                            result.Value.NewOwner.Id, 
+                            (int)result.Value.NewOwner.Role), 
+                        BoardId);
+            }
+            
+            await HomeHubConnection
+                .SendAsync(SendHomeHubConstants.DeleteMember, CurrentUser, BoardId);
+            
+            NavigationManager.NavigateTo($"/");
+        }
+    }
     
     public void Dispose()
     {

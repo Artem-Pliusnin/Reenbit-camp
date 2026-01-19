@@ -1,5 +1,6 @@
 using Domain.Models.BoardMembers;
 using Domain.Requests.BoardMembers;
+using Domain.Responses.BoardMembers;
 using Domain.Shared;
 
 namespace Services.Abstractions.Services;
@@ -12,5 +13,5 @@ public interface IBoardMembersService
 
     Task<Result<object>> UpdateRoleAsync(int id, UpdateBoardMemberRoleRequest request);
     
-    Task<Result<object>> DeleteAsync(int id);
+    Task<Result<DeleteBoardMemberDto>> DeleteAsync(int id);
 }

@@ -28,11 +28,21 @@ public partial class TaskHubConnectionContext : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (TaskHubConnection is not null &&
-            TaskHubConnection.State == HubConnectionState.Connected)
+        if (TaskHubConnection.State == HubConnectionState.Connected)
         {
-            await TaskHubConnection
-                .SendAsync(SendTaskHubConstants.DeleteFromTaskGroup, CardId);
+            try
+            {
+                await TaskHubConnection
+                    .SendAsync(SendTaskHubConstants.DeleteFromTaskGroup, CardId);
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Connection already disconnected.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DisposeAsync: {ex.Message}");
+            }
         }
     }
 

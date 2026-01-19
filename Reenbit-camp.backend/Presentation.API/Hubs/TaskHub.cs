@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Domain.Constants.HubConstants;
+using Domain.DTOs.CardAttachments;
 using Domain.DTOs.CardLabels;
 using Domain.DTOs.CardMembers;
 using Domain.DTOs.Cards;
@@ -72,25 +73,33 @@ public class TaskHub : Hub
     
     public async Task AddComment(CommentDto dto, int cardId)
     {
-        Console.WriteLine(JsonSerializer.Serialize(dto));
         await Clients.OthersInGroup(GetTaskGroupName(cardId))
             .SendAsync(TaskHubConstants.AddComment, dto);
     }
     
     public async Task UpdateComment(CommentDto dto, int cardId)
     {
-        Console.WriteLine(JsonSerializer.Serialize(dto));
         await Clients.OthersInGroup(GetTaskGroupName(cardId))
             .SendAsync(TaskHubConstants.UpdateComment, dto);
     }
     
     public async Task DeleteComment(int commentId, int cardId)
     {
-        Console.WriteLine(commentId);
         await Clients.OthersInGroup(GetTaskGroupName(cardId))
             .SendAsync(TaskHubConstants.DeleteComment, commentId);
     }
     
+    public async Task AddAttachment(CardAttachmentDto dto, int cardId)
+    {
+        await Clients.OthersInGroup(GetTaskGroupName(cardId))
+            .SendAsync(TaskHubConstants.AddAttachment, dto);
+    }
+    
+    public async Task DeleteAttachment(int attachmentId, int cardId)
+    {
+        await Clients.OthersInGroup(GetTaskGroupName(cardId))
+            .SendAsync(TaskHubConstants.DeleteAttachment, attachmentId);
+    }
     public static string GetTaskGroupName(int taskId)
     {
         return $"task_{taskId}";

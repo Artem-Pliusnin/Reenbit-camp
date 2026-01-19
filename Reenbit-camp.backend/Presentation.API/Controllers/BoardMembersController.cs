@@ -86,13 +86,13 @@ public class BoardMembersController : AuthorizedContoller
     {
         var command = new DeleteBoardMemberCommand(id);
         
-        Result result = await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
             return HandleFailure(result);
         }
         
-        return Ok();
+        return Ok(result.Value);
     }
 }

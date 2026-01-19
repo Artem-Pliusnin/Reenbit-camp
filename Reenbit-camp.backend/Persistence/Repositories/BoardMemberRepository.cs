@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
@@ -12,6 +13,15 @@ public class BoardMemberRepository :
     public BoardMemberRepository(TrelloAppDbContext context) 
         : base(context)
     {}
+
+    public async Task<BoardMember?> GetByIdWithBoardAsync(
+        int boardMemberId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(bm => bm.Board)
+            .FirstOrDefaultAsync(bm => bm.Id == boardMemberId, cancellationToken);
+    }
 
     public async Task<List<BoardMember>> GetByBoardIdAsync(
         int boardId, 
@@ -39,5 +49,24 @@ public class BoardMemberRepository :
         return await _dbSet.AnyAsync(
             bm => bm.UserId == userId && bm.BoardId == boardId,
             cancellationToken);
+    }
+
+    public async Task<BoardMember?> GetNewOwnerAsync(
+        int boardId, 
+        BoardMember removedOwner, 
+        CancellationToken cancellationToken = default)
+    {
+        var remainingMembers = await _dbSet
+            .Where(m => m.BoardId == boardId && m.Id != removedOwner.Id)
+            .OrderBy(m => m.Role)
+            .ThenBy(m => m.Id)
+            .ToListAsync();
+        
+        if (!remainingMembers.Any())
+        {
+            return null;
+        }
+    
+        return remainingMembers.First();
     }
 }

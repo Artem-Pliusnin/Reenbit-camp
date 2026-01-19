@@ -371,11 +371,20 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (HomeHubConnection?.State == HubConnectionState.Connected)
+        if (HomeHubConnection.State == HubConnectionState.Connected)
         {
-            await HomeHubConnection.SendAsync(
-                SendHomeHubConstants.DeleteFromBoardGroup,
-                BoardId);
+            try
+            {
+                await HomeHubConnection.SendAsync(SendHomeHubConstants.DeleteFromBoardGroup, BoardId);
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Connection already disconnected.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DisposeAsync: {ex.Message}");
+            }
         }
 
         foreach (var subscription in Subscriptions)

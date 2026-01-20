@@ -11,8 +11,14 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
     public UserRepository(TrelloAppDbContext context)
         : base(context)
     {}
-
-
+    
+    public async Task<User?> GetByIdWithAvatarAsync(
+        int id, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    }
+    
     public async Task<bool> ExistsByEmailAsync(string email,
         CancellationToken cancellationToken = default)
     {
@@ -50,6 +56,7 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
         
         return await usersQuery
             .OrderBy(u => (u.FirstName + " " + u.LastName))
+            .Include(u => u.Avatar)
             .Take(limit)
             .ToListAsync(cancellationToken);
     }
@@ -62,6 +69,7 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
         return await _dbSet
             .Where(u => u.Boards.Any(bm => bm.BoardId == boardId))
             .Where(u => !u.Cards.Any(cm => cm.CardId == cardId))
+            .Include(u => u.Avatar)
             .ToListAsync(cancellationToken);
     }
 }

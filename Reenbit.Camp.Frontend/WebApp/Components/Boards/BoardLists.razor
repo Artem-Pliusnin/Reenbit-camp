@@ -15,6 +15,7 @@
             <TelerikListBox Width="100%"
                             Class="w-100"
                             @ref=@ListBoxRefs[list.Id]
+                            @key=@list
                             Data=@list.Cards
                             TextField=@nameof(CardModel.Title)
                             Id=@list.Id.ToString()

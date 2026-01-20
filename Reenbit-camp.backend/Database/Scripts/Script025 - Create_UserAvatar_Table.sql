@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS "UserAvatars" (
+    Id SERIAL PRIMARY KEY,
+    User_Id INT NOT NULL UNIQUE,
+    File_Name VARCHAR(255) NOT NULL,
+    File_Url VARCHAR(500) NOT NULL,
+
+    CONSTRAINT fk_user_avatar_user
+    FOREIGN KEY (User_Id)
+    REFERENCES "User"(Id)
+    ON DELETE CASCADE
+);

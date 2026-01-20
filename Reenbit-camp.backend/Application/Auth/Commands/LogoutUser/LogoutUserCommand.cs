@@ -1,6 +1,6 @@
 using Application.Abstractions.Messaging;
 
-namespace Application.Users.Commands.LogoutUser;
+namespace Application.Auth.Commands.LogoutUser;
 
 public sealed record LogoutUserCommand(
     int UserId) 

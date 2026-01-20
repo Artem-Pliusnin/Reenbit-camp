@@ -3,7 +3,7 @@ using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
-namespace Application.Users.Commands.LogoutUser;
+namespace Application.Auth.Commands.LogoutUser;
 
 internal class LogoutUserCommandHandler : ICommandHandler<LogoutUserCommand, bool>
 {

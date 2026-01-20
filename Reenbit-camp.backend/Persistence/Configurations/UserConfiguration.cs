@@ -24,11 +24,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("lastname")
             .HasMaxLength(100)
             .IsRequired();
-
-        builder.Property(u => u.Avatar)
-            .HasColumnName("avatar")
-            .HasMaxLength(255);
-
+        
         builder.Property(u => u.Email)
             .HasColumnName("email")
             .HasMaxLength(255)

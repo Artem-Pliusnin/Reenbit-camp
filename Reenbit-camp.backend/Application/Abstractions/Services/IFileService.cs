@@ -4,13 +4,15 @@ namespace Application.Abstractions.Services;
 
 public interface IFileService
 {
-    Task<StoredFileDto> UploadAttachmentFileAsync(
+    Task<StoredFileDto> UploadFileAsync(
         Stream content,
         string fileName,
         string contentType,
+        string directoryName,
         CancellationToken cancellationToken = default);
     
-    Task DeleteAttachmentFileAsync(
+    Task DeleteFileAsync(
         string fileName,
+        string directoryName,
         CancellationToken cancellationToken = default);
 }

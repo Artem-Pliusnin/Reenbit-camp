@@ -13,6 +13,8 @@ public class TrelloAppDbContext : DbContext
     
     DbSet<User> Users { get; set; }
     
+    DbSet<UserAvatar> UserAvatars { get; set; }
+    
     DbSet<Session> Sessions { get; set; }
     
     DbSet<Board> Boards { get; set; }

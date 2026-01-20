@@ -1,5 +1,6 @@
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
+using Domain.Constants.FIleConstants;
 using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
@@ -36,7 +37,10 @@ internal class DeleteCardCommandHandler : ICommandHandler<DeleteCardCommand>
 
         foreach (var attachment in card.Attachments)
         {
-            await _fileService.DeleteAttachmentFileAsync(attachment.FileName, cancellationToken);
+            await _fileService.DeleteFileAsync(
+                attachment.FileName, 
+                FileDirectoriesConstants.Attachments, 
+                cancellationToken);
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

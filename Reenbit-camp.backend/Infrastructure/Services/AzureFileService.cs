@@ -17,16 +17,17 @@ public class AzureFileService : IFileService
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task<StoredFileDto> UploadAttachmentFileAsync(
+    public async Task<StoredFileDto> UploadFileAsync(
         Stream content, 
         string fileName, 
         string contentType,
+        string directoryName,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var container = _blobServiceClient
-                .GetBlobContainerClient(FileDirectoriesConstants.Attachments);
+                .GetBlobContainerClient(directoryName);
 
             await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
@@ -63,14 +64,15 @@ public class AzureFileService : IFileService
         }
     }
     
-    public async Task DeleteAttachmentFileAsync(
+    public async Task DeleteFileAsync(
         string fileName,
+        string directoryName,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var container = _blobServiceClient
-                .GetBlobContainerClient(FileDirectoriesConstants.Attachments);
+                .GetBlobContainerClient(directoryName);
 
             var blob = container.GetBlobClient(fileName);
 
@@ -84,4 +86,5 @@ public class AzureFileService : IFileService
                 "Error occured while deleting file.", ex);
         }
     }
+    
 }

@@ -6,7 +6,7 @@ using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
-namespace Application.Users.Commands.LoginUser;
+namespace Application.Auth.Commands.LoginUser;
 
 internal class LoginUserCommandHandler 
     : ICommandHandler<LoginUserCommand, TokensResponseDto>

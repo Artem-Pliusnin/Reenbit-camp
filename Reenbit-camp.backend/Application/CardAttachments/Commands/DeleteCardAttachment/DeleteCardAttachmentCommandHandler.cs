@@ -1,6 +1,7 @@
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.CardLabels.Commands.DeleteCardLabel;
+using Domain.Constants.FIleConstants;
 using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
@@ -36,7 +37,10 @@ internal class DeleteCardAttachmentCommandHandler : ICommandHandler<DeleteCardAt
             
             cardAttachmentRepository.Remove(cardAttachment);
             
-            await _fileService.DeleteAttachmentFileAsync(cardAttachment.FileName, cancellationToken);
+            await _fileService.DeleteFileAsync(
+                cardAttachment.FileName, 
+                FileDirectoriesConstants.Attachments,
+                cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

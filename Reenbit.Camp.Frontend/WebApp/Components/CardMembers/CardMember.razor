@@ -1,12 +1,21 @@
 <div class="member-avatar-wrapper"
      id=@($"member-{Member.Id}")
      @onclick=@OpenPopover>
-
-    <TelerikAvatar
-        Type=@AvatarType.Text
-        ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
-        @Member.User.UserName[0]
-    </TelerikAvatar>
+    
+    @if (Member.User.Avatar is null)
+    {
+        <TelerikAvatar
+            Type=@AvatarType.Text
+            ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+            @Member.User.UserName[0]
+        </TelerikAvatar>
+    }
+    else
+    {
+        <TelerikAvatar Type=@AvatarType.Image>
+            <img src=@Member.User.Avatar.FileUrl/>
+        </TelerikAvatar>
+    }
 
     <TelerikPopover
         @ref=@PopoverRef

@@ -9,7 +9,7 @@
             <SocketHubContext>
                 <TelerikRootComponent>
                     <header class="top-navbar">
-                        <NavMenu Username=@context.User.Identity?.Name/>
+                        <NavMenu UserId=@GetUserId(context.User)/>
                     </header>
 
                     <main>

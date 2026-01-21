@@ -28,7 +28,7 @@ internal class CreateCommentCommandHandler : ICommandHandler<CreateCommentComman
             var userRepository = _unitOfWork.GetRepository<IUserRepository>();
             
             var user = await userRepository
-                .GetByIdAsync(request.UserId, cancellationToken);
+                .GetByIdWithAvatarAsync(request.UserId, cancellationToken);
             
             if (user == null)
             {

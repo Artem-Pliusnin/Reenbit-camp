@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenProvider, TokenProvider>();
         
         services.AddScoped<IFileService, AzureFileService>();
+        services.AddScoped<IImageService, ImageService>();
         
         return services;
     }

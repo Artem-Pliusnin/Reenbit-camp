@@ -16,15 +16,18 @@ internal class UpdateUserAvatarCommandHandler : ICommandHandler<UpdateUserAvatar
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
+    private readonly IImageService _imageService;
 
     public UpdateUserAvatarCommandHandler(
         IUnitOfWork unitOfWork, 
         IMapper mapper, 
-        IFileService fileService)
+        IFileService fileService, 
+        IImageService imageService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _fileService = fileService;
+        _imageService = imageService;
     }
     
     public async Task<Result<UserAvatarDto>> Handle(
@@ -33,9 +36,15 @@ internal class UpdateUserAvatarCommandHandler : ICommandHandler<UpdateUserAvatar
     {
         try
         {
+            var image = await _imageService
+                .ResizeAvatarAsync(
+                    request.FileContent,
+                    FileSizeConstants.AvatarSize,
+                    cancellationToken);
+                
             var fileDto = await _fileService
                 .UploadFileAsync(
-                    request.FileContent,
+                    image,
                     request.FileName,
                     request.ContentType,
                     FileDirectoriesConstants.Avatars,
@@ -43,7 +52,7 @@ internal class UpdateUserAvatarCommandHandler : ICommandHandler<UpdateUserAvatar
 
             var userRepository = _unitOfWork.GetRepository<IUserRepository>();
             
-            var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+            var user = await userRepository.GetByIdWithAvatarAsync(request.UserId, cancellationToken);
 
             if (user == null)
             {

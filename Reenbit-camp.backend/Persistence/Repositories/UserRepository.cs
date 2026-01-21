@@ -16,7 +16,9 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
         int id, 
         CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+        return await _dbSet
+            .Include(u => u.Avatar)
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
     
     public async Task<bool> ExistsByEmailAsync(string email,

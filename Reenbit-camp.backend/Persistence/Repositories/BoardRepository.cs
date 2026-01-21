@@ -78,6 +78,7 @@ public class BoardRepository :
                 .ThenInclude(l => l.Cards.OrderBy(c => c.Position))
                     .ThenInclude(c => c.Members)
                         .ThenInclude(cm => cm.User)
+                            .ThenInclude(u => u.Avatar)
             .FirstOrDefaultAsync(b => b.Id == boardId, cancellationToken);
     }
 }

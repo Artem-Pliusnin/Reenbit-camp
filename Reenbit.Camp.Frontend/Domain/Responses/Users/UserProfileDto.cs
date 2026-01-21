@@ -2,8 +2,9 @@ using Domain.Responses.UserAvatars;
 
 namespace Domain.Responses.Users;
 
-public sealed record UserDto(
+public record UserProfileDto(
     int Id,
-    string UserName,
+    string FirstName,
+    string LastName,
     string Email,
     UserAvatarDto? Avatar);

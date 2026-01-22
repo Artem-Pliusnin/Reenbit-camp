@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Models.BoardMembers;
 using Domain.Requests.BoardMembers;
+using Domain.Responses.BoardMembers;
 using Domain.Shared;
 using Services.Abstractions.Services;
 using Services.API;
@@ -42,7 +43,7 @@ public class BoardMembersService : IBoardMembersService
         return response.HandleResult();
     }
     
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<DeleteBoardMemberDto>> DeleteAsync(int id)
     {
         var response = await _boardMembersApi.DeleteAsync(id);
 

@@ -108,174 +108,172 @@ else
 
             @if (IsCreateMode)
             {
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <TelerikButton
-                    Icon=@SvgIcon.ArrowLeft
-                    Size="small"
-                    OnClick=@ChangeToBaseMode
-                    Class="popover-btn">
-                </TelerikButton>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <TelerikButton
+                        Icon=@SvgIcon.ArrowLeft
+                        Size="small"
+                        OnClick=@ChangeToBaseMode
+                        Class="popover-btn">
+                    </TelerikButton>
 
-                <h6 class="mb-0">Create label</h6>
+                    <h6 class="mb-0">Create label</h6>
 
-                <TelerikButton
-                    Icon=@SvgIcon.X
-                    Size="small"
-                    OnClick=@ClosAddMenu
-                    Class="popover-btn">
-                </TelerikButton>
-            </div>
-
-            <div class="mb-3">
-                <small class="text-muted">Preview</small>
-
-                <div class="d-flex align-items-center label-preview"
-                     style="background: @NewLabelColor">
-                        <span class="label-text">
-                           @NewLabelText
-                        </span>
+                    <TelerikButton
+                        Icon=@SvgIcon.X
+                        Size="small"
+                        OnClick=@ClosAddMenu
+                        Class="popover-btn">
+                    </TelerikButton>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <small class="text-muted">Title</small>
+                <div class="mb-3">
+                    <small class="text-muted">Preview</small>
 
-                <input class="form-control form-control-sm"
-                       placeholder="Label title"
-                       maxlength="30"
-                       @bind=@NewLabelText
-                       @bind:event="oninput"
-                       @bind:after=@(() => PopoverRef?.Refresh())
-                />
-            </div>
+                    <div class="d-flex align-items-center label-preview"
+                         style="background: @NewLabelColor">
+                        <span class="label-text">
+                            @NewLabelText
+                        </span>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <small class="text-muted">Color</small>
+                <div class="mb-3">
+                    <small class="text-muted">Title</small>
 
-                <TelerikColorPicker
-                    @bind-Value=@NewLabelColor
-                    OnChange=@ColorPickerOnChange
-                    ValueFormat=@ColorFormat.Hex
-                    AdaptiveMode=@AdaptiveMode.Auto
-                    PopupClass="k-popup-fit"/>
+                    <input class="form-control form-control-sm"
+                           placeholder="Label title"
+                           maxlength="30"
+                           @bind=@NewLabelText
+                                              @bind:event="oninput"
+                           @bind:after=@(() => PopoverRef?.Refresh())/>
+                </div>
 
-            </div>
+                <div class="mb-3">
+                    <small class="text-muted">Color</small>
 
-            <TelerikButton
-                OnClick=@CreateLabel
-                Class="btn-light btn-sm w-100">
-                Create
-            </TelerikButton>
+                    <TelerikColorPicker
+                        @bind-Value=@NewLabelColor
+                        OnChange=@ColorPickerOnChange
+                        ValueFormat=@ColorFormat.Hex
+                        AdaptiveMode=@AdaptiveMode.Auto
+                        PopupClass="k-popup-fit"/>
+
+                </div>
+
+                <TelerikButton
+                    OnClick=@CreateLabel
+                    Class="btn-light btn-sm w-100">
+                    Create
+                </TelerikButton>
             }
-            else if(IsEditMode)
+            else if (IsEditMode)
             {
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <TelerikButton
-                    Icon=@SvgIcon.ArrowLeft
-                    Size="small"
-                    OnClick=@ChangeToBaseMode
-                    Class="popover-btn">
-                </TelerikButton>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <TelerikButton
+                        Icon=@SvgIcon.ArrowLeft
+                        Size="small"
+                        OnClick=@ChangeToBaseMode
+                        Class="popover-btn">
+                    </TelerikButton>
 
-                <h6 class="mb-0">Edit label</h6>
+                    <h6 class="mb-0">Edit label</h6>
 
-                <TelerikButton
-                    Icon=@SvgIcon.X
-                    Size="small"
-                    OnClick=@ClosAddMenu
-                    Class="popover-btn">
-                </TelerikButton>
-            </div>
-
-            <div class="mb-3">
-                <small class="text-muted">Preview</small>
-
-                <div class="d-flex align-items-center label-preview"
-                     style="background: @EditLabel.Color">
-                        <span class="label-text">
-                           @EditLabel.Text
-                        </span>
+                    <TelerikButton
+                        Icon=@SvgIcon.X
+                        Size="small"
+                        OnClick=@ClosAddMenu
+                        Class="popover-btn">
+                    </TelerikButton>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <small class="text-muted">Title</small>
+                <div class="mb-3">
+                    <small class="text-muted">Preview</small>
 
-                <input class="form-control form-control-sm"
-                       placeholder="Label title"
-                       maxlength="30"
-                       @bind=@EditLabel.Text
-                       @bind:event="oninput"
-                       @bind:after=@(() => PopoverRef?.Refresh())
-                />
-            </div>
+                    <div class="d-flex align-items-center label-preview"
+                         style="background: @EditLabel.Color">
+                        <span class="label-text">
+                            @EditLabel.Text
+                        </span>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <small class="text-muted">Color</small>
+                <div class="mb-3">
+                    <small class="text-muted">Title</small>
 
-                <TelerikColorPicker
-                    @bind-Value=@EditLabel.Color
-                    OnChange=@ColorPickerOnChange
-                    ValueFormat=@ColorFormat.Hex
-                    AdaptiveMode=@AdaptiveMode.Auto
-                    PopupClass="k-popup-fit"/>
+                    <input class="form-control form-control-sm"
+                           placeholder="Label title"
+                           maxlength="30"
+                           @bind=@EditLabel.Text
+                                              @bind:event="oninput"
+                           @bind:after=@(() => PopoverRef?.Refresh())/>
+                </div>
 
-            </div>
+                <div class="mb-3">
+                    <small class="text-muted">Color</small>
 
-            <div class="d-flex gap-3">
-                <TelerikButton
-                    OnClick=@SaveEditedLabel
-                    Class="btn-primary flex-fill">
-                    Save
-                </TelerikButton>
+                    <TelerikColorPicker
+                        @bind-Value=@EditLabel.Color
+                        OnChange=@ColorPickerOnChange
+                        ValueFormat=@ColorFormat.Hex
+                        AdaptiveMode=@AdaptiveMode.Auto
+                        PopupClass="k-popup-fit"/>
 
-                <TelerikButton
-                    OnClick=@DeleteLabel
-                    Class="btn-danger flex-fill">
-                    Delete
-                </TelerikButton>
-            </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <TelerikButton
+                        OnClick=@SaveEditedLabel
+                        Class="btn-primary flex-fill">
+                        Save
+                    </TelerikButton>
+
+                    <TelerikButton
+                        OnClick=@DeleteLabel
+                        Class="btn-danger flex-fill">
+                        Delete
+                    </TelerikButton>
+                </div>
             }
             else
             {
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <div style="width: 2rem"></div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div style="width: 2rem"></div>
 
-                <h6 class="mb-0">Labels</h6>
+                    <h6 class="mb-0">Labels</h6>
+
+                    <TelerikButton
+                        Icon=@SvgIcon.X
+                        Size="small"
+                        OnClick=@ClosAddMenu
+                        Class="popover-btn">
+                    </TelerikButton>
+                </div>
+
+                <div class="d-flex flex-column align-items-center gap-2 labels-cont">
+                    @foreach (var label in Labels)
+                    {
+                        <div class="label-row d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center label"
+                                 style="background: @label.Color">
+                                <span class="label-text">
+                                    @label.Text
+                                </span>
+                            </div>
+
+                            <TelerikButton Icon=@SvgIcon.Pencil
+                                           Class="label-btn"
+                                           OnClick=@(() => ChangeToEditMode(label))/>
+                        </div>
+                    }
+                </div>
+
+                <hr/>
 
                 <TelerikButton
-                    Icon=@SvgIcon.X
-                    Size="small"
-                    OnClick=@ClosAddMenu
-                    Class="popover-btn">
+                    OnClick=@ChangeToCreateMode
+                    Class="btn-light btn-sm w-100">
+                    Create new label
                 </TelerikButton>
-            </div>
-
-            <div class="d-flex flex-column align-items-center gap-2 labels-cont">
-                @foreach (var label in Labels)
-                {
-                    <div class="label-row d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center label" 
-                             style="background: @label.Color">
-                            <span class="label-text">
-                                @label.Text
-                            </span>
-                        </div>
-    
-                        <TelerikButton Icon=@SvgIcon.Pencil
-                                       Class="label-btn"
-                                       OnClick=@(() => ChangeToEditMode(label)) />
-                    </div>
-                }
-            </div>
-
-            <hr/>
-
-            <TelerikButton
-                OnClick=@ChangeToCreateMode
-                Class="btn-light btn-sm w-100">
-                Create new label
-            </TelerikButton>
             }
 
         </div>

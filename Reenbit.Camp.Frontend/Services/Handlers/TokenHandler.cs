@@ -47,7 +47,6 @@ public class TokenHandler : DelegatingHandler
             }
             else
             {
-                await _localStorage.RemoveItemAsync("Session");
                 _navigationManager.NavigateTo("/auth");
             }
         }

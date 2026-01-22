@@ -32,29 +32,28 @@
             }
             else
             {
-                <TelerikListView Data=@Invitations>
-                    <Template>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <div class="fw-semibold">@context.Board.Title</div>
-                                <small class="text-muted">
-                                    Invited by @context.InvitedByUser.UserName
-                                </small>
-                            </div>
-
-                            <div class="d-flex gap-1">
-                                <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.Check"
-                                               Size="ButtonSize.Small"
-                                               OnClick=@(() => Accept(context.Id))/>
-
-                                <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.X"
-                                               Size="ButtonSize.Small"
-                                               FillMode="ButtonFillMode.Flat"
-                                               OnClick=@(() => Decline(context.Id))/>
-                            </div>
+                @foreach (var invitation in Invitations)
+                {
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <div class="fw-semibold">@invitation.Board.Title</div>
+                            <small class="text-muted">
+                                Invited by @invitation.InvitedByUser.UserName
+                            </small>
                         </div>
-                    </Template>
-                </TelerikListView>
+
+                        <div class="d-flex gap-1">
+                            <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.Check"
+                                           Size="ButtonSize.Small"
+                                           OnClick=@(() => Accept(invitation.Id))/>
+
+                            <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.X"
+                                           Size="ButtonSize.Small"
+                                           FillMode="ButtonFillMode.Flat"
+                                           OnClick=@(() => Decline(invitation.Id))/>
+                        </div>
+                    </div>
+                }
             }
         </PopoverContent>
     </TelerikPopover>

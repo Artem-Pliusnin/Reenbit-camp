@@ -5,7 +5,7 @@ using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
-namespace Application.Users.Commands.RegisterUser;
+namespace Application.Auth.Commands.RegisterUser;
 
 internal class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, int>
 {

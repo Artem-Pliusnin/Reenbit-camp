@@ -5,7 +5,7 @@ using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
-namespace Application.Users.Commands.RefreshTokens;
+namespace Application.Auth.Commands.RefreshTokens;
 
 internal class RefreshTokensCommandHandler : ICommandHandler<RefreshTokensCommand, TokensResponseDto>
 {

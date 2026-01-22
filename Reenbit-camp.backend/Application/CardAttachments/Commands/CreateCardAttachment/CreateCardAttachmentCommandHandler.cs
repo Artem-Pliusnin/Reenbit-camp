@@ -1,6 +1,7 @@
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using AutoMapper;
+using Domain.Constants.FIleConstants;
 using Domain.DTOs.CardAttachments;
 using Domain.Entities;
 using Domain.Errors;
@@ -36,10 +37,11 @@ internal class CreateCardAttachmentCommandHandler
             var cardAttachmentRepository = _unitOfWork.GetRepository<ICardAttachmentRepository>();
 
             var fileDto = await _fileService
-                .UploadAttachmentFileAsync(
+                .UploadFileAsync(
                     request.FileContent,
                     request.FileName,
                     request.ContentType,
+                    FileDirectoriesConstants.Attachments,
                     cancellationToken);
 
             var cardAttachment = new CardAttachment()

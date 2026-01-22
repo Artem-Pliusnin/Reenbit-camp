@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using Application.Users.Commands.LoginUser;
-using Application.Users.Commands.LogoutUser;
-using Application.Users.Commands.RefreshTokens;
-using Application.Users.Commands.RegisterUser;
+using Application.Auth.Commands.LoginUser;
+using Application.Auth.Commands.LogoutUser;
+using Application.Auth.Commands.RefreshTokens;
+using Application.Auth.Commands.RegisterUser;
 using Domain.DTOs.Authorization;
 using Domain.Errors;
 using Domain.Shared;

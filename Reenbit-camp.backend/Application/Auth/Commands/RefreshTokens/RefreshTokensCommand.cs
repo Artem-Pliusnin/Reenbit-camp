@@ -1,7 +1,7 @@
 using Application.Abstractions.Messaging;
 using Domain.DTOs.Authorization;
 
-namespace Application.Users.Commands.RefreshTokens;
+namespace Application.Auth.Commands.RefreshTokens;
 
 public sealed record RefreshTokensCommand(
     string RefreshToken)

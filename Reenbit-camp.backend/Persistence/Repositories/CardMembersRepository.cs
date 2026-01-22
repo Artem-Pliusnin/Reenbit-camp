@@ -19,6 +19,7 @@ public class CardMembersRepository :
     {
         return await _dbSet.Where(cm => cm.CardId == cardId)
             .Include(cm => cm.User)
+                .ThenInclude(u =>u.Avatar)
             .ToListAsync(cancellationToken);
     }
     

@@ -19,4 +19,8 @@ public static class UserErrors
     public static readonly Error UserDoesNotExistError = new(
         "User.DoesNotExistError",
         "User with given id does not exist.");
+    
+    public static readonly Error UserUpdateError = new(
+        "User.UpdateError",
+        "Error occured while updating user.");
 }

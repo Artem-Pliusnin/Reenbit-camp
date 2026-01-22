@@ -10,5 +10,10 @@ public class UserProfile: Profile
     {
         CreateMap<UserDto, UserModel>().ReverseMap();
         CreateMap<UserProfileDto, UserProfileModel>().ReverseMap();
+        CreateMap<UserProfileModel, UserModel>()
+            .ForMember(
+                dest => dest.UserName, 
+                opt => opt.MapFrom(src => src.FirstName + " " + src.LastName));
+
     }
 }

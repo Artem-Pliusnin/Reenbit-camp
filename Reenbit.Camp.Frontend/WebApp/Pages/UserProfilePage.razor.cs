@@ -1,3 +1,4 @@
+using AutoMapper;
 using Domain.Constants.FileConstants;
 using Domain.Models.Users;
 using Domain.Requests.Users;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Refit;
 using Services.Abstractions.Services;
 using Telerik.Blazor.Components;
+using WebApp.Layout;
 
 namespace WebApp.Pages;
 
@@ -14,8 +16,14 @@ public partial class UserProfilePage : ComponentBase
     [Parameter]
     public int UserId { get; set; }
     
+    [CascadingParameter(Name="NavMenu")]
+    public NavMenu? NavMenuRef { get; set; }
+    
     [Inject] 
     public IUsersService UsersService { get; set; } = default!;
+    
+    [Inject] 
+    public IMapper Mapper { get; set; } = default!;
     
     private UserProfileModel userProfile;
     
@@ -74,8 +82,6 @@ public partial class UserProfilePage : ComponentBase
         isFileLoading = true;
         DialogRef.Refresh();
         
-        var start = DateTime.Now;
-        
         selectedFile = e.File;
         
         if (selectedFile != null)
@@ -88,8 +94,6 @@ public partial class UserProfilePage : ComponentBase
             previewImageUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
         }
 
-        Console.WriteLine((DateTime.Now - start).TotalMilliseconds);
-        
         isFileLoading = false;
         DialogRef.Refresh();
     }
@@ -102,7 +106,6 @@ public partial class UserProfilePage : ComponentBase
         }
         
         var stream = selectedFile.OpenReadStream(FilesConstants.MaxFileSize);
-        
         var file = new StreamPart(stream, selectedFile.Name, selectedFile.ContentType);
         
         var result = await UsersService.UpdateUserAvatarAsync(file, UserId);
@@ -110,6 +113,9 @@ public partial class UserProfilePage : ComponentBase
         if (result.IsSuccess)
         {
             userProfile.Avatar = result.Value;
+            
+            var userModel = Mapper.Map<UserModel>(userProfile);
+            NavMenuRef!.UpdateProfile(userModel);
         }
 
         CloseAvatarWindow();
@@ -140,6 +146,9 @@ public partial class UserProfilePage : ComponentBase
         {
             userProfile.FirstName = enteredFirstName;
             userProfile.LastName = enteredLastName;
+            
+            var userModel = Mapper.Map<UserModel>(userProfile);
+            NavMenuRef!.UpdateProfile(userModel);
         }
         
         StateHasChanged();

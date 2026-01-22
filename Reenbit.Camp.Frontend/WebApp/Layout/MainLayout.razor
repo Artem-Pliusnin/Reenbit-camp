@@ -9,11 +9,13 @@
             <SocketHubContext>
                 <TelerikRootComponent>
                     <header class="top-navbar">
-                        <NavMenu UserId=@GetUserId(context.User)/>
+                        <NavMenu UserId=@GetUserId(context.User) @ref=@navMenuRef/>
                     </header>
 
                     <main>
-                        @Body
+                        <CascadingValue Name="NavMenu" Value=@navMenuRef>
+                            @Body
+                        </CascadingValue>
                     </main>
                 </TelerikRootComponent>
             </SocketHubContext>

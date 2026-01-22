@@ -34,6 +34,12 @@ public partial class NavMenu
         }
     }
 
+    public void UpdateProfile(UserModel user)
+    {
+        CurrentUser = user;
+        StateHasChanged();
+    }
+
     private void ToggleMenu()
     {
         isOpen = !isOpen;

@@ -1,9 +1,18 @@
 <div class="comment-item d-flex gap-2 p-2">
-    <TelerikAvatar
-        Type=@AvatarType.Text
-        ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
-        @Comment.User.UserName[0]
-    </TelerikAvatar>
+    @if (Comment.User.Avatar is null)
+    {
+        <TelerikAvatar
+            Type=@AvatarType.Text
+            ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+            @Comment.User.UserName[0]
+        </TelerikAvatar>
+    }
+    else
+    {
+        <TelerikAvatar Type=@AvatarType.Image>
+            <img src=@Comment.User.Avatar.FileUrl/>
+        </TelerikAvatar>
+    }
 
     <div class="flex-grow-1">
         <div class="comment-header">

@@ -18,19 +18,38 @@
     <div class="navbar-right">
         <BoardInvitationsMenu />
         
-        <div class="d-flex flex-row gap-1 align-items-center">
-            <span class="user-name">
-                @Username
-            </span>
-
-            <TelerikAvatar
-                Type=@AvatarType.Text
-                Class="avatar"
-                ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
-                @(!string.IsNullOrWhiteSpace(Username)
-                    ? Username[0]
-                    : '?')
-            </TelerikAvatar>
+        <div class="user-profile" @onclick=@NavigateToProfile>
+            @if (isLoadinUser)
+            {
+                <div class="d-flex justify-content-center align-items-center"
+                     style="width: 4rem">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            }
+            else
+            {
+                <span class="user-name">
+                    @CurrentUser.UserName
+                </span>
+                
+                @if (CurrentUser.Avatar is null)
+                {
+                    <TelerikAvatar
+                        Type=@AvatarType.Text
+                        Class="avatar"
+                        ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                        @(!string.IsNullOrWhiteSpace(CurrentUser.UserName)
+                            ? CurrentUser.UserName[0]
+                            : '?')
+                    </TelerikAvatar>
+                }
+                else
+                {
+                    <TelerikAvatar Class="avatar" Type=@AvatarType.Image>
+                        <img src=@CurrentUser.Avatar.FileUrl/>
+                    </TelerikAvatar>
+                }
+            }
         </div>
 
         <Logout />

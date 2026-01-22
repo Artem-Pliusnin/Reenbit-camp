@@ -48,11 +48,20 @@
                 @foreach (var member in Card.Members)
                 {
                     <div class="avatar-wrapper" title=@member.User.UserName>
-                        <TelerikAvatar
-                            Type=@AvatarType.Text
-                            ThemeColor=@Avatar.ThemeColor.Inverse>
-                            @member.User.UserName[0]
-                        </TelerikAvatar>
+                        @if (member.User.Avatar is null)
+                        {
+                            <TelerikAvatar
+                                Type=@AvatarType.Text
+                                ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                                @member.User.UserName[0]
+                            </TelerikAvatar>
+                        }
+                        else
+                        {
+                            <TelerikAvatar Type=@AvatarType.Image>
+                                <img src=@member.User.Avatar.FileUrl/>
+                            </TelerikAvatar>
+                        }
                     </div>
                 }
             </div>

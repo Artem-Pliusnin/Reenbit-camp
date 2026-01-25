@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @using WebApp.Components.Shared
 @using WebApp.Components.Auth
+@using WebApp.Components.FAQChat
 
 
 <div class="page">
@@ -17,6 +18,7 @@
                             @Body
                         </CascadingValue>
                     </main>
+                    <ChatOpener></ChatOpener>
                 </TelerikRootComponent>
             </SocketHubContext>
         </Authorized>

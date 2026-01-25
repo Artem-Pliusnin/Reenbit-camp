@@ -1,0 +1,38 @@
+.faq-chat-panel {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 25rem;
+    height: 100vh;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -6px 0 16px rgba(0,0,0,0.2);
+    z-index: 1001;
+}
+
+.faq-chat-header {
+    padding: 0.7rem;
+    background-color: #176B87;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faq-chat-header h4{
+    margin: 0;
+    color: #EEF5FF;
+}
+
+.faq-chat{
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .faq-chat-panel {
+        width: 100vw;
+        height: 100vh;
+    }
+}

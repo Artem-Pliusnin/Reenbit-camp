@@ -1,0 +1,48 @@
+@using Domain.Enums
+@using Telerik.SvgIcons
+
+
+<div class="chat-cont">
+    <div class="faq-chat-messages">
+        @foreach (var message in Messages)
+        {
+            <div class="faq-chat-message @(message.Sender == SenderType.User ? "user" : "bot")">
+                @message.Message
+            </div>
+        }
+    </div>
+
+    <div class="faq-chat-input">
+        <TelerikTextBox
+            Placeholder="Ask a question..."
+            @bind-Value=@InputMessage
+            Class="message-input"
+            Width="100%"/>
+
+        <TelerikButton
+            Icon=@SvgIcon.PaperPlane
+            Class="send-btn"
+            OnClick=@SendMessage>
+            Send
+        </TelerikButton>
+    </div>
+</div>
+
+<style>
+    .send-btn{
+        background-color: #176B87;
+        color: #EEF5FF;
+        border: none;
+        cursor: pointer;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .send-btn:hover {
+        background-color: #1B8AAF;
+    }
+    
+    .message-input{
+        font-size: 1rem;
+    }
+    
+</style>

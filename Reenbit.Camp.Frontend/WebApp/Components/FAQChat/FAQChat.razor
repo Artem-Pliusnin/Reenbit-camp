@@ -10,6 +10,14 @@
                 @message.Message
             </div>
         }
+        @if (isResponseLoading)
+        {
+            <div class="faq-chat-message bot">
+                <TelerikLoader Size=@ThemeConstants.Loader.Size.Medium
+                               ThemeColor=@ThemeConstants.Loader.ThemeColor.Secondary
+                               Type=@LoaderType.InfiniteSpinner/>
+            </div>
+        }
     </div>
 
     <div class="faq-chat-input">
@@ -22,6 +30,7 @@
         <TelerikButton
             Icon=@SvgIcon.PaperPlane
             Class="send-btn"
+            Enabled=@(!isResponseLoading && !string.IsNullOrEmpty(InputMessage))
             OnClick=@SendMessage>
             Send
         </TelerikButton>

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Domain.Errors;
@@ -5,7 +6,7 @@ using Domain.Shared;
 
 namespace Application.FAQChat.Queries.AskQuestion;
 
-public class AskQuestionQueryHandler : IQueryHandler<AskQuestionQuery, string>
+internal class AskQuestionQueryHandler : IQueryHandler<AskQuestionQuery, string>
 {
     private readonly IChatService _chatService;
 
@@ -18,7 +19,8 @@ public class AskQuestionQueryHandler : IQueryHandler<AskQuestionQuery, string>
     {
         try
         {
-            var response = await _chatService.AskAsync(request.Question);
+            var response = await _chatService
+                .AskAsync(request.UserId, request.Question);
             
             return response;
         }

@@ -11,4 +11,8 @@ public class FAQChatErrors
     public static readonly Error FileImportError = new(
         "FAQ.FileImportError",
         "Error occured while importing the file.");
+    
+    public static readonly Error EndSessionError = new(
+        "FAQ.EndSessionError",
+        "Error occured while ending the session.");
 }

@@ -1,13 +1,12 @@
-using Application.Comments.Commands.CreateComment;
+using Application.FAQChat.Commands.EndChatSession;
 using Application.FAQChat.Commands.ImportFile;
+using Application.FAQChat.Commands.StartChatSession;
 using Application.FAQChat.Queries.AskQuestion;
-using Domain.DTOs.Comments;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
-using Presentation.API.Contracts.Comments;
 using Presentation.API.Contracts.FAQ;
 
 namespace Presentation.API.Controllers;
@@ -21,7 +20,7 @@ public class FAQChatController : AuthorizedContoller
     
     [HttpPost("question")]
     public async Task<IActionResult> AskQuestionAsync(
-        [FromBody] string question,
+        [FromBody] AskQuestionRequest request,
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))
@@ -30,7 +29,7 @@ public class FAQChatController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
         
-        var query = new AskQuestionQuery(userId, question);
+        var query = new AskQuestionQuery(userId, request.Question);
         
         Result<string> result = await Sender.Send(query, cancellationToken);
         
@@ -42,7 +41,7 @@ public class FAQChatController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpPost]
+    [HttpPost("file/import")]
     public async Task<IActionResult> ImportFileAsync(
         [FromForm] ImportFileRequest request, 
         CancellationToken cancellationToken)
@@ -60,6 +59,49 @@ public class FAQChatController : AuthorizedContoller
             return HandleFailure(result);
         }
         
+        return Ok();
+    }
+    
+    [HttpPost("session/start")]
+    public async Task<IActionResult> StartSessionAsync(
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new StartChatSessionCommand(userId);
+        
+        Result result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
+    [HttpPost("session/end")]
+    public async Task<IActionResult> EndSessionAsync(CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new EndChatSessionCommand(userId);
+        
+        Result result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
         return Ok();
     }
 }

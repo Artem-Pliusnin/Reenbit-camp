@@ -72,7 +72,7 @@ public static class DependencyInjection
                 .Build<MemoryServerless>();
         });
         
-        services.AddScoped<IChatService, ChatService>();
+        services.AddSingleton<IChatService, ChatService>();
         
         return services;
     }

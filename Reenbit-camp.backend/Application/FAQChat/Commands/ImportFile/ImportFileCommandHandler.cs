@@ -5,7 +5,7 @@ using Domain.Shared;
 
 namespace Application.FAQChat.Commands.ImportFile;
 
-public class ImportFileCommandHandler : ICommandHandler<ImportFileCommand>
+internal class ImportFileCommandHandler : ICommandHandler<ImportFileCommand>
 {
     private readonly IChatService _chatService;
 

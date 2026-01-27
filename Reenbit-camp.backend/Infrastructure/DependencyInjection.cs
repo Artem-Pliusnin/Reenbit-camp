@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -72,7 +73,30 @@ public static class DependencyInjection
                 .Build<MemoryServerless>();
         });
         
-        services.AddSingleton<IChatService, ChatService>();
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var redisEndpoint = configuration["Redis:Endpoint"];
+            var redisPassword = configuration["Redis:Password"];
+            var redisPort = configuration["Redis:Port"] ?? "6380";
+            
+            var options = new ConfigurationOptions
+            {
+                EndPoints = { $"{redisEndpoint}:{redisPort}" },
+                Password = redisPassword,
+                Ssl = true,
+                AbortOnConnectFail = false,
+                ConnectRetry = 5,
+                ConnectTimeout = 15000,
+                SyncTimeout = 15000,
+                AsyncTimeout = 15000,
+                KeepAlive = 60
+            };
+
+            return ConnectionMultiplexer.Connect(options);
+        });
+        
+        services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IChatHistoryService, ChatHistoryService>();
         
         return services;
     }

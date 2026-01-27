@@ -17,6 +17,7 @@
       <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.72.240904.1" />
       <PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" Version="0.72.240904.1" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+      <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
     </ItemGroup>
 

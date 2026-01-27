@@ -7,9 +7,9 @@ public interface IChatService
         string documentId,
         string fileName);
     
-    void StartChatSession(int userId);
+    Task StartChatSession(int userId);
 
-    bool EndChatSession(int userId);
+    Task EndChatSession(int userId);
 
     Task<string> AskAsync(int userId, string question);
 }

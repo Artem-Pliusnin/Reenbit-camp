@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Application.Abstractions.Services;
 using Domain.Constants.FIleConstants;
+using Domain.DTOs.FAQChat;
 using Infrastructure.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -7,22 +9,24 @@ using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using MongoDB.Bson.IO;
 
 namespace Infrastructure.Services;
 
 public class ChatService : IChatService
 {
-    private readonly Dictionary<int, ChatHistory> _sessions;
     private readonly Kernel _kernel;
     private readonly IKernelMemory _memory;
+    private readonly IChatHistoryService _chatHistoryService;
 
     public ChatService(
         IOptions<AzureOpenAISettings> openAIOptions,
-        IKernelMemory memory)
+        IKernelMemory memory, 
+        IChatHistoryService chatHistoryService)
     {
-        _sessions = new Dictionary<int, ChatHistory>();
-        
         _memory = memory;
+        _chatHistoryService = chatHistoryService;
+        
         var openAI = openAIOptions.Value;
 
         _kernel = Kernel.CreateBuilder()
@@ -57,14 +61,14 @@ public class ChatService : IChatService
         }
     }
     
-    public void StartChatSession(int userId)
+    public async Task StartChatSession(int userId)
     {
-        _sessions[userId] = new ChatHistory();
+        await _chatHistoryService.ClearAsync(userId);
     }
 
-    public bool EndChatSession(int userId)
+    public async Task EndChatSession(int userId)
     {
-        return _sessions.Remove(userId);
+        await _chatHistoryService.ClearAsync(userId);
     }
 
     public async Task<string> AskAsync(int userId ,string question)
@@ -74,13 +78,19 @@ public class ChatService : IChatService
             ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
         };
         
-        if (!_sessions.ContainsKey(userId))
+        var historyDtos = await _chatHistoryService.GetAsync(userId);
+
+        var chatHistory = new ChatHistory();
+        foreach (var m in historyDtos)
         {
-            StartChatSession(userId);
+            if (!string.IsNullOrWhiteSpace(m.Content))
+            {
+                chatHistory.AddMessage(
+                    m.Role == "user" ? AuthorRole.User : AuthorRole.Assistant,
+                    m.Content);
+            }
         }
-        
-        var chatHistory = _sessions[userId];
-        
+
         var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
         
         var prompt = $@"
@@ -90,13 +100,21 @@ public class ChatService : IChatService
 
             If the answer is empty say 'I don't know',otherwise reply with the answer.
             ";
-    
+
+        Console.WriteLine(JsonSerializer.Serialize(chatHistory));
         chatHistory.AddMessage(AuthorRole.User, prompt);
         
         var result = await chatCompletionService
             .GetChatMessageContentAsync(chatHistory, settings, _kernel);
+        
+        historyDtos.Add(new ChatMessageDto { Role = "user", Content = question });
+    
+        if (!string.IsNullOrWhiteSpace(result.Content))
+        {
+            historyDtos.Add(new ChatMessageDto { Role = "assistant", Content = result.Content });
+        }
 
-        chatHistory.AddMessage(AuthorRole.Assistant, result.Content);
+        await _chatHistoryService.SaveAsync(userId, historyDtos);
 
         return result.Content;
     }

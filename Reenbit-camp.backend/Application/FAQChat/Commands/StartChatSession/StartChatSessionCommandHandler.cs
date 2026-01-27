@@ -15,7 +15,7 @@ internal class StartChatSessionCommandHandler : ICommandHandler<StartChatSession
     
     public async Task<Result> Handle(StartChatSessionCommand request, CancellationToken cancellationToken)
     {
-        _chatService.StartChatSession(request.UserId);
+        await _chatService.StartChatSession(request.UserId);
         
         return Result.Success();
     }

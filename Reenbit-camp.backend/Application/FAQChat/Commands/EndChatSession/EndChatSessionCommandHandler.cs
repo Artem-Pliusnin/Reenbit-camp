@@ -16,13 +16,8 @@ internal class EndChatSessionCommandHandler : ICommandHandler<EndChatSessionComm
     
     public async Task<Result> Handle(EndChatSessionCommand request, CancellationToken cancellationToken)
     {
-        var result = _chatService.EndChatSession(request.UserId);
-
-        if (result)
-        {
-            return Result.Success();
-        }
-
-        return Result.Failure(FAQChatErrors.EndSessionError);
+        await _chatService.EndChatSession(request.UserId);
+        
+        return Result.Success();
     }
 }

@@ -14,7 +14,10 @@
       <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
       <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
       <PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.1" />
+      <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.72.240904.1" />
+      <PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" Version="0.72.240904.1" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+      <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
     </ItemGroup>
 

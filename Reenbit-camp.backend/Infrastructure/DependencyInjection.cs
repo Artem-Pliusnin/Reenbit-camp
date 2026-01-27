@@ -1,9 +1,13 @@
 using Application.Abstractions.Services;
 using Infrastructure.Authentication;
+using Infrastructure.Configuration;
 using Infrastructure.Services;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.KernelMemory;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -27,6 +31,72 @@ public static class DependencyInjection
         
         services.AddScoped<IFileService, AzureFileService>();
         services.AddScoped<IImageService, ImageService>();
+        
+        services.Configure<AzureOpenAISettings>(
+            configuration.GetSection("AzureOpenAI"));
+        
+        services.Configure<AzureSearchSettings>(
+            configuration.GetSection("AzureSearch"));
+        
+        services.AddSingleton<IKernelMemory>(sp =>
+        {
+            var openAISettings = sp
+                .GetRequiredService<IOptions<AzureOpenAISettings>>()
+                .Value;
+            
+            var searchSettings = sp
+                .GetRequiredService<IOptions<AzureSearchSettings>>()
+                .Value;
+            
+            var embeddingConfig = new AzureOpenAIConfig
+            {
+                APIKey = openAISettings.ApiKey,
+                Deployment = openAISettings.DeploymentEmbeddingName,
+                Endpoint = openAISettings.Endpoint,
+                APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+                Auth = AzureOpenAIConfig.AuthTypes.APIKey
+            };
+
+            var chatConfig = new AzureOpenAIConfig
+            {
+                APIKey = openAISettings.ApiKey,
+                Deployment = openAISettings.DeploymentChatName,
+                Endpoint = openAISettings.Endpoint,
+                APIType = AzureOpenAIConfig.APITypes.ChatCompletion,
+                Auth = AzureOpenAIConfig.AuthTypes.APIKey
+            };
+
+            return new KernelMemoryBuilder()
+                .WithAzureOpenAITextGeneration(chatConfig)
+                .WithAzureOpenAITextEmbeddingGeneration(embeddingConfig)
+                .WithAzureAISearchMemoryDb(searchSettings.Endpoint, searchSettings.ApiKey)
+                .Build<MemoryServerless>();
+        });
+        
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var redisEndpoint = configuration["Redis:Endpoint"];
+            var redisPassword = configuration["Redis:Password"];
+            var redisPort = configuration["Redis:Port"] ?? "6380";
+            
+            var options = new ConfigurationOptions
+            {
+                EndPoints = { $"{redisEndpoint}:{redisPort}" },
+                Password = redisPassword,
+                Ssl = true,
+                AbortOnConnectFail = false,
+                ConnectRetry = 5,
+                ConnectTimeout = 15000,
+                SyncTimeout = 15000,
+                AsyncTimeout = 15000,
+                KeepAlive = 60
+            };
+
+            return ConnectionMultiplexer.Connect(options);
+        });
+        
+        services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<IChatHistoryService, ChatHistoryService>();
         
         return services;
     }

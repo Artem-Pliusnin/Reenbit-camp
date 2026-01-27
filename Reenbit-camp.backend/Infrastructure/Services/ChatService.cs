@@ -101,7 +101,6 @@ public class ChatService : IChatService
             If the answer is empty say 'I don't know',otherwise reply with the answer.
             ";
 
-        Console.WriteLine(JsonSerializer.Serialize(chatHistory));
         chatHistory.AddMessage(AuthorRole.User, prompt);
         
         var result = await chatCompletionService

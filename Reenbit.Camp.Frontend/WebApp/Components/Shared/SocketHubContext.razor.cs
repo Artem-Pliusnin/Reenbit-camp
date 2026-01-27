@@ -23,6 +23,7 @@ public partial class SocketHubContext : ComponentBase, IAsyncDisposable
         {
             await HubConnectionManager.StartAsync(HubType.HomeHub);
             await HubConnectionManager.StartAsync(HubType.TaskHub);
+            await HubConnectionManager.StartAsync(HubType.VideoChatHub);
 
             isConnected = true;
         }

@@ -33,6 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Components\VideoChat\" />
       <Folder Include="wwwroot\Shared\" />
     </ItemGroup>
 

@@ -28,8 +28,9 @@ public class HubConnectionManager
 
         var hubUrl = type switch
         {
-            HubType.HomeHub => $"{_hubBaseUrl}/homehub",
-            HubType.TaskHub => $"{_hubBaseUrl}/taskhub"
+            HubType.HomeHub => $"{_hubBaseUrl}/home",
+            HubType.TaskHub => $"{_hubBaseUrl}/task",
+            HubType.VideoChatHub => $"{_hubBaseUrl}/video-chat"
         };
 
         hub = new HubConnectionBuilder()

@@ -50,5 +50,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<HomeHub>("hubs/home");
 app.MapHub<TaskHub>("hubs/task");
+app.MapHub<VideoChatHub>("hubs/video-chat");
 
 app.Run();

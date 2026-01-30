@@ -23,7 +23,6 @@ public partial class SocketHubContext : ComponentBase, IAsyncDisposable
         {
             await HubConnectionManager.StartAsync(HubType.HomeHub);
             await HubConnectionManager.StartAsync(HubType.TaskHub);
-            await HubConnectionManager.StartAsync(HubType.VideoChatHub);
 
             isConnected = true;
         }
@@ -36,6 +35,7 @@ public partial class SocketHubContext : ComponentBase, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await HubConnectionManager.DisposeAsync(HubType.HomeHub);
+        await HubConnectionManager.DisposeAsync(HubType.TaskHub);
     }
     
     

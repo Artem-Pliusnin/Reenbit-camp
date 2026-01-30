@@ -1,4 +1,3 @@
-using System.Text.Json;
 using AutoMapper;
 using Domain.Constants.HubConstants;
 using Domain.Enums;
@@ -9,7 +8,6 @@ using Domain.Models.Labels;
 using Domain.Requests.Boards;
 using Domain.Requests.Labels;
 using Domain.Responses.BoardMembers;
-using Domain.Responses.Invitations;
 using Domain.Responses.Labels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -172,6 +170,11 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     private void CloseMembersDialog()
     {
         IsMembersDialogOpen = false;
+    }
+
+    private void RedirectToMeeting()
+    {
+        NavigationManager.NavigateTo($"/board-meeting/{BoardId}");
     }
 
     private void StartEditTitle()

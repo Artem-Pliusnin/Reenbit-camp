@@ -1,0 +1,5 @@
+.avatar-cont{
+    display: flex;
+    height: 50%;
+    aspect-ratio: 1/1;
+}

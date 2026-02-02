@@ -2,6 +2,7 @@ using Domain.Models.CardAttachments;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Refit;
 using Services.Abstractions.Services;
 using Services.API;
@@ -43,8 +44,8 @@ public static class DependencyInjection
         
         services.AddScoped<TokenHandler>();
 
-        var apiBaseUrl = configuration["ApiBaseUrl"] ?? 
-                         throw new Exception("Api url not configured");
+        var apiBaseUrl = configuration["ApiUrls:ApiBaseUrl"] 
+                         ?? throw new Exception("ApiBaseUrl not configured");
 
         services.AddRefitClient<IAuthApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));

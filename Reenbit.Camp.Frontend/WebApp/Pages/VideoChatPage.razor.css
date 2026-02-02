@@ -37,6 +37,7 @@
     border-radius: 0.7rem;
     flex-shrink: 0;
     background: rgba(255,255,255,0.5);
+    overflow: hidden;
 }
 
 .meeting-member-info{

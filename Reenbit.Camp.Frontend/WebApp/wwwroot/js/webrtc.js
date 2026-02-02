@@ -31,6 +31,7 @@ window.webrtc = {
                 
                 document.getElementById(`video-container-${remoteUserId}`).appendChild(video);
             }
+            video.style.display = "flex";
             video.srcObject = e.streams[0];
         };
 

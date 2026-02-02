@@ -1,7 +1,4 @@
-using System.Text.Json;
 using Domain.Constants.HubConstants;
-using Domain.Models.BoardMembers;
-using Domain.Models.Users;
 using Domain.Models.VideoChatModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -155,7 +152,8 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
     
     private async Task ToggleScreenShare()
     {
-        if (ScreenOwnerId != null && ScreenOwnerId != CurrentUser.User.Id.ToString())
+        if (ScreenOwnerId != null && 
+            ScreenOwnerId != CurrentUser.User.Id.ToString())
         {
             return;
         }
@@ -238,11 +236,10 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
 
         NavigationManager.NavigateTo($"/board/{BoardId}");
     }
-    
+
     private async Task OnUserJoined(string userId)
     {
-        if (_peers.ContainsKey(userId) 
-            || !await AddConnectedUser(userId))
+        if (!await AddConnectedUser(userId, true, true))
         {
             return;
         }
@@ -264,7 +261,9 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
         await VideoChatHubConnection.SendAsync(
             SendVideoChatHubConstants.SendOffer,
             userId,
-            offer
+            offer,
+            CurrentUser.IsVideoActive,
+            CurrentUser.IsAudioActive
         );
 
         if (IsScreenSharing)
@@ -275,10 +274,13 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
         await InvokeAsync(StateHasChanged);
     }
     
-    private async Task OnReceiveOffer(string fromUserId, string offer)
+    private async Task OnReceiveOffer(
+        string fromUserId, 
+        string offer, 
+        bool isVideoActive, 
+        bool isAudioActive)
     {
-        if (_peers.ContainsKey(fromUserId) 
-            || !await AddConnectedUser(fromUserId))
+        if (!await AddConnectedUser(fromUserId, isVideoActive, isAudioActive))
         {
             return;
         }
@@ -316,6 +318,8 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
                 "webrtc.setRemoteDescription", 
                 peerConnection, 
                 answer);
+            
+            StateHasChanged();
         }
     }
 
@@ -504,7 +508,7 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
             .On<string>(SubscribeVideoChatHubConstants.UserJoined, OnUserJoined));
 
         Subscriptions.Add(VideoChatHubConnection
-            .On<string, string>(SubscribeVideoChatHubConstants.ReceiveOffer, OnReceiveOffer));
+            .On<string, string, bool, bool>(SubscribeVideoChatHubConstants.ReceiveOffer, OnReceiveOffer));
 
         Subscriptions.Add(VideoChatHubConnection
             .On<string, string>(SubscribeVideoChatHubConstants.ReceiveAnswer, OnReceiveAnswer));
@@ -535,7 +539,10 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
         
     }
 
-    private async Task<bool> AddConnectedUser(string userId)
+    private async Task<bool> AddConnectedUser(
+        string userId, 
+        bool isVideoActive, 
+        bool isAudioActive) 
     {
         if (int.TryParse(userId, out int id))
         {
@@ -546,21 +553,20 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
                 ConnectedUsers[userId] = new MeetingMemberModel()
                 {
                     User = result.Value,
-                    IsVideoActive = true,
-                    IsAudioActive = true
+                    IsVideoActive = isVideoActive,
+                    IsAudioActive = isAudioActive
                 };
+                
                 StateHasChanged();
                 return true;
             }
             
             return false;
         }
-        else
-        {
-            return false;
-        }
+        
+        return false;
     }
-
+    
     public async ValueTask DisposeAsync()
     {
         foreach (var peer in _peers.Values)

@@ -16,7 +16,7 @@ public class HubConnectionManager
         IConfiguration configuration)
     {
         _tokenProvider = tokenProvider;
-        _hubBaseUrl = configuration["HubBaseUrl"];
+        _hubBaseUrl = configuration["ApiUrls:HubBaseUrl"];
     }
 
     public HubConnection Get(HubType type)

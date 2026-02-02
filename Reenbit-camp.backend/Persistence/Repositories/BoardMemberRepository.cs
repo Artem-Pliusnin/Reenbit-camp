@@ -38,6 +38,7 @@ public class BoardMemberRepository :
         return await _dbSet.Where(bm => bm.BoardId == boardId && bm.UserId == userId)
             .Include(bm => bm.Board)
             .Include(bm => bm.User)
+                .ThenInclude(u => u.Avatar)
             .FirstOrDefaultAsync(cancellationToken);
     }
     

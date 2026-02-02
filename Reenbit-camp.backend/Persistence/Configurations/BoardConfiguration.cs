@@ -38,6 +38,12 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
         builder.Property(b => b.LastUpdateDate)
             .HasColumnName("last_update_date")
             .HasConversion(UtcDateTimeConverters.Nullable);
+
+        builder.Property(b => b.Status)
+            .HasColumnName("status_id")
+            .HasConversion<int>()
+            .HasDefaultValue(1)
+            .IsRequired();
         
         builder.HasOne(b => b.CreatedByUser)
             .WithMany()
@@ -49,5 +55,6 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
             .HasForeignKey(b => b.LastUpdatedBy)
             .OnDelete(DeleteBehavior.SetNull);
         
+        builder.HasIndex(b => b.Status);
     }
 }

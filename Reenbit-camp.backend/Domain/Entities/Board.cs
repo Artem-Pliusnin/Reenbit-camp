@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Domain.Entities;
 
 public class Board
@@ -16,6 +18,8 @@ public class Board
     
     public User CreatedByUser { get; set; }
     public User? LastUpdatedByUser { get; set; }
+    
+    public BoardStatus Status { get; set; } = BoardStatus.Active;
     
     public List<Invitation> Invitations { get; set; }
     public List<BoardMember> Members { get; set; }

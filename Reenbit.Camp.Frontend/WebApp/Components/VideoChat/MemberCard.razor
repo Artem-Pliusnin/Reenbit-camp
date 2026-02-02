@@ -1,0 +1,30 @@
+<div class="w-100 h-100 d-flex align-items-center justify-content-center">
+    <div class="avatar-cont">
+    @if (User.Avatar is null)
+    {
+        <TelerikAvatar
+            Type=@AvatarType.Text
+            ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse
+            Class="card-avatar">
+            @User.UserName[0]
+        </TelerikAvatar>
+    }
+    else
+    {
+        <TelerikAvatar Type=@AvatarType.Image Class="card-avatar">
+            <img src=@User.Avatar.FileUrl/>
+        </TelerikAvatar>
+    }
+    </div>
+</div>
+
+
+<style>
+    .card-avatar{
+        height: 100%;
+        width: 100%;
+        flex-basis: 100%;
+        margin: 0;
+        border: 2px solid #176B87;
+    }
+</style>

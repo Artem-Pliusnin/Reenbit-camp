@@ -1,0 +1,143 @@
+@page "/board-meeting/{boardId:int}"
+@using Telerik.SvgIcons
+@using WebApp.Components.VideoChat
+@using WebApp.Components.Common
+@layout EmptyLayout
+
+@if (IsLoading)
+{
+    <div class="loading-background d-flex justify-content-center align-items-center">
+        <TelerikLoader Size="@ThemeConstants.Loader.Size.Large"
+                       ThemeColor="custom-color"
+                       Type="@LoaderType.ConvergingSpinner"/>
+    </div>
+}
+else
+{
+    <div class="meeting-root">
+        <div class="remote-strip-wrapper">
+            <div id="remoteVideos" class="remote-strip">
+                @foreach (var user in ConnectedUsers)
+                {
+                    <div @key=@user.Key id=@($"video-container-{user.Key}") class="remote-video-container">
+                        @if (!user.Value.IsVideoActive)
+                        {
+                            <MemberCard User=@user.Value.User></MemberCard>
+                        }
+                        <div class="meeting-member-info">
+                            @if (!user.Value.IsAudioActive)
+                            {
+                                <div class="microphone-badge">
+                                    <MicMuteIcon Class="bi bi-mic-mute mic-icon"></MicMuteIcon>
+                                </div>
+                            }
+                            
+                            <span>@user.Value.User.UserName</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div id="screen-container" class="screen-container">
+            <video id="screen-video"
+                   autoplay
+                   playsinline
+                   class="screen-video"
+                   style="display: none">
+            </video>
+            <div class="meeting-member-info">
+                <span>@ScreenOwnerName</span>
+            </div>
+        </div>
+
+        <div class="meeting-controls">
+            <TelerikButton Icon=@SvgIcon.Camera
+                           ThemeColor=@(CurrentUser.IsVideoActive ? "primary" : "secondary")
+                           Class="meeting-btn"
+                           OnClick=@ToggleVideo/>
+
+            <TelerikButton Icon=@SvgIcon.MicrophoneOutline
+                           ThemeColor=@(CurrentUser.IsAudioActive ? "primary" : "secondary")
+                           Class="meeting-btn"
+                           OnClick=@ToggleAudio/>
+
+            <TelerikButton Icon=@SvgIcon.Upload
+                           ThemeColor=@(IsScreenSharing ? "primary" : "secondary")
+                           Class="meeting-btn"
+                           OnClick=@ToggleScreenShare/>
+
+            <TelerikButton Icon=@SvgIcon.Logout
+                           ThemeColor="error"
+                           Class="meeting-btn"
+                           OnClick=@LeaveMeeting/>
+        </div>
+
+        <TelerikCard Class="local-video-cont">
+            <CardBody Class="local-video-cont-body">
+                <video id="localVideo"
+                       muted
+                       autoplay
+                       playsinline
+                       class="user-video">
+                </video>
+
+                @if (!CurrentUser.IsVideoActive)
+                {
+                    <MemberCard User=@CurrentUser.User></MemberCard>
+                }
+                @if (!CurrentUser.IsAudioActive)
+                {
+                    <div class="microphone-badge current-microphone-badge">
+                        <MicMuteIcon Class="bi bi-mic-mute mic-icon"></MicMuteIcon>
+                    </div>
+                }
+            </CardBody>
+        </TelerikCard>
+    </div>
+}
+
+<style>
+    .k-loader-custom-color .k-loader-segment {
+        background-color: cyan;
+    }
+
+    .user-video{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .local-video-cont{
+        position: absolute;
+        height: 20vh;
+        aspect-ratio: 4/3;
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .local-video-cont-body{
+        padding: 0.5rem;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+    }
+
+    .meeting-btn {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+    }
+
+    .meeting-btn:focus{
+        outline: none;
+        box-shadow: none;
+    }
+
+    .mic-icon{
+        width: 80%;
+        height: 80%;
+        fill: currentColor;
+    }
+
+</style>

@@ -35,6 +35,7 @@ public partial class SocketHubContext : ComponentBase, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await HubConnectionManager.DisposeAsync(HubType.HomeHub);
+        await HubConnectionManager.DisposeAsync(HubType.TaskHub);
     }
     
     

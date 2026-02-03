@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Persistence.Converters;
@@ -42,7 +43,7 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
         builder.Property(b => b.Status)
             .HasColumnName("status_id")
             .HasConversion<int>()
-            .HasDefaultValue(1)
+            .HasDefaultValue(BoardStatus.Active)
             .IsRequired();
         
         builder.HasOne(b => b.CreatedByUser)

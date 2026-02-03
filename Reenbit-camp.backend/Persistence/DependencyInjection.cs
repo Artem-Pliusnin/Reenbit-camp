@@ -16,7 +16,7 @@ public static class DependencyInjection
     {
         string connectionString = configuration
             .GetConnectionString("PostgresConnectionString") 
-            ?? throw new Exception("Connection string not found");;
+            ?? throw new Exception("Connection string not found");
 
         services.AddDbContext<TrelloAppDbContext>(options => 
             options.UseNpgsql(connectionString));

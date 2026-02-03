@@ -8,6 +8,10 @@ public static class BoardErrors
         "Board.UpdateError",
         "Error occured while updating the board.");
     
+    public static readonly Error ArchiveBoardError = new(
+        "Board.ArchiveBoard",
+        "Error occured while archiving the board.");
+    
     public static readonly Error CreateBoardError = new(
         "Board.CreateError",
         "Error occured while creating the board.");

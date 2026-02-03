@@ -1,5 +1,7 @@
+using Domain.Constants.ArchivationConstants;
 using Domain.DTOs.Shared;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Models;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +25,8 @@ public class BoardRepository :
     {
         var query = _dbSet
             .Include(b => b.Members)
-            .Where(b => b.Members.Any(m => m.UserId == userId));
+            .Where(b => (b.Status == BoardStatus.Active) 
+                        && (b.Members.Any(m => m.UserId == userId)));
 
         if (!string.IsNullOrWhiteSpace(filter.Title))
         {
@@ -80,5 +83,12 @@ public class BoardRepository :
                         .ThenInclude(cm => cm.User)
                             .ThenInclude(u => u.Avatar)
             .FirstOrDefaultAsync(b => b.Id == boardId, cancellationToken);
+    }
+
+    public async Task<List<Board>> GetPendingBoardIdsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Where(b => b.Status == BoardStatus.Pending)
+            .Take(ArchivationConstants.ArchivationSize)
+            .ToListAsync(cancellationToken);
     }
 }

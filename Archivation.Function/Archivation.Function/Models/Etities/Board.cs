@@ -1,3 +1,5 @@
+using Archivation.Function.Models.Enums;
+
 namespace Archivation.Function.Models.Etities;
 
 public class Board

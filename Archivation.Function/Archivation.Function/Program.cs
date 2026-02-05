@@ -2,6 +2,8 @@ using Archivation.Function.Data;
 using Archivation.Function.Data.Repositories;
 using Archivation.Function.Services;
 using Archivation.Function.Services.Mapping;
+using Archivation.Function.ServicesAbstractions;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -35,5 +37,15 @@ builder.Services.AddScoped<IBoardArchiveRepository, BoardArchiveRepository>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 builder.Services.AddAutoMapper(typeof(ArchivationProfile));
+
+builder.Services.AddSingleton(s =>
+{
+    var client = new CosmosClient(
+        builder.Configuration["CosmosConnectionString"]);
+
+    return client;
+});
+        
+builder.Services.AddScoped<IArchivationLogsService, ArchivationLogsService>();
 
 builder.Build().Run();

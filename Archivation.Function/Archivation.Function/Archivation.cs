@@ -1,10 +1,8 @@
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Archivation.Function.Data.Repositories;
 using Archivation.Function.Models.DTos;
-using Archivation.Function.Models.Etities;
-using Archivation.Function.Services;
+using Archivation.Function.Models.Enums;
+using Archivation.Function.ServicesAbstractions;
 using AutoMapper;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
@@ -17,15 +15,19 @@ public class Archivation
     private readonly ILogger<Archivation> _logger;
     private readonly IBoardArchiveRepository _boardArchiveRepository;
     private readonly IBlobStorageService _blobStorageService;
+    private readonly IArchivationLogsService _archivationLogsService;
     private readonly IMapper _mapper;
 
     public Archivation(ILogger<Archivation> logger, 
         IBoardArchiveRepository boardArchiveRepository, 
-        IBlobStorageService blobStorageService, IMapper mapper)
+        IBlobStorageService blobStorageService, 
+        IArchivationLogsService archivationLogsService,
+        IMapper mapper)
     {
         _logger = logger;
         _boardArchiveRepository = boardArchiveRepository;
         _blobStorageService = blobStorageService;
+        _archivationLogsService = archivationLogsService;
         _mapper = mapper;
     }
 
@@ -40,14 +42,24 @@ public class Archivation
             var boardId = JsonSerializer.Deserialize<int>(message.Body.ToString());
 
             var board = await _boardArchiveRepository.GetBoardArchiveDataAsync(boardId);
+            if (board != null)
+            {
+                await _archivationLogsService
+                    .SaveArchivationLogAsync(boardId, ArchiveStatus.GotFromDatabase);
+                
+                var boardDto = _mapper.Map<BoardDto>(board);
 
-            var boardDto = _mapper.Map<BoardDto>(board);
+                await _blobStorageService.UploadJsonAsync(boardId.ToString(), boardDto);
 
-            await _blobStorageService.UploadJsonAsync(boardId.ToString(), boardDto);
-            
-            await _boardArchiveRepository.MarkBoardAsArchived(boardId);
-            
-            await _boardArchiveRepository.DeleteBoardRelatedDataAsync(boardId);
+                await _boardArchiveRepository.MarkBoardAsArchived(boardId);
+
+                await _boardArchiveRepository.DeleteBoardRelatedDataAsync(boardId);
+            }
+            else
+            {
+                await _archivationLogsService
+                    .SaveArchivationLogAsync(boardId, ArchiveStatus.FailedToGetFromDataBase);
+            }
         }
         catch (JsonException ex)
         {

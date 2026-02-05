@@ -1,4 +1,4 @@
-using Archivation.Function.Models.Etities;
+using Archivation.Function.Models.Enums;
 
 namespace Archivation.Function.Models.DTos;
 

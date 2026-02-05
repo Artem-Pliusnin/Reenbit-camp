@@ -1,6 +1,6 @@
-using Domain.Enums;
+using Archivation.Function.Models.Enums;
 
-namespace Application.Abstractions.Services;
+namespace Archivation.Function.ServicesAbstractions;
 
 public interface IArchivationLogsService
 {

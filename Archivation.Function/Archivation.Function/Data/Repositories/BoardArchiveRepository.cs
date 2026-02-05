@@ -1,4 +1,6 @@
+using Archivation.Function.Models.Enums;
 using Archivation.Function.Models.Etities;
+using Archivation.Function.ServicesAbstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -7,13 +9,17 @@ namespace Archivation.Function.Data.Repositories;
 public class BoardArchiveRepository : IBoardArchiveRepository
 {
     private readonly BoardsDbContext _context;
+    private readonly IArchivationLogsService _archivationLogsService;
     private readonly ILogger<BoardArchiveRepository> _logger;
 
     public BoardArchiveRepository(
-        BoardsDbContext context, ILogger<BoardArchiveRepository> logger)
+        BoardsDbContext context, 
+        ILogger<BoardArchiveRepository> logger, 
+        IArchivationLogsService archivationLogsService)
     {
         _context = context;
         _logger = logger;
+        _archivationLogsService = archivationLogsService;
     }
     
     public async Task<Board?> GetBoardArchiveDataAsync(int boardId)
@@ -77,6 +83,9 @@ public class BoardArchiveRepository : IBoardArchiveRepository
                 "Successfully deleted all related data for BoardId {BoardId} " +
                 "(Lists: {Lists}, Labels: {Labels}, Members: {Members}, Invitations: {Invitations})", 
                 boardId, deletedLists, deletedLabels, deletedBoardMembers, deletedInvitations);
+            
+            await _archivationLogsService
+                .SaveArchivationLogAsync(boardId, ArchiveStatus.DeletedFromDataBase);
         }
         catch (Exception ex)
         {
@@ -84,6 +93,8 @@ public class BoardArchiveRepository : IBoardArchiveRepository
             _logger.LogError(ex, 
                 "Error deleting board related data for BoardId {BoardId}", 
                 boardId);
+            await _archivationLogsService
+                .SaveArchivationLogAsync(boardId, ArchiveStatus.FailedToDeleteFromDataBase);
             throw;
         }
     }

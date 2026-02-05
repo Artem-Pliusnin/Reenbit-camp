@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archivation.Function", "Archivation.Function\Archivation.Function.csproj", "{47FDE9D1-AB4C-4235-A47D-D3D3CC445328}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47FDE9D1-AB4C-4235-A47D-D3D3CC445328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47FDE9D1-AB4C-4235-A47D-D3D3CC445328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47FDE9D1-AB4C-4235-A47D-D3D3CC445328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47FDE9D1-AB4C-4235-A47D-D3D3CC445328}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

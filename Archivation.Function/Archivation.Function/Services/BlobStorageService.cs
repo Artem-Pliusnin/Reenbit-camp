@@ -1,21 +1,26 @@
 using System.Text;
 using System.Text.Json;
 using Archivation.Function.Models.DTos;
+using Archivation.Function.ServicesAbstractions;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using ArchiveStatus = Archivation.Function.Models.Enums.ArchiveStatus;
 
 namespace Archivation.Function.Services;
 
 public class BlobStorageService : IBlobStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
+    private readonly IArchivationLogsService _archivationLogsService;
 
-    public BlobStorageService(BlobServiceClient blobServiceClient)
+    public BlobStorageService(BlobServiceClient blobServiceClient, 
+        IArchivationLogsService archivationLogsService)
     {
         _blobServiceClient = blobServiceClient;
+        _archivationLogsService = archivationLogsService;
     }
 
-    public async Task<string> UploadJsonAsync(string fileName,  BoardDto board)
+    public async Task UploadJsonAsync(string fileName,  BoardDto board)
     {
         try
         {
@@ -38,11 +43,14 @@ public class BlobStorageService : IBlobStorageService
             {
                 ContentType = "application/json"
             });
-
-            return blobClient.Uri.ToString();
+            
+            await _archivationLogsService
+                .SaveArchivationLogAsync(board.Id, ArchiveStatus.SavedToBlobStorage);
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
+            await _archivationLogsService
+                .SaveArchivationLogAsync(board.Id, ArchiveStatus.FailedToSaveToBlobStorage);
             throw;
         }
     }

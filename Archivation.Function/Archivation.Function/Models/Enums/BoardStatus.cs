@@ -1,4 +1,4 @@
-namespace Archivation.Function.Models.Etities;
+namespace Archivation.Function.Models.Enums;
 
 public enum BoardStatus
 {

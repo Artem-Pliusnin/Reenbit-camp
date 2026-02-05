@@ -13,13 +13,16 @@ internal class ArchivePendingBoardsCommandHandler
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageQueueService _messageQueueService;
+    private readonly IArchivationLogsService _archivationLogsService;
 
     public ArchivePendingBoardsCommandHandler(
         IUnitOfWork unitOfWork, 
-        IMessageQueueService messageQueueService)
+        IMessageQueueService messageQueueService, 
+        IArchivationLogsService archivationLogsService)
     {
         _unitOfWork = unitOfWork;
         _messageQueueService = messageQueueService;
+        _archivationLogsService = archivationLogsService;
     }
     
     public async Task<Result<int>> Handle(
@@ -44,6 +47,9 @@ internal class ArchivePendingBoardsCommandHandler
                     board.Id,
                     ArchivationConstants.ArchivationQueUerName,
                     cancellationToken);
+                
+                await _archivationLogsService
+                    .SaveArchivationLogAsync(board.Id, ArchiveStatus.SentToServiceBusQueue);
             }
             
             return pendingBoards.Count;

@@ -6,6 +6,7 @@ using Infrastructure.Authentication;
 using Infrastructure.BackgroundJobs;
 using Infrastructure.Configuration;
 using Infrastructure.Services;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -122,6 +123,16 @@ public static class DependencyInjection
         });
         
         services.AddScoped<IMessageQueueService, AzureServiceBusService>();
+        
+        services.AddSingleton(s =>
+        {
+            var client = new CosmosClient(
+                configuration["Cosmos:ConnectionString"]);
+
+            return client;
+        });
+        
+        services.AddScoped<IArchivationLogsService, ArchivationLogsService>();
         
         return services;
     }

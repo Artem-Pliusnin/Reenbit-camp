@@ -4,4 +4,6 @@ public static class ArchivationConstants
 {
     public const int ArchivationSize = 10;
     public const string ArchivationQueUerName = "archivation";
+    public const string LogsDatabaseName = "ArchivationDB";
+    public const string LogsContainerName = "Logs";
 }

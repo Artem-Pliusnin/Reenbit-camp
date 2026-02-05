@@ -1,4 +1,5 @@
 using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Errors;
@@ -10,10 +11,13 @@ namespace Application.Boards.Commands.ArchiveBoard;
 internal class ArchiveBoardCommandHandler : ICommandHandler<ArchiveBoardCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IArchivationLogsService _archivationLogsService;
 
-    public ArchiveBoardCommandHandler(IUnitOfWork unitOfWork)
+    public ArchiveBoardCommandHandler(IUnitOfWork unitOfWork, 
+        IArchivationLogsService archivationLogsService)
     {
         _unitOfWork = unitOfWork;
+        _archivationLogsService = archivationLogsService;
     }
     
     public async Task<Result> Handle(
@@ -37,6 +41,9 @@ internal class ArchiveBoardCommandHandler : ICommandHandler<ArchiveBoardCommand>
             boardRepository.Update(board);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            
+            await _archivationLogsService
+                .SaveArchivationLogAsync(board.Id, ArchiveStatus.MarkedAsPending);
 
             return Result.Success();
         }

@@ -44,13 +44,8 @@ internal class ArchivePendingBoardsCommandHandler
                     board.Id,
                     ArchivationConstants.ArchivationQueUerName,
                     cancellationToken);
-                
-                board.Status = BoardStatus.Archived;
-                boardRepository.Update(board);
             }
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
+            
             return pendingBoards.Count;
         }
         catch

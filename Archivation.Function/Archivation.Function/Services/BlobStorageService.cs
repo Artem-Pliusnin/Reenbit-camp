@@ -54,4 +54,57 @@ public class BlobStorageService : IBlobStorageService
             throw;
         }
     }
+    
+    public async Task<BoardDto?> DownloadJsonAsync(int boardId)
+    {
+        try
+        {
+            var container = _blobServiceClient
+                .GetBlobContainerClient(ArchivationConstants.BlobStorageContainerName);
+            
+            var blobClient = container.GetBlobClient(boardId.ToString());
+
+            if (!await blobClient.ExistsAsync())
+            {
+                await _archivationLogsService
+                    .SaveArchivationLogAsync(boardId, ArchiveStatus.FailedToGetFromBlobStorage);
+                return null;
+            }
+            
+            var stream = await blobClient.OpenReadAsync();
+            
+            var board = JsonSerializer.Deserialize<BoardDto>(stream);
+            
+            return board;
+        }
+        catch
+        {
+            await _archivationLogsService
+                .SaveArchivationLogAsync(boardId, ArchiveStatus.FailedToGetFromBlobStorage);
+            throw;
+        }
+    }
+
+    public async Task DeleteBlobAsync(int boardId)
+    {
+        try
+        {
+            var container = _blobServiceClient
+                .GetBlobContainerClient(ArchivationConstants.BlobStorageContainerName);
+            
+            var blobClient = container.GetBlobClient(boardId.ToString());
+
+            await blobClient.DeleteIfExistsAsync();
+            
+            await _archivationLogsService
+                .SaveArchivationLogAsync(boardId, ArchiveStatus.DeletedFromBlobStorage);
+        }
+        catch
+        {
+            await _archivationLogsService
+                .SaveArchivationLogAsync(boardId, ArchiveStatus.FailedToDeleteFromBlobStorage);
+            
+            throw;
+        }
+    }
 }

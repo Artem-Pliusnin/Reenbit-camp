@@ -45,7 +45,7 @@ internal class ArchivePendingBoardsCommandHandler
             {
                 await _messageQueueService.SendMessageAsync(
                     board.Id,
-                    ArchivationConstants.ArchivationQueUerName,
+                    ArchivationConstants.ArchivationQueueName,
                     cancellationToken);
                 
                 await _archivationLogsService

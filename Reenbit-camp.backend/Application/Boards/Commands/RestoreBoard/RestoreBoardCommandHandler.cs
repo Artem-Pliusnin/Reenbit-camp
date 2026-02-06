@@ -1,0 +1,74 @@
+using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
+using Domain.Constants.ArchivationConstants;
+using Domain.Enums;
+using Domain.Errors;
+using Domain.Repositories;
+using Domain.Shared;
+
+namespace Application.Boards.Commands.RestoreBoard;
+
+public class RestoreBoardCommandHandler : ICommandHandler<RestoreBoardCommand>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IArchivationLogsService _archivationLogsService;
+    private readonly IMessageQueueService _messageQueueService;
+
+    public RestoreBoardCommandHandler(
+        IUnitOfWork unitOfWork, 
+        IArchivationLogsService archivationLogsService, 
+        IMessageQueueService messageQueueService)
+    {
+        _unitOfWork = unitOfWork;
+        _archivationLogsService = archivationLogsService;
+        _messageQueueService = messageQueueService;
+    }
+    public async Task<Result> Handle(RestoreBoardCommand request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
+
+            var board = await boardRepository
+                .GetByIdAsync(request.BoardId, cancellationToken);
+
+            if (board == null)
+            {
+                return Result.Failure(BoardErrors.BoardDoesNotExistError);
+            }
+
+            if (board.Status == BoardStatus.Active)
+            {
+                return Result.Failure(BoardErrors.NotArchivedError);
+            }
+
+            if (board.Status == BoardStatus.Pending)
+            {
+                board.Status = BoardStatus.Active;
+                
+                boardRepository.Update(board);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                
+                await _archivationLogsService
+                    .SaveArchivationLogAsync(board.Id, ArchiveStatus.Restored);
+                
+                return Result.Success();
+            }
+            
+            await _messageQueueService.SendMessageAsync(
+                board.Id,
+                ArchivationConstants.RestorationQueueName,
+                cancellationToken);
+            
+            await _archivationLogsService
+                .SaveArchivationLogAsync(board.Id, ArchiveStatus.SentToRestorationServiceBusQueue);
+
+            return Result.Success();
+        }
+        catch
+        {
+            return Result.Failure(BoardErrors.ArchiveBoardError);
+        }
+    }
+}

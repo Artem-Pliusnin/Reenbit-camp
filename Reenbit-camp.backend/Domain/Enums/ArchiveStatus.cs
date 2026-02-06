@@ -10,4 +10,6 @@ public enum ArchiveStatus
     FailedToGetFromDataBase = 6,
     FailedToDeleteFromDataBase = 7,
     FailedToSaveToBlobStorage = 8,
+    SentToRestorationServiceBusQueue = 9,
+    Restored = 10
 }

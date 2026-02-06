@@ -54,9 +54,4 @@ public class BlobStorageService : IBlobStorageService
             throw;
         }
     }
-
-    public async Task<bool> DeleteBlobAsync(string blobName)
-    {
-        throw new NotImplementedException();
-    }
 }

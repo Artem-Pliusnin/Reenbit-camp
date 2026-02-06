@@ -1,27 +1,28 @@
 using System.Text.Json;
-using Archivation.Function.Data.Repositories;
-using Archivation.Function.Models.DTos;
-using Archivation.Function.Models.Enums;
-using Archivation.Function.ServicesAbstractions;
 using AutoMapper;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Restoration.Function.Data.Repositories;
+using Restoration.Function.Models.Enums;
+using Restoration.Function.Models.Etities;
+using Restoration.Function.ServicesAbstractions;
 
-namespace Archivation.Function;
+namespace Restoration.Function;
 
-public class Archivation
+public class Restoration
 {
-    private readonly ILogger<Archivation> _logger;
+    private readonly ILogger<Restoration> _logger;
     private readonly IBoardArchiveRepository _boardArchiveRepository;
     private readonly IBlobStorageService _blobStorageService;
     private readonly IArchivationLogsService _archivationLogsService;
     private readonly IMapper _mapper;
 
-    public Archivation(ILogger<Archivation> logger, 
+    public Restoration(
+        ILogger<Restoration> logger, 
         IBoardArchiveRepository boardArchiveRepository, 
         IBlobStorageService blobStorageService, 
-        IArchivationLogsService archivationLogsService,
+        IArchivationLogsService archivationLogsService, 
         IMapper mapper)
     {
         _logger = logger;
@@ -31,9 +32,9 @@ public class Archivation
         _mapper = mapper;
     }
 
-    [Function(nameof(Archivation))]
+    [Function(nameof(Restoration))]
     public async Task Run(
-        [ServiceBusTrigger(ArchivationConstants.ArchivationQueueName, Connection = "AzureServiceBus")]
+        [ServiceBusTrigger(RestorationConstants.RestorationQueueName, Connection = "AzureServiceBus")]
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
@@ -41,24 +42,24 @@ public class Archivation
         {
             var boardId = JsonSerializer.Deserialize<int>(message.Body.ToString());
 
-            var board = await _boardArchiveRepository.GetBoardArchiveDataAsync(boardId);
-            if (board != null)
+            var boardData = await _blobStorageService.DownloadJsonAsync(boardId);
+            if (boardData != null)
             {
-                await _archivationLogsService
-                    .SaveArchivationLogAsync(boardId, ArchiveStatus.GotFromDatabase);
+                await _archivationLogsService.SaveArchivationLogAsync(
+                    boardId, 
+                    ArchiveStatus.GotDataFromBlobStorage);
                 
-                var boardDto = _mapper.Map<BoardDto>(board);
-
-                await _blobStorageService.UploadJsonAsync(boardId.ToString(), boardDto);
-
-                await _boardArchiveRepository.MarkBoardAsArchived(boardId);
-
-                await _boardArchiveRepository.DeleteBoardRelatedDataAsync(boardId);
-            }
-            else
-            {
-                await _archivationLogsService
-                    .SaveArchivationLogAsync(boardId, ArchiveStatus.FailedToGetFromDataBase);
+                var board = _mapper.Map<Board>(boardData);
+                
+                await _boardArchiveRepository.RestoreBoardData(board);
+                
+                await _boardArchiveRepository.MarkBoardAsActive(board.Id);
+                
+                await _blobStorageService.DeleteBlobAsync(board.Id);
+                
+                await _archivationLogsService.SaveArchivationLogAsync(
+                    board.Id, 
+                    ArchiveStatus.Restored);
             }
         }
         catch (JsonException ex)
@@ -72,11 +73,11 @@ public class Archivation
         }
         catch(Exception ex)
         {
-            _logger.LogError($"Failed archive board {message.Body}.");
+            _logger.LogError($"Failed restore board {message.Body}.");
             await messageActions.DeadLetterMessageAsync(
                 message,
                 null,
-                "Archivation error",
+                "Restoration error",
                 ex.ToString());
         }
     }

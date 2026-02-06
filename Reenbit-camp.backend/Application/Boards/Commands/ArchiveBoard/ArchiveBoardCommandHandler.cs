@@ -35,6 +35,11 @@ internal class ArchiveBoardCommandHandler : ICommandHandler<ArchiveBoardCommand>
             {
                 return Result.Failure(BoardErrors.BoardDoesNotExistError);
             }
+
+            if (board.Status != BoardStatus.Active)
+            {
+                return Result.Failure(BoardErrors.AlreadyArchivedError);
+            }
             
             board.Status = BoardStatus.Pending;
 

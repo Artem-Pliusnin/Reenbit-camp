@@ -12,6 +12,14 @@ public static class BoardErrors
         "Board.ArchiveBoard",
         "Error occured while archiving the board.");
     
+    public static readonly Error AlreadyArchivedError = new(
+        "Board.AlreadyArchived",
+        "Board already archived.");
+    
+    public static readonly Error NotArchivedError = new(
+        "Board.NotArchived",
+        "Board is not archived.");
+    
     public static readonly Error CreateBoardError = new(
         "Board.CreateError",
         "Error occured while creating the board.");

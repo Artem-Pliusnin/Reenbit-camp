@@ -1,14 +1,14 @@
-using Archivation.Function.Data;
-using Archivation.Function.Data.Repositories;
-using Archivation.Function.Services;
-using Archivation.Function.Services.Mapping;
-using Archivation.Function.ServicesAbstractions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Restoration.Function.Data;
+using Restoration.Function.Data.Repositories;
+using Restoration.Function.Services;
+using Restoration.Function.Services.Mapping;
+using Restoration.Function.ServicesAbstractions;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 

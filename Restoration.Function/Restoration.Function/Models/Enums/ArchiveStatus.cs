@@ -1,4 +1,4 @@
-namespace Domain.Enums;
+namespace Restoration.Function.Models.Enums;
 
 public enum ArchiveStatus
 {
@@ -11,5 +11,11 @@ public enum ArchiveStatus
     FailedToDeleteFromDataBase = 7,
     FailedToSaveToBlobStorage = 8,
     SentToRestorationServiceBusQueue = 9,
-    Restored = 10
+    Restored = 10,
+    GotDataFromBlobStorage = 11,
+    SavedToDataBase = 12,
+    DeletedFromBlobStorage = 13,
+    FailedToGetFromBlobStorage = 14,
+    FailedToSaveToDataBase = 15,
+    FailedToDeleteFromBlobStorage = 16,
 }

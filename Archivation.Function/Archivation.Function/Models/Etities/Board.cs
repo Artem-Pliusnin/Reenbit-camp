@@ -1,6 +1,6 @@
-using Domain.Enums;
+using Archivation.Function.Models.Enums;
 
-namespace Domain.Entities;
+namespace Archivation.Function.Models.Etities;
 
 public class Board
 {
@@ -16,13 +16,12 @@ public class Board
     
     public DateTime? LastUpdateDate { get; set; }
     
-    public User CreatedByUser { get; set; }
-    public User? LastUpdatedByUser { get; set; }
-    
     public BoardStatus Status { get; set; } = BoardStatus.Active;
     
     public List<Invitation> Invitations { get; set; }
+    
     public List<BoardMember> Members { get; set; }
+    
     public List<List> Lists { get; set; }
     
     public List<Label> Labels { get; set; }

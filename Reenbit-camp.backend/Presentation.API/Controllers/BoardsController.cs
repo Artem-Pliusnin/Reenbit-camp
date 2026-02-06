@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Application.Boards.Commands.ArchiveBoard;
 using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.UpdateBoard;
 using Application.Boards.Queries.GetBoardData;
@@ -124,6 +125,23 @@ public class BoardsController : AuthorizedContoller
         
         await _hubContext.Clients.Group(HomeHub.GetBoardGroupName(id))
             .SendAsync(HomeHubConstants.UpdateBoardTitle, request.Title);
+        
+        return Ok();
+    }
+    
+    [HttpPost("{id}/archive")]
+    public async Task<IActionResult> ArchiveBoard(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ArchiveBoardCommand(id);
+        
+        Result result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
         
         return Ok();
     }

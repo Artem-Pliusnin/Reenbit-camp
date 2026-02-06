@@ -14,4 +14,7 @@ public interface IBoardRepository : IRepository<Board, int>
     Task<Board?> GetFullInfoAsync(
         int boardId, 
         CancellationToken cancellationToken = default);
+    
+    Task<List<Board>> GetPendingBoardIdsAsync(
+        CancellationToken cancellationToken = default);
 }

@@ -1,8 +1,10 @@
 using Application;
 using Database;
+using Hangfire;
 using Infrastructure;
 using Persistence;
 using Presentation.API;
+using Presentation.API.Extensions;
 using Presentation.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +46,8 @@ app.UseRouting();
 
 app.UseCors("AllowBlazorClient");
 
+app.UseHangfireDashboard();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -51,5 +55,7 @@ app.MapControllers();
 app.MapHub<HomeHub>("hubs/home");
 app.MapHub<TaskHub>("hubs/task");
 app.MapHub<VideoChatHub>("hubs/video-chat");
+
+app.UseBackgroundJobs();
 
 app.Run();

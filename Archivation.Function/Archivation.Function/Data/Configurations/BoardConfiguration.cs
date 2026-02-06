@@ -1,10 +1,8 @@
-using Domain.Entities;
-using Domain.Enums;
+using Archivation.Function.Models.Etities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Persistence.Converters;
 
-namespace Persistence.Configurations;
+namespace Archivation.Function.Data.CONfigurations;
 
 public class BoardConfiguration : IEntityTypeConfiguration<Board>
 {
@@ -24,37 +22,22 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
 
         builder.Property(b => b.CreatedBy)
             .HasColumnName("created_by")
-            .IsRequired()
-            .HasDefaultValue(1);
+            .IsRequired();
 
         builder.Property(b => b.CreationDate)
             .HasColumnName("creation_date")
-            .IsRequired()
-            .HasDefaultValue(DateTime.UtcNow)
-            .HasConversion(UtcDateTimeConverters.NonNullable);
+            .IsRequired(); ;
 
         builder.Property(b => b.LastUpdatedBy)
             .HasColumnName("last_updated_by");
 
         builder.Property(b => b.LastUpdateDate)
-            .HasColumnName("last_update_date")
-            .HasConversion(UtcDateTimeConverters.Nullable);
+            .HasColumnName("last_update_date");
 
         builder.Property(b => b.Status)
             .HasColumnName("status_id")
             .HasConversion<int>()
-            .HasDefaultValue(BoardStatus.Active)
             .IsRequired();
-        
-        builder.HasOne(b => b.CreatedByUser)
-            .WithMany()
-            .HasForeignKey(b => b.CreatedBy)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(b => b.LastUpdatedByUser)
-            .WithMany()
-            .HasForeignKey(b => b.LastUpdatedBy)
-            .OnDelete(DeleteBehavior.SetNull);
         
         builder.HasIndex(b => b.Status);
     }

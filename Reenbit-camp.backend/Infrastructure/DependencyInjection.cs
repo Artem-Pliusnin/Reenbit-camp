@@ -1,7 +1,12 @@
 using Application.Abstractions.Services;
+using Azure.Messaging.ServiceBus;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Infrastructure.Authentication;
+using Infrastructure.BackgroundJobs;
 using Infrastructure.Configuration;
 using Infrastructure.Services;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -97,6 +102,37 @@ public static class DependencyInjection
         
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IChatHistoryService, ChatHistoryService>();
+        services.AddTransient<ArchivePendingBoardsJob>();
+        
+        string connectionString = configuration
+                                      .GetConnectionString("PostgresConnectionString") 
+                                  ?? throw new Exception("Connection string not found");
+        
+        services.AddHangfire(config => 
+            config.UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(options => 
+                options.UseNpgsqlConnection(connectionString))
+        );
+        services.AddHangfireServer();
+
+        services.AddSingleton<ServiceBusClient>(options =>
+        {
+            var connectionString = configuration["AzureServiceBus:ConnectionString"];
+            return new ServiceBusClient(connectionString);
+        });
+        
+        services.AddScoped<IMessageQueueService, AzureServiceBusService>();
+        
+        services.AddSingleton(s =>
+        {
+            var client = new CosmosClient(
+                configuration["Cosmos:ConnectionString"]);
+
+            return client;
+        });
+        
+        services.AddScoped<IArchivationLogsService, ArchivationLogsService>();
         
         return services;
     }

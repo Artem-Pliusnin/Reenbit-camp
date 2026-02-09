@@ -82,6 +82,9 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
             
             Subscriptions.Add(HomeHubConnection
                 .On<string>(SubscribeHomeHubConstants.UpdateBoardTitle, UpdateBoardTitle));
+            
+            Subscriptions.Add(HomeHubConnection
+                .On(SubscribeHomeHubConstants.ArchiveBoard, OnBoardArchived));
 
             Subscriptions.Add(HomeHubConnection
                 .On<LabelDto>(SubscribeHomeHubConstants.AddNewLabel, AddNewLabel));
@@ -162,6 +165,11 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         return CurrentBoardMember.Role.HasAtLeast(BoardRole.Member);
     }
     
+    private bool CheckArchiveBoardPermision()
+    {
+        return CurrentBoardMember.Role.HasAtLeast(BoardRole.Owner);
+    }
+    
     private void OpenMembersDialog()
     {
         IsMembersDialogOpen = true;
@@ -175,6 +183,23 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     private void RedirectToMeeting()
     {
         NavigationManager.NavigateTo($"/board-meeting/{BoardId}");
+    }
+    
+    private async Task ArchiveBoard()
+    {
+        var result = await BoardsService.ArchiveBoard(BoardId);
+
+        if (result.IsSuccess)
+        {
+            await HomeHubConnection
+                .SendAsync(SendHomeHubConstants.ArchiveBoard, BoardId);
+            NavigationManager.NavigateTo($"/");
+        }
+    }
+
+    private void OnBoardArchived()
+    {
+        NavigationManager.NavigateTo($"/");
     }
 
     private void StartEditTitle()

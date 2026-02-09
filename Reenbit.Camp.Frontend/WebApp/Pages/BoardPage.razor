@@ -56,7 +56,16 @@ else
                         OnClick=@RedirectToMeeting>
                         Meeting
                     </DropDownButtonItem>
-                    
+                    @if (CheckArchiveBoardPermision())
+                    {
+                        <DropDownButtonItem
+                            Icon=@Telerik.SvgIcons.SvgIcon.FileZip
+                            OnClick=@ArchiveBoard
+                            Class="btn-danger">
+                            Archive
+                        </DropDownButtonItem>
+                    }
+
                 </DropDownButtonItems>
 
             </TelerikDropDownButton>

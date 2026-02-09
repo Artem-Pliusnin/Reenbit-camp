@@ -1,4 +1,3 @@
-using Domain.Models;
 using Domain.Models.Boards;
 using Domain.Requests.Boards;
 using Domain.Responses.Boards;

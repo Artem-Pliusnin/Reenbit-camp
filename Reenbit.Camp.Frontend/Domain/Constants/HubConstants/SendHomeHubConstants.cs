@@ -7,6 +7,8 @@ public static class SendHomeHubConstants
     
     public const string AddInvitation = "AddInvitation";
     
+    public const string ArchiveBoard = "ArchiveBoard";
+    
     public const string DeleteMember = "DeleteMember";
     public const string UpdateMemberRole = "UpdateMemberRole";
 

@@ -15,4 +15,10 @@ public interface IBoardsService
     Task<Result<PaginationDto<BoardModel>>> GetByUserAsync(BoardsFilterModel filter);
     
     Task<Result<object>> UpdateAsync(int id, UpdateBoardRequest request);
+    
+    Task<Result<PaginationDto<BoardModel>>> GetArchivedByUserAsync(ArchivedBoardsFilter filter);
+    
+    Task<Result<object>> ArchiveBoard(int id);
+    
+    Task<Result<object>> RestoreBoard(int id);
 }

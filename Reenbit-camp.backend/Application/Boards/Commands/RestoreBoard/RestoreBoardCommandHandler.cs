@@ -37,7 +37,8 @@ public class RestoreBoardCommandHandler : ICommandHandler<RestoreBoardCommand>
                 return Result.Failure(BoardErrors.BoardDoesNotExistError);
             }
 
-            if (board.Status == BoardStatus.Active)
+            if (board.Status == BoardStatus.Active 
+                || board.Status == BoardStatus.Restoring)
             {
                 return Result.Failure(BoardErrors.NotArchivedError);
             }
@@ -46,23 +47,25 @@ public class RestoreBoardCommandHandler : ICommandHandler<RestoreBoardCommand>
             {
                 board.Status = BoardStatus.Active;
                 
-                boardRepository.Update(board);
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-                
                 await _archivationLogsService
                     .SaveArchivationLogAsync(board.Id, ArchiveStatus.Restored);
+            }
+            else
+            {
+                await _messageQueueService.SendMessageAsync(
+                    board.Id,
+                    ArchivationConstants.RestorationQueueName,
+                    cancellationToken);
+            
+                board.Status = BoardStatus.Restoring;
                 
-                return Result.Success();
+                await _archivationLogsService
+                    .SaveArchivationLogAsync(board.Id, ArchiveStatus.SentToRestorationServiceBusQueue);
             }
             
-            await _messageQueueService.SendMessageAsync(
-                board.Id,
-                ArchivationConstants.RestorationQueueName,
-                cancellationToken);
-            
-            await _archivationLogsService
-                .SaveArchivationLogAsync(board.Id, ArchiveStatus.SentToRestorationServiceBusQueue);
+            boardRepository.Update(board);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

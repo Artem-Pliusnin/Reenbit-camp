@@ -69,10 +69,6 @@ public class BoardArchiveRepository : IBoardArchiveRepository
                 .Where(l => l.BoardId == boardId)
                 .ExecuteDeleteAsync();
 
-            var deletedBoardMembers = await _context.BoardMembers
-                .Where(bm => bm.BoardId == boardId)
-                .ExecuteDeleteAsync();
-
             var deletedInvitations = await _context.Invitations
                 .Where(i => i.BoardId == boardId)
                 .ExecuteDeleteAsync();
@@ -81,8 +77,8 @@ public class BoardArchiveRepository : IBoardArchiveRepository
 
             _logger.LogInformation(
                 "Successfully deleted all related data for BoardId {BoardId} " +
-                "(Lists: {Lists}, Labels: {Labels}, Members: {Members}, Invitations: {Invitations})", 
-                boardId, deletedLists, deletedLabels, deletedBoardMembers, deletedInvitations);
+                "(Lists: {Lists}, Labels: {Labels}, Invitations: {Invitations})", 
+                boardId, deletedLists, deletedLabels, deletedInvitations);
             
             await _archivationLogsService
                 .SaveArchivationLogAsync(boardId, ArchiveStatus.DeletedFromDataBase);
@@ -121,7 +117,6 @@ public class BoardArchiveRepository : IBoardArchiveRepository
         try
         {
             await _context.Labels.AddRangeAsync(board.Labels);
-            await _context.BoardMembers.AddRangeAsync(board.Members);
             await _context.Lists.AddRangeAsync(board.Lists);
             
             await _context.SaveChangesAsync();

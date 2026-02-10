@@ -23,4 +23,14 @@ public interface IBoardsApi
     Task<ApiResponse<object>> UpdateAsync(
         int id,
         [Body] UpdateBoardRequest request);
+    
+    [Get("/Boards/archived")]
+    Task<ApiResponse<PaginationDto<BoardDto>>> GetArchivedByUserAsync(
+        [Query] ArchivedBoardsFilter filter);
+    
+    [Post("/Boards/{id}/archive")]
+    Task<ApiResponse<object>> ArchiveBoard(int id);
+    
+    [Post("/Boards/{id}/restore")]
+    Task<ApiResponse<object>> RestoreBoard(int id);
 }

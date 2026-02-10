@@ -55,4 +55,30 @@ public class BoardsService : IBoardsService
 
         return response.HandleResult();
     }
+
+    public async Task<Result<PaginationDto<BoardModel>>> GetArchivedByUserAsync(ArchivedBoardsFilter filter)
+    {
+        var response = await _boardsApi.GetArchivedByUserAsync(filter);
+
+        return response.HandleResultWithMapping(content 
+            => new PaginationDto<BoardModel>(
+                _mapper.Map<List<BoardModel>>(content.Dtos),
+                content.CurrentPage,
+                content.TotalPages
+            ));
+    }
+
+    public async Task<Result<object>> ArchiveBoard(int id)
+    {
+        var response = await _boardsApi.ArchiveBoard(id);
+
+        return response.HandleResult();
+    }
+
+    public async Task<Result<object>> RestoreBoard(int id)
+    {
+        var response = await _boardsApi.RestoreBoard(id);
+
+        return response.HandleResult();
+    }
 }

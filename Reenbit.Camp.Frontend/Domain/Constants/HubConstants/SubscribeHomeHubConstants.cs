@@ -12,6 +12,7 @@ public static class SubscribeHomeHubConstants
     public const string UpdateMemberRole = "UpdateMemberRole";
     
     public const string UpdateBoardTitle = "UpdateBoardTitle";
+    public const string ArchiveBoard = "ArchiveBoard";
 
     public const string AddNewLabel = "AddNewLabel";
     public const string RemoveLabel = "RemoveLabel";

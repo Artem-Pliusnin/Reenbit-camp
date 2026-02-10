@@ -3,6 +3,7 @@ using Application.Boards.Commands.ArchiveBoard;
 using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.RestoreBoard;
 using Application.Boards.Commands.UpdateBoard;
+using Application.Boards.Queries.GetArchivedBoards;
 using Application.Boards.Queries.GetBoardData;
 using Application.Boards.Queries.GetUserBoards;
 using Domain.Constants.HubConstants;
@@ -85,7 +86,35 @@ public class BoardsController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpGet("{id}")]
+    [HttpGet("archived")]
+    public async Task<IActionResult> GetArchivedByUserAsync(
+        [FromQuery] GetArchivedBoardsQueryParameters queryParameters,
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new GetArchivedBoardsQuery(
+            userId,
+            new ArchivedBoardsFilter(
+                queryParameters.Title,
+                queryParameters.Page,
+                queryParameters.PageSize));
+        
+        Result<PaginationDto<BoardDto>> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetInfoAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

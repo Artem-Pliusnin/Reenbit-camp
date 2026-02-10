@@ -8,24 +8,24 @@ public class ArchivationProfile : Profile
 {
     public ArchivationProfile()
     {
-        CreateMap<Board, BoardDto>();
+        CreateMap<Board, BoardDto>().ReverseMap();
         
-        CreateMap<BoardMember, BoardMemberDto>();
+        CreateMap<BoardMember, BoardMemberDto>().ReverseMap();
 
-        CreateMap<List, ListDto>();
+        CreateMap<List, ListDto>().ReverseMap();
 
-        CreateMap<Card, CardDto>();
+        CreateMap<Card, CardDto>().ReverseMap();
         
-        CreateMap<CardAttachment, CardAttachmentDto>();
+        CreateMap<CardAttachment, CardAttachmentDto>().ReverseMap();
         
-        CreateMap<CardLabel, CardLabelDto>();
+        CreateMap<CardLabel, CardLabelDto>().ReverseMap();
         
-        CreateMap<CardMember, CardMemberDto>();
+        CreateMap<CardMember, CardMemberDto>().ReverseMap();
 
-        CreateMap<Comment, CommentDto>();
+        CreateMap<Comment, CommentDto>().ReverseMap();
         
-        CreateMap<Invitation, InvitationDto>();
+        CreateMap<Invitation, InvitationDto>().ReverseMap();
         
-        CreateMap<Label, LabelDto>();
+        CreateMap<Label, LabelDto>().ReverseMap();
     }
 }

@@ -68,6 +68,51 @@ public class BoardRepository :
         };
     }
 
+    public async Task<PaginationDto<Board>> GetArchivedByUserIdAsync(
+        int userId, 
+        ArchivedBoardsFilter filter, 
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbSet
+            .Include(b => b.Members)
+            .Where(b => 
+                (b.Status == BoardStatus.Archived 
+                 || b.Status == BoardStatus.Pending) 
+                && (b.Members.First(m => m.UserId == userId).Role == BoardRole.Owner));
+
+        if (!string.IsNullOrWhiteSpace(filter.Title))
+        {
+            var search = filter.Title.ToLowerInvariant();
+            query = query.Where(b => b.Title.ToLower().Contains(search));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var totalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize);
+
+        var currentPage = filter.Page < 1 ? 1 : filter.Page;
+        
+        if (totalPages == 0)
+        {
+            currentPage = 1;
+        }
+        else if (currentPage > totalPages)
+        {
+            currentPage = totalPages;
+        }
+
+        var boards = await query.Skip((currentPage - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PaginationDto<Board>
+        {
+            Dtos = boards,
+            CurrentPage = currentPage,
+            TotalPages = totalPages
+        };
+    }
+
     public async Task<Board?> GetFullInfoAsync(
         int boardId, 
         CancellationToken cancellationToken = default)

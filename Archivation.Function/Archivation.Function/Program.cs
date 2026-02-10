@@ -4,6 +4,7 @@ using Archivation.Function.Services;
 using Archivation.Function.Services.Mapping;
 using Archivation.Function.ServicesAbstractions;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
@@ -14,9 +15,9 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-/*builder.Services
+builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();*/
+    .ConfigureFunctionsApplicationInsights();
 
 string connectionString = builder.Configuration["PostgresConnectionString"];
 

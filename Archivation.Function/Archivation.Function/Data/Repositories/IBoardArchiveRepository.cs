@@ -9,4 +9,8 @@ public interface IBoardArchiveRepository
     Task MarkBoardAsArchived(int boardId);
     
     Task DeleteBoardRelatedDataAsync(int boardId);
+    
+    Task RestoreBoardData(Board board);
+    
+    Task MarkBoardAsActive(int boardId);
 }

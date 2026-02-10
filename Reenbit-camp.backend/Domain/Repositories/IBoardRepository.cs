@@ -11,6 +11,11 @@ public interface IBoardRepository : IRepository<Board, int>
         BoardsFilter filter,
         CancellationToken cancellationToken = default);
     
+    Task<PaginationDto<Board>> GetArchivedByUserIdAsync(
+        int userId, 
+        ArchivedBoardsFilter filter,
+        CancellationToken cancellationToken = default);
+    
     Task<Board?> GetFullInfoAsync(
         int boardId, 
         CancellationToken cancellationToken = default);

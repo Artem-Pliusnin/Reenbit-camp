@@ -30,6 +30,13 @@ public class HomeHub : Hub
             .SendAsync(HomeHubConstants.AddInvitation, invitation);
     }
     
+    public async Task ArchiveBoard(int boardId)
+    {
+        await Clients.OthersInGroup(GetBoardGroupName(boardId))
+            .SendAsync(HomeHubConstants.ArchiveBoard);
+    }
+
+    
     public async Task AddNewLabel(LabelDto label, int boardId)
     {
         await Clients.OthersInGroup(GetBoardGroupName(boardId))

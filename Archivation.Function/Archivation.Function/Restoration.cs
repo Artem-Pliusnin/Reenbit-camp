@@ -1,14 +1,16 @@
+using System;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Archivation.Function.Data.Repositories;
+using Archivation.Function.Models.Enums;
+using Archivation.Function.Models.Etities;
+using Archivation.Function.ServicesAbstractions;
 using AutoMapper;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Restoration.Function.Data.Repositories;
-using Restoration.Function.Models.Enums;
-using Restoration.Function.Models.Etities;
-using Restoration.Function.ServicesAbstractions;
 
-namespace Restoration.Function;
+namespace Archivation.Function;
 
 public class Restoration
 {
@@ -34,7 +36,7 @@ public class Restoration
 
     [Function(nameof(Restoration))]
     public async Task Run(
-        [ServiceBusTrigger(RestorationConstants.RestorationQueueName, Connection = "AzureServiceBus")]
+        [ServiceBusTrigger(ArchivationConstants.RestorationQueueName, Connection = "AzureServiceBus")]
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {

@@ -1,10 +1,8 @@
 using Domain.Entities;
 using Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
-using Persistence.Repositories;
 
-namespace Persistence.Configurations;
+namespace Persistence.Repositories;
 
 public class UserAvatarRepository : BaseRepository<UserAvatar, int>, IUserAvatarRepository
 {

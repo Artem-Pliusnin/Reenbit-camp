@@ -2,7 +2,6 @@ using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Configurations;
 using Persistence.Database;
 using Persistence.Repositories;
 
@@ -15,7 +14,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         string connectionString = configuration
-            .GetConnectionString("PostgresConnectionString") 
+            .GetConnectionString("PostgresConnectionStringLocal") 
             ?? throw new Exception("Connection string not found");
 
         services.AddDbContext<TrelloAppDbContext>(options => 

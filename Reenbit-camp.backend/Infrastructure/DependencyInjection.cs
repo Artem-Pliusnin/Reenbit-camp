@@ -105,7 +105,7 @@ public static class DependencyInjection
         services.AddTransient<ArchivePendingBoardsJob>();
         
         string connectionString = configuration
-                                      .GetConnectionString("PostgresConnectionString") 
+                                      .GetConnectionString("PostgresConnectionStringLocal") 
                                   ?? throw new Exception("Connection string not found");
         
         services.AddHangfire(config => 
@@ -133,6 +133,11 @@ public static class DependencyInjection
         });
         
         services.AddScoped<IArchivationLogsService, ArchivationLogsService>();
+        
+        services.Configure<StripeSettings>(
+            configuration.GetSection("Stripe"));
+
+        services.AddScoped<IStripeService, StripeService>();
         
         return services;
     }

@@ -35,6 +35,8 @@ public static class DependencyInjection
         services.AddScoped<ICommentsRepository, CommentsRepository>();
         services.AddScoped<ICardAttachmentRepository, CardAttachmentRepository>();
         services.AddScoped<IUserAvatarRepository, UserAvatarRepository>();
+        services.AddScoped<ISubscriptionPlansRepository, SubscriptionPlansRepository>();
+        services.AddScoped<IUserSubscriptionsRepository, UserSubscriptionsRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         

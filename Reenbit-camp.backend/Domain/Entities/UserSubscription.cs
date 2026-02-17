@@ -10,9 +10,9 @@ public class UserSubscription
 
     public int SubscriptionPlanId { get; set; }
     
-    public string StripeCustomerId { get; set; }
+    public string? StripeCustomerId { get; set; }
     
-    public string StripeSubscriptionId { get; set; }
+    public string? StripeSubscriptionId { get; set; }
     
     public SubscriptionStatus SubscriptionStatus { get; set; }
     

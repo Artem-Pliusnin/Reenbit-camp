@@ -8,11 +8,15 @@ public class SubscriptionPlan
 
     public int BoardsLimit { get; set; }
     
+    public bool IsAiAssistantAvailable { get; set; }
+    
+    public bool IsNameHighlighted { get; set; }
+    
     public decimal MonthlyPrice { get; set; }
     
-    public string StripeProductId { get; set; }
+    public string? StripeProductId { get; set; }
     
-    public string StripePriceId { get; set; }
+    public string? StripePriceId { get; set; }
     
     public DateTime CreatedAt { get; set; }
 }

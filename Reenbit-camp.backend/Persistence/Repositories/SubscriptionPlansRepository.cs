@@ -13,6 +13,12 @@ public class SubscriptionPlansRepository :
         : base(context)
     {}
 
+    public async Task<List<SubscriptionPlan>> GetAllPlansAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.OrderBy(sp => sp.Id).ToListAsync(cancellationToken);
+    }
+
     public async Task<SubscriptionPlan?> GetBySubscriptionName(
         string name, 
         CancellationToken cancellationToken = default)

@@ -38,12 +38,11 @@ public class UserSubscriptionsConfiguration : IEntityTypeConfiguration<UserSubsc
 
         builder.Property(us => us.CurrentPeriodEnd)
             .HasColumnName("current_period_end")
-            .HasConversion(UtcDateTimeConverters.NonNullable)
-            .IsRequired();
+            .HasConversion(UtcDateTimeConverters.NonNullable);
         
         builder.Property(us => us.CancelAtPeriodEnd)
             .HasColumnName("cancel_at_period_end")
-            .HasConversion(UtcDateTimeConverters.NonNullable)
+            .HasDefaultValue(false)
             .IsRequired();
         
         builder.HasOne(us => us.User)

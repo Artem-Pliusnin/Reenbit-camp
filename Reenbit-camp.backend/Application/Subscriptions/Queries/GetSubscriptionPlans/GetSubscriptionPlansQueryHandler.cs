@@ -27,7 +27,7 @@ public class GetSubscriptionPlansQueryHandler
         var subscriptionPlansRepository = _unitOfWork.GetRepository<ISubscriptionPlansRepository>();
         
         var plans = await subscriptionPlansRepository
-            .GetAllAsync(cancellationToken);
+            .GetAllPlansAsync(cancellationToken);
 
         var response = _mapper.Map<List<SubscriptionPlanDto>>(plans);
         

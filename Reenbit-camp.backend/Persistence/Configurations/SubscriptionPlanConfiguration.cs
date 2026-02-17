@@ -24,6 +24,17 @@ public class SubscriptionPlanConfiguration : IEntityTypeConfiguration<Subscripti
         builder.Property(sp => sp.BoardsLimit)
             .HasColumnName("board_limit")
             .IsRequired();
+        
+        builder.Property(sp => sp.IsAiAssistantAvailable)
+            .HasColumnName("is_ai_assistant_available")
+            .HasDefaultValue(false)
+            .IsRequired();
+        
+        builder.Property(sp => sp.IsNameHighlighted)
+            .HasColumnName("is_name_highlighted")
+            .HasDefaultValue(false)
+            .IsRequired();
+
 
         builder.Property(sp => sp.MonthlyPrice)
             .HasColumnName("monthly_price")

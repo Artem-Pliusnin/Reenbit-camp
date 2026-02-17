@@ -15,5 +15,6 @@ INSERT INTO "SubscriptionPlan"
 (Name, Board_Limit, Monthly_Price, Stripe_Product_Id, Stripe_Price_Id)
 VALUES
     ('Free', 10, 0, NULL, NULL),
-    ('Pro', 50, 10, 'prod_TxBhnEazOFnq6g', 'price_1SzHKHR5pv9xzX33LehvFcvZ')
-    ON CONFLICT (Name) DO NOTHING;
+    ('Standard', 50, 5, 'prod_TzpEUzmQ3C5SxG', 'price_1T1paTR5pv9xzX33tXNXfy7e'),
+    ('Pro', 100, 10, 'prod_TxBhnEazOFnq6g', 'price_1SzHKHR5pv9xzX33LehvFcvZ')
+ON CONFLICT (Name) DO NOTHING;

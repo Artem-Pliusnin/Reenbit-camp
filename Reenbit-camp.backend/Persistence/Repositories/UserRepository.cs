@@ -18,6 +18,8 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
         return await _dbSet
             .Include(u => u.Avatar)
+            .Include(u => u.Subscription)
+                .ThenInclude(us => us.SubscriptionPlan)
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
     

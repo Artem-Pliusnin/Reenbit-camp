@@ -6,7 +6,7 @@ namespace Application.Mapping;
 
 public class SubscriptionPlanProfile : Profile
 {
-    SubscriptionPlanProfile()
+    public SubscriptionPlanProfile()
     {
         CreateMap<SubscriptionPlan, SubscriptionPlanDto>();
     }

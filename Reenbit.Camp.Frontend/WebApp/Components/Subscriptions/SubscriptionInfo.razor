@@ -1,0 +1,34 @@
+<div class="subscription-container container">
+    <div class="subscription-block">
+
+        <div class="subscription-header">
+            <div class="plan-info">
+                <div class="plan-name">
+                    <span>Active plan: </span>
+                    
+                    <span class="plan-badge @(IsFree ? "free" : "pro")">
+                        @Subscription.SubscriptionPlan.Name
+                    </span>
+                </div>    
+
+                @if (!IsFree)
+                {
+                    <span class="plan-expiration">
+                        Active until @Subscription.CurrentPeriodEnd?.ToLocalTime().ToString("MMM dd, yyyy")
+                    </span>
+                }
+            </div>
+
+            <TelerikButton OnClick=@NavigateToPlans
+                           ThemeColor="primary"
+                           FillMode="outline">
+                Manage plan
+            </TelerikButton>
+        </div>
+
+        <div class="plan-features">
+            Boards limit:
+            <span>@Subscription.SubscriptionPlan.BoardsLimit</span>
+        </div>
+    </div>
+</div>

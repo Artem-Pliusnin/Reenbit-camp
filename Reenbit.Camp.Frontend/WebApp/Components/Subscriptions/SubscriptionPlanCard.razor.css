@@ -1,0 +1,77 @@
+.plan-card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    height: fit-content;
+    min-height: 40rem;
+    width: 20rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease
+}
+
+.plan-card:hover {
+    transform: translateY(-0.3rem);
+}
+
+.plan-card.free {
+    background-color: rgb(230, 230, 230);
+    border: 1px solid rgb(200, 200, 200);
+    color: #495057;
+}
+
+.plan-card.payed {
+    background: linear-gradient(145deg,rgba(4, 0, 66, 1) 0%, rgba(6, 6, 92, 1) 50%, rgba(0, 108, 130, 1) 100%);
+    box-shadow:
+            0 0 1rem rgba(0, 100, 255, 0.7),
+            0 0 2rem rgba(0, 100, 255, 0.5),
+            0 0 3rem rgba(0, 100, 255, 0.3);
+    color: #EEF5FF;
+}
+
+.plan-description{
+    display:flex;
+    flex-direction:column;
+    gap: 2.5rem;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.plan-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.plan-title.free{
+    color: #176B87;
+}
+
+.plan-title.payed{
+    color: darkcyan;
+}
+
+.plan-price {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.plan-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.plan-features div {
+    font-size: 1.1rem;
+}
+
+
+.plan-features div.crossed{
+    text-decoration: line-through;
+}
+

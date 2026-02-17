@@ -8,5 +8,9 @@ public class SubscriptionPlanModel
 
     public int BoardsLimit { get; set; }
     
+    public bool IsAiAssistantAvailable { get; set; }
+    
+    public bool IsNameHighlighted { get; set; }
+    
     public decimal MonthlyPrice { get; set; }
 }

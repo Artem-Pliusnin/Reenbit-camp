@@ -1,0 +1,52 @@
+<div class="plan-card @(IsFree ? "free" : "payed")">
+    <div class="plan-description">
+        <div class="plan-header">
+            <div class="plan-title @(IsFree ? "free" : "payed")">
+                @SubscriptionPlan.Name
+            </div>
+
+            <div class="plan-price">
+                @(SubscriptionPlan.MonthlyPrice == 0
+                    ? "Free"
+                    : $"{SubscriptionPlan.MonthlyPrice}$/month")
+            </div>
+        </div>
+
+        <div class="plan-features">
+            <div>
+                ◈ Boards limit: @SubscriptionPlan.BoardsLimit
+            </div>
+            
+            <div class=@(!SubscriptionPlan.IsAiAssistantAvailable ? "crossed" : "")>
+                ◈ Chat with AI Assistant
+            </div>
+
+
+            <div class=@(!SubscriptionPlan.IsNameHighlighted ? "crossed" : "")>
+                ◈ Nickname highlight
+            </div>
+        </div>
+    </div>
+
+    <TelerikButton Class="plan-button" OnClick=@OnSelectPlan>
+        Select plan
+    </TelerikButton>
+</div>
+
+
+<style>
+    .plan-button {
+        width: 100%;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border-radius: 0.6rem;
+        text-align: center;
+        border: none;
+        background-color: #176B87;
+        color: white;
+    }
+
+    .plan-button:hover {
+        background-color: #1b7b9c;
+    }
+</style>

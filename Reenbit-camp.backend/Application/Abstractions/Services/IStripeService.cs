@@ -18,4 +18,8 @@ public interface IStripeService
     Task CancelSubscriptionAsync(
         string subscriptionId,
         CancellationToken cancellationToken = default);
+
+    Task CancelSubscriptionImmediatelyAsync(
+        string subscriptionId,
+        CancellationToken cancellationToken = default);
 }

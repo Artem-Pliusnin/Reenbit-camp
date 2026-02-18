@@ -18,8 +18,8 @@ public class StripeService : IStripeService
     }
     
     public async Task<string> CreateCustomerAsync(
-        string email, 
-        string name, 
+        string email,
+        string name,
         CancellationToken cancellationToken = default)
     {
         var options = new CustomerCreateOptions
@@ -92,4 +92,16 @@ public class StripeService : IStripeService
             null, 
             cancellationToken);
     }
+    
+    public async Task CancelSubscriptionImmediatelyAsync(
+        string subscriptionId,
+        CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService();
+        
+        await service.CancelAsync(
+            subscriptionId, 
+            cancellationToken: cancellationToken);
+    }
+    
 }

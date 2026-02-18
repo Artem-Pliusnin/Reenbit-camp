@@ -21,4 +21,13 @@ public class UserSubscriptionsRepository :
             us => us.UserId == userId, 
             cancellationToken); 
     }
+
+    public async Task<UserSubscription?> GetBySubscriptionId(
+        string SubscriptionId, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.FirstOrDefaultAsync(
+            us => us.StripeSubscriptionId == SubscriptionId, 
+            cancellationToken); 
+    }
 }

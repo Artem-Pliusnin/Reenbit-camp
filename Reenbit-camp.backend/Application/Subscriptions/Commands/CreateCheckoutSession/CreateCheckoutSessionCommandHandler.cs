@@ -52,7 +52,12 @@ internal class CreateCheckoutSessionCommandHandler
         {
             return Result.Failure<string>(SubscriptionErrors.UserDataNotFound);
         }
-        
+
+        if (currentSubscription.SubscriptionPlanId == request.SubscriptionPlanId)
+        {
+            return Result.Failure<string>(SubscriptionErrors.AlreadyOnThisPlan);
+        }
+
         var customerId = currentSubscription.StripeCustomerId;
         if (string.IsNullOrEmpty(customerId))
         {

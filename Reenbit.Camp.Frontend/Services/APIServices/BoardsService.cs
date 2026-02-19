@@ -81,4 +81,11 @@ public class BoardsService : IBoardsService
 
         return response.HandleResult();
     }
+
+    public async Task<Result<bool>> CanCreateBoardAsync()
+    {
+        var response = await _boardsApi.CanCreateBoardAsync();
+
+        return response.HandleResult();
+    }
 }

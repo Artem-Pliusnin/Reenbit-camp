@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Models.Subscriptions;
 using Domain.Requests.Subscriptions;
+using Domain.Responses.Subscriptions;
 using Domain.Shared;
 using Services.Abstractions.Services;
 using Services.API;
@@ -18,7 +19,15 @@ public class SubscriptionsService : ISubscriptionsService
         _subscriptionsApi = subscriptionsApi;
         _mapper = mapper;
     }
-    
+
+    public async Task<Result<UserSubscriptionModel>> GetCurrentUserSubscriptionAsync()
+    {
+        var response = await _subscriptionsApi.GetCurrentUserSubscriptionAsync();
+        
+        return response.HandleResultWithMapping(content 
+            => _mapper.Map<UserSubscriptionModel>(content));
+    }
+
     public async Task<Result<List<SubscriptionPlanModel>>> GetSubscriptionPlansAsync()
     {
         var response = await _subscriptionsApi.GetSubscriptionPlansAsync();

@@ -1,4 +1,5 @@
 @using Domain.Enums
+@using Telerik.SvgIcons
 <div class="members-list">
     @if (IsLoading)
     {
@@ -12,7 +13,7 @@
         {
             <div class="d-flex align-items-center justify-content-between mb-2">
                 <div>
-                    <strong>@member.User.UserName</strong>
+                    <strong class=@(IsNameHighlighted(member) ? "highlighted" : "")>@member.User.UserName</strong>
                     <div class="text-muted small">@member.User.Email</div>
                 </div>
 

@@ -17,7 +17,7 @@
             </TelerikAvatar>
         }
 
-        <span class="username">
+        <span class="username @(CardMember.User.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")">
             @CardMember.User.UserName
         </span>
     </div>

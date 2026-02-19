@@ -10,8 +10,8 @@ public class SubscriptionsProfile : Profile
 {
     public SubscriptionsProfile()
     {
-        CreateMap<SubscriptionPlanDto, SubscriptionPlanModel>();
+        CreateMap<SubscriptionPlanDto, SubscriptionPlanModel>().ReverseMap();
         
-        CreateMap<UserSubscriptionDto, UserSubscriptionModel>();
+        CreateMap<UserSubscriptionDto, UserSubscriptionModel>().ReverseMap();
     }
 }

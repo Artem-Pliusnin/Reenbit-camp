@@ -75,3 +75,30 @@
     text-decoration: line-through;
 }
 
+.plan-footer{
+    width: 100%;
+}
+
+.subscription-status{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.badge-active{
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 2rem;
+    background: rgba(26, 149, 67, 0.3);
+    color: rgb(15, 211, 35);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.badge-active.free{
+    background: rgba(26, 149, 67, 0.5);;
+    color: rgb(0, 255, 25);
+    font-size: 1.2rem;
+}

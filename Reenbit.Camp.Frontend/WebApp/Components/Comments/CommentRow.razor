@@ -16,7 +16,7 @@
 
     <div class="flex-grow-1">
         <div class="comment-header">
-            <span class="comment-author">@Comment.User.UserName</span>
+            <span class="comment-author @(Comment.User.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")">@Comment.User.UserName</span>
             <span class="comment-date">
                 @Comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
             </span>

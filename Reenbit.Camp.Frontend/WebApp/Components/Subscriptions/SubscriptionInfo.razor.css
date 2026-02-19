@@ -10,7 +10,7 @@
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    gap:1rem;
+    gap:0.5rem;
 }
 
 .plan-info{
@@ -31,7 +31,7 @@
 }
 
 .plan-badge{
-    padding:0.25rem 0.6rem;
+    padding:0.5rem 0.8rem;
     border-radius:1rem;
     font-size:1rem;
     font-weight:600;
@@ -43,18 +43,24 @@
     color: gray;
 }
 
-.plan-badge.pro{
-    background:#176B87;
+.plan-badge.payed{
+    background: linear-gradient(145deg,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 50%, rgba(0, 212, 255, 1) 100%);
     color:white;
 }
 
 .plan-expiration{
-    font-size:0.85rem;
+    font-size:1rem;
     color: rgba(0, 0 ,0 , 0.7);
 }
 
 .plan-features{
     font-size:0.95rem;
+}
+
+.features-header{
+    font-size:1.1rem;
+    font-weight:500;
+    margin-top:0.5rem;
 }
 
 .plan-features span{

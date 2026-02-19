@@ -10,13 +10,24 @@ public partial class SubscriptionPlansPage : ComponentBase
     public ISubscriptionsService SubscriptionsService { get; set; } = default!;
     
     private List<SubscriptionPlanModel> SubscriptionPlans = new();
+
+    private UserSubscriptionModel UserSubscription;
     
     private bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        var result = await SubscriptionsService.GetSubscriptionPlansAsync();
+        var userSubscriptionResult = await SubscriptionsService
+            .GetCurrentUserSubscriptionAsync();
+
+        if (userSubscriptionResult.IsSuccess)
+        {
+            UserSubscription = userSubscriptionResult.Value;
+        }
+        
+        var result = await SubscriptionsService
+            .GetSubscriptionPlansAsync();
 
         if (result.IsSuccess)
         {

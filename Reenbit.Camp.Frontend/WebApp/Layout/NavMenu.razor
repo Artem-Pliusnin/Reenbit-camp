@@ -1,5 +1,6 @@
 ﻿@using WebApp.Components.Auth 
 @using WebApp.Components.Invitations
+@using WebApp.Components.FAQChat
 
 <nav class="navbar">
     <div class="navbar-left">
@@ -31,7 +32,7 @@
             }
             else
             {
-                <span class="user-name">
+                <span class="user-name @(IsNicknameHighlighted ? "highlighted" : "")">
                     @CurrentUser.UserName
                 </span>
                 
@@ -58,6 +59,11 @@
         <Logout />
     </div>
 </nav>
+
+@if(IsAiAvailable)
+{
+    <ChatOpener></ChatOpener>
+}
 
 <style>
     .navbar-links a {

@@ -7,6 +7,9 @@ namespace WebApp.Components.Subscriptions;
 
 public partial class SubscriptionPlanCard : ComponentBase
 {
+    [CascadingParameter(Name="UserSubscription")]
+    public UserSubscriptionModel UserSubscription { get; set; } = default!;
+    
     [Parameter, EditorRequired]
     public SubscriptionPlanModel SubscriptionPlan { get; set; }
     
@@ -20,11 +23,16 @@ public partial class SubscriptionPlanCard : ComponentBase
 
     private async void OnSelectPlan()
     {
+        if (UserSubscription.SubscriptionPlan.Id == SubscriptionPlan.Id)
+        {
+            return;
+        }
+        
         var result = await SubscriptionsService
             .CreateCheckoutSessionAsync(
                 new CreateCheckoutRequest(
                     SubscriptionPlan.Id,
-                    Navigation.ToAbsoluteUri("error").ToString(),
+                    Navigation.ToAbsoluteUri("payment-success").ToString(),
                     Navigation.BaseUri
                 ));
 
@@ -33,4 +41,27 @@ public partial class SubscriptionPlanCard : ComponentBase
             Navigation.NavigateTo(result.Value, forceLoad:true);
         }
     }
+    
+    private async void OnCancelPlan()
+    {
+        if (UserSubscription.SubscriptionPlan.Id != SubscriptionPlan.Id
+            || IsFree)
+        {
+            return;
+        }
+        
+        var result = await SubscriptionsService
+            .CancelSubscriptionAsync();
+
+        if (result.IsSuccess)
+        {
+            UserSubscription.CancelAtPeriodEnd = true;
+            StateHasChanged();
+        }
+    }
+
+    private bool CanSelectPlan()
+    {
+        return (!IsFree && UserSubscription.SubscriptionPlan.Id != SubscriptionPlan.Id);  
+    } 
 }

@@ -22,6 +22,7 @@
     height: fit-content;
     flex-direction: column;
     padding: 2rem 1rem;
+    margin-bottom: 3rem;
 }
 
 .container{

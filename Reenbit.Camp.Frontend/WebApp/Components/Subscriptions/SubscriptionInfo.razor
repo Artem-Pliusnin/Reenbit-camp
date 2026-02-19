@@ -1,21 +1,36 @@
 <div class="subscription-container container">
     <div class="subscription-block">
-
         <div class="subscription-header">
             <div class="plan-info">
                 <div class="plan-name">
                     <span>Active plan: </span>
                     
-                    <span class="plan-badge @(IsFree ? "free" : "pro")">
+                    <span class="plan-badge @(IsFree ? "free" : "payed")">
                         @Subscription.SubscriptionPlan.Name
                     </span>
+
+                    @if (!IsFree && !Subscription.CancelAtPeriodEnd)
+                    {
+                        <TelerikButton OnClick=@CancelPlan
+                                       Class="cancel-plan-btn">
+                            Cancel plan
+                        </TelerikButton>
+                    }
                 </div>    
 
                 @if (!IsFree)
                 {
-                    <span class="plan-expiration">
-                        Active until @Subscription.CurrentPeriodEnd?.ToLocalTime().ToString("MMM dd, yyyy")
-                    </span>
+                    @if(Subscription.CancelAtPeriodEnd){
+                        <span class="plan-expiration">
+                            Active until: @Subscription.CurrentPeriodEnd?.ToLocalTime().ToString("dd.MM.yyyy")
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="plan-expiration">
+                            Next billing: @Subscription.CurrentPeriodEnd?.ToLocalTime().ToString("dd.MM.yyyy")
+                        </span>
+                    }
                 }
             </div>
 
@@ -26,9 +41,44 @@
             </TelerikButton>
         </div>
 
+        <span class="features-header">Plan features:</span>
         <div class="plan-features">
-            Boards limit:
-            <span>@Subscription.SubscriptionPlan.BoardsLimit</span>
+            <div>
+                ◈ Boards limit: @Subscription.SubscriptionPlan.BoardsLimit
+            </div>
+
+            @if(Subscription.SubscriptionPlan.IsAiAssistantAvailable)
+            {
+                <div>
+                    ◈ Chat with AI Assistant
+                </div>
+            }
+
+            @if (Subscription.SubscriptionPlan.IsNameHighlighted)
+            {
+                <div>
+                    ◈ Nickname highlight
+                </div>
+            }
         </div>
     </div>
 </div>
+
+<style>
+    .cancel-plan-btn{
+        width: fit-content;
+        height: fit-content;
+        font-weight: 600;
+        padding: 0.5rem 0.75rem;
+        border-radius: 2rem;
+        text-align: center;
+        border: 1px solid #f59e0b;
+        color: #f59e0b;
+        background-color: transparent;
+    }
+
+    .cancel-plan-btn:hover {
+        background-color: #d97706;
+        color: white;
+    }
+</style>

@@ -9,6 +9,9 @@ namespace Services.API;
 
 public interface ISubscriptionsApi
 {
+    [Get("/Subscriptions/current")]
+    Task<ApiResponse<UserSubscriptionDto>> GetCurrentUserSubscriptionAsync();
+    
     [Get("/Subscriptions/plans")]
     Task<ApiResponse<List<SubscriptionPlanDto>>> GetSubscriptionPlansAsync();
 

@@ -11,14 +11,17 @@
 }
 else
 {
+    
     <div class="page-container">
-        <div class="plans-layout">
+        <CascadingValue Name="UserSubscription" Value=@UserSubscription>
+            <div class="plans-layout">
 
-            @foreach (var plan in SubscriptionPlans)
-            {
-                <SubscriptionPlanCard SubscriptionPlan=@plan></SubscriptionPlanCard>
-            }
+                @foreach (var plan in SubscriptionPlans)
+                {
+                    <SubscriptionPlanCard SubscriptionPlan=@plan></SubscriptionPlanCard>
+                }
 
-        </div>
+            </div>
+        </CascadingValue>
     </div> 
 }

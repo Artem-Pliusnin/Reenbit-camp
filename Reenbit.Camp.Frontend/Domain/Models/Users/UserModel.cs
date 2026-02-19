@@ -1,3 +1,4 @@
+using Domain.Models.Subscriptions;
 using Domain.Models.UserAvatars;
 
 namespace Domain.Models.Users;
@@ -11,4 +12,6 @@ public class UserModel
     public UserAvatarModel? Avatar { get; set; }
     
     public string Email { get; set; }
+    
+    public UserSubscriptionModel Subscription { get; set; }
 }

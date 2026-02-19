@@ -23,7 +23,25 @@ internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, B
     {
         try
         {
+            var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
             var boardMemberRepository = _unitOfWork.GetRepository<IBoardMemberRepository>();
+            var userSubscriptionRepository = _unitOfWork.GetRepository<IUserSubscriptionsRepository>();
+            
+            var userBoardsCount = await boardRepository
+                .CountUserOwnedBoardsAsync(request.UserId, cancellationToken);
+            
+            var userSubscription = await userSubscriptionRepository
+                .GetUserSubscription(request.UserId, cancellationToken);
+
+            if (userSubscription == null)
+            {
+                return Result.Failure<BoardDto>(SubscriptionErrors.UserDataNotFound);
+            }
+
+            if (userBoardsCount >= userSubscription.SubscriptionPlan.BoardsLimit)
+            {
+                return Result.Failure<BoardDto>(SubscriptionErrors.BoardsLimitReached);
+            }
 
             var board = new Board()
             {

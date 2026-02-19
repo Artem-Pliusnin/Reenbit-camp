@@ -24,4 +24,8 @@ public static class SubscriptionErrors
     public static readonly Error InvalidWebhookPayload = new(
         "Subscription.InvalidWebhookPayload",
         "Invalid webhook payload");
+    
+    public static readonly Error BoardsLimitReached = new(
+        "Subscription.BoardsLimitReached",
+        "User reached the limit of board.");
 }

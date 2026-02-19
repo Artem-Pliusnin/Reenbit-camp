@@ -48,19 +48,19 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (!string.IsNullOrEmpty(oldSubscriptionId))
+        if(string.IsNullOrEmpty(oldSubscriptionId))
         {
-            try
-            {
-                await _stripeService.CancelSubscriptionImmediatelyAsync(
-                    oldSubscriptionId, 
-                    cancellationToken);
-            }
-            catch (Exception e)
-            {
-                return Result.Success();
-            }
+            return Result.Success();
         }
+        
+        try
+        {
+            await _stripeService.CancelSubscriptionImmediatelyAsync(
+                oldSubscriptionId, 
+                cancellationToken);
+        }
+        catch
+        {}
         
         return Result.Success();
     }

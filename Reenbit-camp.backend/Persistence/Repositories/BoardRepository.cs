@@ -136,4 +136,13 @@ public class BoardRepository :
             .Take(ArchivationConstants.ArchivationSize)
             .ToListAsync(cancellationToken);
     }
+
+    public Task<int> CountUserOwnedBoardsAsync(
+        int userId, 
+        CancellationToken cancellationToken = default)
+    {
+        return _dbSet.CountAsync(b => 
+            b.Members.Any(m => m.UserId == userId && m.Role == BoardRole.Owner),
+            cancellationToken);
+    }
 }

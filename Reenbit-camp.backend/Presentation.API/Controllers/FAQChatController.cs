@@ -2,11 +2,13 @@ using Application.FAQChat.Commands.EndChatSession;
 using Application.FAQChat.Commands.ImportFile;
 using Application.FAQChat.Commands.StartChatSession;
 using Application.FAQChat.Queries.AskQuestion;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.FAQ;
 
 namespace Presentation.API.Controllers;
@@ -19,6 +21,7 @@ public class FAQChatController : AuthorizedContoller
     {}
     
     [HttpPost("question")]
+    [RequireSubscription(SubscriptionPlanType.Standard)]
     public async Task<IActionResult> AskQuestionAsync(
         [FromBody] AskQuestionRequest request,
         CancellationToken cancellationToken)
@@ -63,6 +66,7 @@ public class FAQChatController : AuthorizedContoller
     }
     
     [HttpPost("session/start")]
+    [RequireSubscription(SubscriptionPlanType.Standard)]
     public async Task<IActionResult> StartSessionAsync(
         CancellationToken cancellationToken)
     {
@@ -85,6 +89,7 @@ public class FAQChatController : AuthorizedContoller
     }
     
     [HttpPost("session/end")]
+    [RequireSubscription(SubscriptionPlanType.Standard)]
     public async Task<IActionResult> EndSessionAsync(CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))

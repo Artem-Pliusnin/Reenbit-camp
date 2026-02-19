@@ -40,7 +40,7 @@ internal class AcceptInvitationCommandHandler : ICommandHandler<AcceptInvitation
         
         var userRepository = _unitOfWork.GetRepository<IUserRepository>();
             
-        var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+        var user = await userRepository.GetByIdWithAvatarAsync(request.UserId, cancellationToken);
         
         if (user is null)
         {

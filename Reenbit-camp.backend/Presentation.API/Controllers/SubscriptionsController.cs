@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Application.Subscriptions.Commands.CancelSubscription;
 using Application.Subscriptions.Commands.CreateCheckoutSession;
 using Application.Subscriptions.Queries.GetSubscriptionPlans;
+using Application.Subscriptions.Queries.GetUserSubscription;
 using Domain.DTOs.Comments;
 using Domain.DTOs.Subscriptions;
 using Domain.Errors;
@@ -19,6 +20,28 @@ public class SubscriptionsController : AuthorizedContoller
     public SubscriptionsController(ISender sender) 
         : base(sender)
     {
+    }
+    
+    [HttpGet("current")]
+    public async Task<IActionResult> GetCurrentUserSubscriptionAsync(
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new GetUserSubscriptionQuery(userId);
+        
+        Result<UserSubscriptionDto> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
     }
     
     [HttpGet("plans")]

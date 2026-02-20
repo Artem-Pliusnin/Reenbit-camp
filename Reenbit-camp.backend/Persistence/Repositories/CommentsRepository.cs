@@ -21,6 +21,9 @@ public class CommentsRepository :
         return await _dbSet.Where(c => c.CardId == cardId)
             .Include(c => c.User)
                 .ThenInclude(u => u.Avatar)
+            .Include(c => c.User)
+                .ThenInclude(u => u.Subscription)
+                    .ThenInclude(us => us.SubscriptionPlan)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(cancellationToken);
     }

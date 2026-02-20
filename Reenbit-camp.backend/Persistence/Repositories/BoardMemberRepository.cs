@@ -30,6 +30,8 @@ public class BoardMemberRepository :
         return await _dbSet.Where(bm => bm.BoardId == boardId)
             .Include(bm => bm.Board)
             .Include(bm => bm.User)
+                .ThenInclude(u => u.Subscription)
+                    .ThenInclude(us => us.SubscriptionPlan)
             .ToListAsync(cancellationToken);
     }
 
@@ -39,6 +41,9 @@ public class BoardMemberRepository :
             .Include(bm => bm.Board)
             .Include(bm => bm.User)
                 .ThenInclude(u => u.Avatar)
+            .Include(bm => bm.User)
+                .ThenInclude(u => u.Subscription)
+                    .ThenInclude(us => us.SubscriptionPlan)
             .FirstOrDefaultAsync(cancellationToken);
     }
     

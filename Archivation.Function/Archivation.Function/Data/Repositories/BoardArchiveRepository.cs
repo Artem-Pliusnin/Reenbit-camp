@@ -107,7 +107,7 @@ public class BoardArchiveRepository : IBoardArchiveRepository
                 ArchiveStatus.FailedToSaveToDataBase);
         }
 
-        if (existingBoard.Status != BoardStatus.Archived)
+        if (existingBoard.Status != BoardStatus.Restoring)
         {
             return;
         }

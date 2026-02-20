@@ -36,6 +36,10 @@ public class TrelloAppDbContext : DbContext
     DbSet<CardMember> CardMembers { get; set; }
     
     DbSet<CardAttachment> CardAttachments { get; set; }
+    
+    DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+    
+    DbSet<UserSubscription> UserSubscriptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

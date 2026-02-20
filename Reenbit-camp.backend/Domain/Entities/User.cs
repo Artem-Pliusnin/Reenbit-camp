@@ -18,6 +18,8 @@ public class User
     
     public UserAvatar  Avatar { get; set; }
     
+    public UserSubscription  Subscription { get; set; }
+    
     public List<BoardMember> Boards { get; set; }
     
     public List<Invitation> ReceivedInvitations { get; set; }

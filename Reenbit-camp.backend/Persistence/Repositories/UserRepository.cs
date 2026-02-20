@@ -18,6 +18,8 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
         return await _dbSet
             .Include(u => u.Avatar)
+            .Include(u => u.Subscription)
+                .ThenInclude(us => us.SubscriptionPlan)
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
     
@@ -59,19 +61,23 @@ public class UserRepository : BaseRepository<User, int>, IUserRepository
         return await usersQuery
             .OrderBy(u => (u.FirstName + " " + u.LastName))
             .Include(u => u.Avatar)
+            .Include(u => u.Subscription)
+                .ThenInclude(us => us.SubscriptionPlan)
             .Take(limit)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<List<User>> GetNotСonnectedToCardAsync(
         int cardId, 
-        int boardId, 
+        int boardId,
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(u => u.Boards.Any(bm => bm.BoardId == boardId))
             .Where(u => !u.Cards.Any(cm => cm.CardId == cardId))
             .Include(u => u.Avatar)
+            .Include(u => u.Subscription)
+                .ThenInclude(us => us.SubscriptionPlan)
             .ToListAsync(cancellationToken);
     }
 }

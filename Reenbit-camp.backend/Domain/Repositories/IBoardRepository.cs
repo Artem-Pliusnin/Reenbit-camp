@@ -22,4 +22,8 @@ public interface IBoardRepository : IRepository<Board, int>
     
     Task<List<Board>> GetPendingBoardIdsAsync(
         CancellationToken cancellationToken = default);
+    
+    Task<int> CountUserOwnedBoardsAsync(
+        int userId,
+        CancellationToken cancellationToken = default);
 }

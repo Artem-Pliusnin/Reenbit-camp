@@ -3,6 +3,7 @@ using Application.Boards.Commands.ArchiveBoard;
 using Application.Boards.Commands.CreateBoard;
 using Application.Boards.Commands.RestoreBoard;
 using Application.Boards.Commands.UpdateBoard;
+using Application.Boards.Queries.CanCreateBoard;
 using Application.Boards.Queries.GetArchivedBoards;
 using Application.Boards.Queries.GetBoardData;
 using Application.Boards.Queries.GetUserBoards;
@@ -193,4 +194,25 @@ public class BoardsController : AuthorizedContoller
         return Ok();
     }
 
+    [HttpGet("can-create")]
+    public async Task<IActionResult> CanCreateBoardAsync(
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new CanCreateBoardQuery(userId);
+        
+        var result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
 }

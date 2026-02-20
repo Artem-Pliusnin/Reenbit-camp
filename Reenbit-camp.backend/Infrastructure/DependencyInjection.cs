@@ -134,6 +134,11 @@ public static class DependencyInjection
         
         services.AddScoped<IArchivationLogsService, ArchivationLogsService>();
         
+        services.Configure<StripeSettings>(
+            configuration.GetSection("Stripe"));
+
+        services.AddScoped<IStripeService, StripeService>();
+        
         return services;
     }
 }

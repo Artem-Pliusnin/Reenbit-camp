@@ -57,7 +57,7 @@ public class AuthController : ApiController
         
         if (result.IsFailure)
         {
-            return HandleUnauthorized(result);
+            return HandleFailure(result);
         }
         
         return Ok(result.Value);
@@ -76,7 +76,7 @@ public class AuthController : ApiController
         
         if (result.IsFailure)
         {
-            return  HandleUnauthorized(result);
+            return  HandleFailure(result);
         }
         
         return Ok(result.Value);
@@ -103,7 +103,7 @@ public class AuthController : ApiController
         
         if (result.IsFailure )
         {
-            return HandleUnauthorized(result);
+            return HandleFailure(result);
         }
         
         return Ok(result.Value);

@@ -145,13 +145,7 @@ public class CardsController : AuthorizedContoller
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        if (!TryGetUserId(out var userId))
-        {
-            return  HandleUnauthorized(
-                Result.Failure(UserErrors.UserUnauthorized));
-        }
-
-        var command = new UpdateCardPositionCommand(id, request.NewListId, request.NewPosition, userId);
+        var command = new UpdateCardPositionCommand(id, request.NewListId, request.NewPosition);
         
         Result result = await Sender.Send(command, cancellationToken);
         

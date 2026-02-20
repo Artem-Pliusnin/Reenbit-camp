@@ -18,6 +18,16 @@ public abstract class ApiController : ControllerBase
             throw new InvalidOperationException();
         }
 
+        if (result is IValidationResult validationResult)
+        {
+            return BadRequest(
+                CreateProblemDetails(
+                    "Validation Failed",
+                    StatusCodes.Status400BadRequest,
+                    result.Error,
+                    validationResult.Errors));
+        }
+
         return BadRequest(
             CreateProblemDetails(
                 "Bad Request",

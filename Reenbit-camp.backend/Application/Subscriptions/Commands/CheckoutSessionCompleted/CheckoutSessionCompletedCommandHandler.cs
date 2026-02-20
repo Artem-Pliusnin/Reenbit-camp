@@ -52,15 +52,17 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
         {
             return Result.Success();
         }
-        
+
         try
         {
             await _stripeService.CancelSubscriptionImmediatelyAsync(
-                oldSubscriptionId, 
+                oldSubscriptionId,
                 cancellationToken);
         }
-        catch
-        {}
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error cancelling subscription {ex.Message}");
+        }
         
         return Result.Success();
     }

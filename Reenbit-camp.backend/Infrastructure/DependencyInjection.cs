@@ -105,7 +105,7 @@ public static class DependencyInjection
         services.AddTransient<ArchivePendingBoardsJob>();
         
         string connectionString = configuration
-                                      .GetConnectionString("PostgresConnectionStringLocal") 
+                                      .GetConnectionString("PostgresConnectionString") 
                                   ?? throw new Exception("Connection string not found");
         
         services.AddHangfire(config => 

@@ -45,77 +45,17 @@ public class StripeWebhooksController : ApiController
             {
                 case StripeWebHooksConstants.SessionCompleted:
                 {
-                    var sesionInfoResult = await StripeHelper
-                        .GetSessionInfoAsync(stripeEvent);
-
-                    if (sesionInfoResult.IsFailure)
-                    {
-                        return HandleFailure(sesionInfoResult);
-                    }
-
-                    var command = new CheckoutSessionCompletedCommand(
-                        sesionInfoResult.Value.UserId,
-                        sesionInfoResult.Value.PlanId,
-                        sesionInfoResult.Value.SubscriptionId,
-                        sesionInfoResult.Value.SubscriptionPeriodEnd);
-
-                    var result = await Sender.Send(command);
-
-                    if (result.IsFailure)
-                    {
-                        return HandleFailure(result);
-                    }
-
-                    break;
+                    return await HandleSessionCompleted(stripeEvent);
                 }
 
                 case StripeWebHooksConstants.SubscriptionUpdated:
                 {
-                    var subscriptionInfoResult = StripeHelper
-                        .GetSubscriptionInfo(stripeEvent);
-
-                    if (subscriptionInfoResult.IsFailure)
-                    {
-                        return HandleFailure(subscriptionInfoResult);
-                    }
-
-                    var command = new SubscriptionUpdatedCommand(
-                        subscriptionInfoResult.Value.SubscriptionId,
-                        subscriptionInfoResult.Value.SubscriptionStatus,
-                        subscriptionInfoResult.Value.SubscriptionPeriodEnd,
-                        subscriptionInfoResult.Value.CancelAtPeriodEnd);
-
-                    var result = await Sender.Send(command);
-
-                    if (result.IsFailure)
-                    {
-                        return HandleFailure(result);
-                    }
-
-                    break;
+                    return await HandleSubscriptionUpdated(stripeEvent);
                 }
 
                 case StripeWebHooksConstants.SubscriptionDeleted:
                 {
-                    var subscriptionInfoResult = StripeHelper
-                        .GetSubscriptionInfo(stripeEvent);
-
-                    if (subscriptionInfoResult.IsFailure)
-                    {
-                        return HandleFailure(subscriptionInfoResult);
-                    }
-
-                    var command = new SubscriptionDeletedCommand(
-                        subscriptionInfoResult.Value.SubscriptionId
-                        );
-
-                    var result = await Sender.Send(command);
-
-                    if (result.IsFailure)
-                    {
-                        return HandleFailure(result);
-                    }
-                    break;   
+                    return await HandleSubscriptionDeleted(stripeEvent);
                 }
             }
             
@@ -124,6 +64,82 @@ public class StripeWebhooksController : ApiController
         {
             return HandleFailure(
                 Result.Failure(SubscriptionErrors.InvalidWebhookSignature));
+        }
+        
+        return Ok();
+    }
+
+    private async Task<IActionResult> HandleSessionCompleted(Event stripeEvent)
+    {
+        var sesionInfoResult = await StripeHelper
+            .GetSessionInfoAsync(stripeEvent);
+
+        if (sesionInfoResult.IsFailure)
+        {
+            return HandleFailure(sesionInfoResult);
+        }
+
+        var command = new CheckoutSessionCompletedCommand(
+            sesionInfoResult.Value.UserId,
+            sesionInfoResult.Value.PlanId,
+            sesionInfoResult.Value.SubscriptionId,
+            sesionInfoResult.Value.SubscriptionPeriodEnd);
+
+        var result = await Sender.Send(command);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
+    private async Task<IActionResult> HandleSubscriptionUpdated(Event stripeEvent)
+    {
+        var subscriptionInfoResult = StripeHelper
+            .GetSubscriptionInfo(stripeEvent);
+
+        if (subscriptionInfoResult.IsFailure)
+        {
+            return HandleFailure(subscriptionInfoResult);
+        }
+
+        var command = new SubscriptionUpdatedCommand(
+            subscriptionInfoResult.Value.SubscriptionId,
+            subscriptionInfoResult.Value.SubscriptionStatus,
+            subscriptionInfoResult.Value.SubscriptionPeriodEnd,
+            subscriptionInfoResult.Value.CancelAtPeriodEnd);
+
+        var result = await Sender.Send(command);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
+    }
+    
+    private async Task<IActionResult> HandleSubscriptionDeleted(Event stripeEvent)
+    {
+        var subscriptionInfoResult = StripeHelper
+            .GetSubscriptionInfo(stripeEvent);
+
+        if (subscriptionInfoResult.IsFailure)
+        {
+            return HandleFailure(subscriptionInfoResult);
+        }
+
+        var command = new SubscriptionDeletedCommand(
+            subscriptionInfoResult.Value.SubscriptionId
+        );
+
+        var result = await Sender.Send(command);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
         }
         
         return Ok();

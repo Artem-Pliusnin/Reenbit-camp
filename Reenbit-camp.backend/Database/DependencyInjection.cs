@@ -10,7 +10,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         string connectionString = configuration
-            .GetConnectionString("PostgresConnectionStringLocal");
+            .GetConnectionString("PostgresConnectionString");
 
         services.AddSingleton(new DatabaseInitializer(connectionString));
         

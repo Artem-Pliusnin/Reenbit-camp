@@ -27,7 +27,7 @@
 
         <PopoverContent>
             <div class="py-2">
-                <strong>@Member.User.UserName</strong>
+                <strong class="@(Member.User.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")">@Member.User.UserName</strong>
                 <div class="text-muted small">@Member.User.Email</div>
                 
                 @if (CanDelete)

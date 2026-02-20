@@ -1,0 +1,101 @@
+<div class="plan-card @(IsFree ? "free" : "payed")">
+    <div class="plan-description">
+        <div class="plan-header">
+            <div class="plan-title @(IsFree ? "free" : "payed")">
+                @SubscriptionPlan.Name
+            </div>
+
+            <div class="plan-price">
+                @(SubscriptionPlan.MonthlyPrice == 0
+                    ? "Free"
+                    : $"{SubscriptionPlan.MonthlyPrice}$/month")
+            </div>
+        </div>
+
+        <div class="plan-features">
+            <div>
+                ◈ Boards limit: @SubscriptionPlan.BoardsLimit
+            </div>
+            
+            <div class=@(!SubscriptionPlan.IsAiAssistantAvailable ? "crossed" : "")>
+                ◈ Chat with AI Assistant
+            </div>
+            
+            <div class=@(!SubscriptionPlan.IsNameHighlighted ? "crossed" : "")>
+                ◈ Nickname highlight
+            </div>
+        </div>
+    </div>
+
+    <div class="plan-footer">
+        @if (CanSelectPlan())
+        {
+            <TelerikButton Class="plan-button select-btn"
+                           OnClick=@OnSelectPlan>
+                Select plan
+            </TelerikButton>
+        }
+        else if (UserSubscription.SubscriptionPlan.Id == SubscriptionPlan.Id)
+        {
+            <div class="subscription-status">
+                <div class="badge-active @(IsFree ? "free" : "payed")">
+                    Active plan
+                </div>
+
+                @if (!IsFree)
+                {
+                    @if (UserSubscription.CancelAtPeriodEnd)
+                    {
+                        <div class="status-text warning">
+                            Ends on
+                            <strong>@UserSubscription.CurrentPeriodEnd?.ToLocalTime().ToString("dd.MM.yyyy")</strong>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="status-text">
+                            Next billing:
+                            <strong>@UserSubscription.CurrentPeriodEnd?.ToLocalTime().ToString("dd.MM.yyyy")</strong>
+                        </div>
+
+                        <TelerikButton Class="plan-button cancel-btn"
+                                       OnClick=@OnCancelPlan>
+                            Cancel plan
+                        </TelerikButton>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+
+
+<style>
+    .plan-button {
+        width: 100%;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border-radius: 0.6rem;
+        text-align: center;
+        border: none;
+    }
+
+    .select-btn{
+        background-color: #176B87;
+        color: white;
+    }
+    
+    .select-btn:hover {
+        background-color: #1b7b9c;
+    }
+
+    .cancel-btn {
+        background-color: #6b7280;
+        color: white;
+    }
+
+    .cancel-btn:hover {
+        background-color: #4b5563;
+    }
+    
+</style>

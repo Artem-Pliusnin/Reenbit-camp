@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Domain.Models.Users;
 using Microsoft.AspNetCore.Components;
 using Services.Abstractions.Services;
@@ -20,6 +21,12 @@ public partial class NavMenu
     private bool isLoadinUser;
 
     private bool isOpen;
+    
+    private bool IsNicknameHighlighted =>
+        CurrentUser?.Subscription?.SubscriptionPlan?.IsNameHighlighted == true;
+
+    private bool IsAiAvailable =>
+        CurrentUser?.Subscription?.SubscriptionPlan?.IsAiAssistantAvailable == true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,6 +37,7 @@ public partial class NavMenu
         if (result.IsSuccess)
         { 
             CurrentUser = result.Value;
+            Console.WriteLine(JsonSerializer.Serialize(CurrentUser));
             isLoadinUser = false;
         }
     }

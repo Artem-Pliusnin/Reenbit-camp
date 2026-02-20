@@ -33,4 +33,7 @@ public interface IBoardsApi
     
     [Post("/Boards/{id}/restore")]
     Task<ApiResponse<object>> RestoreBoard(int id);
+
+    [Get("/Boards/can-create")]
+    Task<ApiResponse<bool>> CanCreateBoardAsync();
 }

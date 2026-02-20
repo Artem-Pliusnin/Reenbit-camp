@@ -21,4 +21,6 @@ public interface IBoardsService
     Task<Result<object>> ArchiveBoard(int id);
     
     Task<Result<object>> RestoreBoard(int id);
+    
+    Task<Result<bool>> CanCreateBoardAsync();
 }

@@ -101,3 +101,32 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+
+
+.highlighted {
+    background: linear-gradient(
+            90deg,
+            #b059da,
+            #2980b9,
+            #1ed6b4,
+            #d35400,
+            #b059da
+    );
+
+    background-size: 300% 100%;
+
+    color: transparent !important;
+    background-clip: text !important;
+    -webkit-background-clip: text;
+
+    animation: gradient-flow 6s linear infinite;
+}
+
+@keyframes gradient-flow {
+    from {
+        background-position: 0 50%;
+    }
+    to {
+        background-position: 300% 50%;
+    }
+}

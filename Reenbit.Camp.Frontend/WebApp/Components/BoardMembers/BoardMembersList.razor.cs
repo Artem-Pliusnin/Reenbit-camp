@@ -68,6 +68,9 @@ public partial class BoardMembersList : ComponentBase, IDisposable
             .On<UpdatedCardMemberRoleDto>(SubscribeHomeHubConstants.UpdateMemberRole, OnUpdateMemberRole));
     }
     
+    private bool IsNameHighlighted(BoardMemberModel memeber) => 
+        memeber.User.Subscription?.SubscriptionPlan.IsNameHighlighted ?? false;
+    
     private IEnumerable<BoardRole> GetAvailableRoles(BoardMemberModel member)
     {
         if (!CanChangeRole(member))

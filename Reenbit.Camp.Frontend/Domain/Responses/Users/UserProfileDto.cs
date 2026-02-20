@@ -1,3 +1,4 @@
+using Domain.Responses.Subscriptions;
 using Domain.Responses.UserAvatars;
 
 namespace Domain.Responses.Users;
@@ -7,4 +8,5 @@ public record UserProfileDto(
     string FirstName,
     string LastName,
     string Email,
-    UserAvatarDto? Avatar);
+    UserAvatarDto? Avatar,
+    UserSubscriptionDto Subscription);

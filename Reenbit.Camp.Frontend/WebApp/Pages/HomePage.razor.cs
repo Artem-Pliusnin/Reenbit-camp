@@ -17,10 +17,17 @@ public partial class HomePage : ComponentBase, IDisposable
     
     [Inject] 
     public IBoardsService BoardsService { get; set; } = default!;
+    
+    [Inject]
+    public NavigationManager Navigation { get; set; } = default!;
 
     private List<BoardModel> Boards = new List<BoardModel>();
     
     private List<int> CreatedBoards = new List<int>();
+    
+    private bool CanCreateBoard;
+    
+    private bool IsDialogOpen = false;
     
     private System.Timers.Timer aTimer = default!;
 
@@ -43,6 +50,9 @@ public partial class HomePage : ComponentBase, IDisposable
     
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
+        await CheckBoardCreationLimit();
+        
         await LoadBoardsAsync();
         aTimer = new System.Timers.Timer(300);
         aTimer.Elapsed += OnTimerElapsed;
@@ -81,8 +91,29 @@ public partial class HomePage : ComponentBase, IDisposable
         }
     }
 
+    private async Task CheckBoardCreationLimit()
+    {
+        var result = await BoardsService.CanCreateBoardAsync();
+
+        if (result.IsSuccess)
+        {
+            CanCreateBoard = result.Value;
+        }
+        else
+        {
+            CanCreateBoard = false;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task CreateBoardAsync()
     {
+        if (!CanCreateBoard)
+        {
+            IsDialogOpen = true;
+            return;
+        }
+        
         var result = await BoardsService
             .CreateAsync(new CreateBoardRequest(newBoard.Title));
         
@@ -93,6 +124,7 @@ public partial class HomePage : ComponentBase, IDisposable
         
         newBoard.Title = "";
         await LoadBoardsAsync();
+        await CheckBoardCreationLimit();
     }
     
     private async Task ChangePage(int page)
@@ -102,6 +134,11 @@ public partial class HomePage : ComponentBase, IDisposable
 
         filter.Page = page;
         await LoadBoardsAsync();
+    }
+
+    private void NavigateToPlans()
+    {
+        Navigation.NavigateTo("/subscription/plans");
     }
     
     void IDisposable.Dispose()

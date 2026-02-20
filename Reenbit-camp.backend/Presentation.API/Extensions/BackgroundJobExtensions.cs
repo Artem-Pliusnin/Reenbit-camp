@@ -13,6 +13,13 @@ public static class BackgroundJobExtensions
                 "archive-pending-boards",
                 job => job.ExecuteAsync(),
                 app.Configuration["BackgroundJobs:Archiving:Schedule"]);
+        
+        app.Services
+            .GetRequiredService<IRecurringJobManager>()
+            .AddOrUpdate<CancelExpiredSubscriptionsJob>(
+                "cancel-expired-subscriptions",
+                job => job.ExecuteAsync(),
+                app.Configuration["BackgroundJobs:CancelingSubscriptions:Schedule"]);
 
         return app;
     }

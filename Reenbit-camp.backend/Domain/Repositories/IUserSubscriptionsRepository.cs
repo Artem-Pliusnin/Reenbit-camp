@@ -11,4 +11,8 @@ public interface IUserSubscriptionsRepository : IRepository<UserSubscription, in
     Task<UserSubscription?> GetBySubscriptionId(
         string SubscriptionId, 
         CancellationToken cancellationToken = default);
+
+    Task<List<UserSubscription>> GetExpiredSubscriptionsAsync(
+        DateTime now,
+        CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
@@ -28,5 +29,26 @@ public class UserSubscriptionsRepository :
         return await _dbSet.FirstOrDefaultAsync(
             us => us.StripeSubscriptionId == SubscriptionId, 
             cancellationToken); 
+    }
+
+    public async Task<List<UserSubscription>> GetExpiredSubscriptionsAsync(
+        DateTime now, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Where(s =>
+                s.SubscriptionPlan.Name != "Free" 
+                && ((s.SubscriptionStatus == SubscriptionStatus.Canceled &&
+                     s.CurrentPeriodEnd.HasValue &&
+                     s.CurrentPeriodEnd <= now)
+                    ||
+                    (s.SubscriptionStatus == SubscriptionStatus.Unpaid &&
+                     s.CurrentPeriodEnd.HasValue &&
+                     s.CurrentPeriodEnd <= now)
+                    ||
+                    (s.CancelAtPeriodEnd &&
+                     s.CurrentPeriodEnd.HasValue &&
+                     s.CurrentPeriodEnd.Value <= now))
+            )
+            .ToListAsync(cancellationToken);
     }
 }

@@ -25,8 +25,7 @@ internal class HasRequiredRoleQueryHandler : IQueryHandler<HasRequiredRoleQuery,
 
         if (member is null)
         {
-            return Result.Failure<bool>(BoardMemberErrors.BoardMemberDoesNotExistError
-            );
+            return Result.Failure<bool>(BoardMemberErrors.BoardMemberDoesNotExistError);
         }
 
         return member.Role <= request.MinimumRole;

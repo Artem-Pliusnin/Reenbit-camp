@@ -5,6 +5,7 @@ using Application.Lists.Commands.UpdateList;
 using Application.Lists.Commands.UpdateListPosition;
 using Application.Lists.Queries.GetListsByBoard;
 using Domain.DTOs.Lists;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
@@ -12,12 +13,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.List;
 using Presentation.API.Hubs;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class ListsController : AuthorizedContoller
 {
     private readonly IHubContext<HomeHub> _hubContext;
@@ -27,12 +29,12 @@ public class ListsController : AuthorizedContoller
         _hubContext = hubContext;
     }
     
-    [HttpGet("board/{id}")]
+    [HttpGet]
     public async Task<IActionResult> GetByBoardAsync(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
-        var query = new GetListsByBoardQuery(id);
+        var query = new GetListsByBoardQuery(boardId);
         
         Result<List<ListDto>> result = await Sender.Send(query, cancellationToken);
         
@@ -68,6 +70,7 @@ public class ListsController : AuthorizedContoller
     }
 
     [HttpPut("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> UpdateAsync(
         [FromBody] UpdateListRequest request,
         [FromRoute] int id,
@@ -91,8 +94,8 @@ public class ListsController : AuthorizedContoller
         return Ok();
     }
     
-    
     [HttpPut("{id}/position")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> UpdatePositionAsync(
         [FromBody] UpdateListPositionRequest request,
         [FromRoute] int id,
@@ -113,13 +116,12 @@ public class ListsController : AuthorizedContoller
             return HandleFailure(result);
         }
         
-        
-        
         return Ok();
     }
 
 
     [HttpDelete("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

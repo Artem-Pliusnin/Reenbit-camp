@@ -2,15 +2,17 @@ using Application.CardAttachments.Commands.CreateCardAttachment;
 using Application.CardAttachments.Commands.DeleteCardAttachment;
 using Application.CardAttachments.Queries.GetCardAttachments;
 using Domain.DTOs.CardAttachments;
+using Domain.Enums;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.CardAttachments;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class CardAttachmentsController : ApiController
 {
     public CardAttachmentsController(ISender sender) 
@@ -35,6 +37,7 @@ public class CardAttachmentsController : ApiController
     }
     
     [HttpPost]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> CreateAsync(
         [FromForm] CreateCardAttachmentRequest request,
         CancellationToken cancellationToken)
@@ -58,6 +61,7 @@ public class CardAttachmentsController : ApiController
     }
     
     [HttpDelete("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

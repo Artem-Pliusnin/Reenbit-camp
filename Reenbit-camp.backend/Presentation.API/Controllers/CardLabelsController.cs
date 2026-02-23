@@ -2,15 +2,17 @@ using Application.CardLabels.Commands.CreateCardLabel;
 using Application.CardLabels.Commands.DeleteCardLabel;
 using Application.CardLabels.Queries.GetCardLabels;
 using Domain.DTOs.CardLabels;
+using Domain.Enums;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.CardLabels;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class CardLabelsController : AuthorizedContoller
 {
     public CardLabelsController(ISender sender) 
@@ -35,6 +37,7 @@ public class CardLabelsController : AuthorizedContoller
     }
     
     [HttpPost]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateCardLabelRequest request, 
         CancellationToken cancellationToken)
@@ -52,6 +55,7 @@ public class CardLabelsController : AuthorizedContoller
     }
     
     [HttpDelete("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

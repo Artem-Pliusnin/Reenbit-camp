@@ -27,4 +27,12 @@ public static class BoardErrors
     public static readonly Error BoardDoesNotExistError = new(
         "Board.NotExistBoardError",
         "Board with given id does not exist.");
+    
+    public static readonly Error MissingBoardId = new(
+        "Board.MissingId",
+        "Board Id is required in route.");
+    
+    public static Error InsufficientRole(string minimumRole) => new(
+        "Board.InsufficientRole",
+        $"This action requires {minimumRole} role or higher");
 }

@@ -5,18 +5,20 @@ using Application.Labels.Queries.GetBoardLabels;
 using Application.Labels.Queries.GetLabelsForCard;
 using Domain.Constants.HubConstants;
 using Domain.DTOs.Labels;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.Labels;
 using Presentation.API.Hubs;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class LabelsController : AuthorizedContoller
 {
     private readonly IHubContext<HomeHub> _hubContext;
@@ -26,12 +28,12 @@ public class LabelsController : AuthorizedContoller
         _hubContext = hubContext;
     }
     
-    [HttpGet("board/{id}")]
+    [HttpGet]
     public async Task<IActionResult> GetByBoardAsync(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
-        var query = new GetBoardLabelsQuery(id);
+        var query = new GetBoardLabelsQuery(boardId);
         
         Result<List<LabelDto>> result = await Sender.Send(query, cancellationToken);
         
@@ -61,6 +63,7 @@ public class LabelsController : AuthorizedContoller
     }
     
     [HttpPost]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateLabelRequest request, 
         CancellationToken cancellationToken)
@@ -81,6 +84,7 @@ public class LabelsController : AuthorizedContoller
     }
 
     [HttpPut("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> UpdateAsync(
         [FromBody] UpdateLabelRequest request,
         [FromRoute] int id,
@@ -109,6 +113,7 @@ public class LabelsController : AuthorizedContoller
     }
     
     [HttpDelete("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

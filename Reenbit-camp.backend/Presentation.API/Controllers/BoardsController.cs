@@ -10,6 +10,7 @@ using Application.Boards.Queries.GetUserBoards;
 using Domain.Constants.HubConstants;
 using Domain.DTOs.Boards;
 using Domain.DTOs.Shared;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Models;
 using Domain.Shared;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.Boards;
 using Presentation.API.Hubs;
 
@@ -115,13 +117,13 @@ public class BoardsController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpGet("{id:int}")]
+    [HttpGet("{boardId}")]
     public async Task<IActionResult> GetInfoAsync(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
 
-        var query = new GetBoardDataQuery(id);
+        var query = new GetBoardDataQuery(boardId);
             
         Result<BoardInfoDto> result = await Sender.Send(query, cancellationToken);
         
@@ -133,10 +135,11 @@ public class BoardsController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpPut("{id}")]
+    [HttpPut("{boardId}")]
+    [RequireBoardRole(BoardRole.Admin)]
     public async Task<IActionResult> UpdateAsync(
         [FromBody] UpdateBoardRequest request, 
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))
@@ -145,7 +148,7 @@ public class BoardsController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
 
-        var command = new UpdateBoardCommand(userId, id, request.Title);
+        var command = new UpdateBoardCommand(userId, boardId, request.Title);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -154,18 +157,19 @@ public class BoardsController : AuthorizedContoller
             return HandleFailure(result);
         }
         
-        await _hubContext.Clients.Group(HomeHub.GetBoardGroupName(id))
+        await _hubContext.Clients.Group(HomeHub.GetBoardGroupName(boardId))
             .SendAsync(HomeHubConstants.UpdateBoardTitle, request.Title);
         
         return Ok();
     }
     
-    [HttpPost("{id}/archive")]
+    [HttpPost("{boardId}/archive")]
+    [RequireBoardRole(BoardRole.Owner)]
     public async Task<IActionResult> ArchiveBoard(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
-        var command = new ArchiveBoardCommand(id);
+        var command = new ArchiveBoardCommand(boardId);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -177,12 +181,13 @@ public class BoardsController : AuthorizedContoller
         return Ok();
     }
     
-    [HttpPost("{id}/restore")]
+    [HttpPost("{boardId}/restore")]
+    [RequireBoardRole(BoardRole.Owner)]
     public async Task<IActionResult> RestoreBoard(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
-        var command = new RestoreBoardCommand(id);
+        var command = new RestoreBoardCommand(boardId);
         
         Result result = await Sender.Send(command, cancellationToken);
         

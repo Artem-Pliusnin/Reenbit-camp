@@ -4,29 +4,31 @@ using Application.BoardMembers.Commands.UpdateBoardMemberRole;
 using Application.BoardMembers.Queries.GetBoardMembers;
 using Application.BoardMembers.Queries.GetСurrentBoardMember;
 using Domain.DTOs.BoardMembers;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.BoardMembers;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class BoardMembersController : AuthorizedContoller
 {
     public BoardMembersController(ISender sender)
         : base(sender)
     {}
     
-    [HttpGet("board/{id}")]
+    [HttpGet]
     public async Task<IActionResult> GetByBoardAsync(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
-        var query = new GetBoardMembersQuery(id);
+        var query = new GetBoardMembersQuery(boardId);
         
         Result<List<BoardMemberDto>> result = await Sender.Send(query, cancellationToken);
         
@@ -38,9 +40,9 @@ public class BoardMembersController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpGet("board/{id}/current")]
+    [HttpGet("/current")]
     public async Task<IActionResult> GetCurrentAsync(
-        [FromRoute] int id,
+        [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
         if (!TryGetUserId(out var userId))
@@ -49,7 +51,7 @@ public class BoardMembersController : AuthorizedContoller
                 Result.Failure(UserErrors.UserUnauthorized));
         }
         
-        var query = new GetСurrentBoardMemberQuery(userId, id);
+        var query = new GetСurrentBoardMemberQuery(userId, boardId);
         
         Result<BoardMemberDto> result = await Sender.Send(query, cancellationToken);
         
@@ -62,6 +64,7 @@ public class BoardMembersController : AuthorizedContoller
     }
     
     [HttpPut("{id}/role")]
+    [RequireBoardRole(BoardRole.Admin)]
     public async Task<IActionResult> UpdateRoleAsync(
         [FromBody] UpdateBoardMemberRoleRequest request,
         [FromRoute] int id,

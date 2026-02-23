@@ -3,16 +3,18 @@ using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateCommet;
 using Application.Comments.Queries.GetCardComments;
 using Domain.DTOs.Comments;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.Comments;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class CommentsController : AuthorizedContoller
 {
     public CommentsController(ISender sender) 
@@ -37,6 +39,7 @@ public class CommentsController : AuthorizedContoller
     }
     
     [HttpPost]
+    [RequireBoardRole(BoardRole.Viewer)]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateCommentRequest request, 
         CancellationToken cancellationToken)

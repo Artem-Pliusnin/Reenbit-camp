@@ -8,17 +8,19 @@ using Application.Cards.Commands.UpdateCardStatus;
 using Application.Cards.Queries.GetCardsByList;
 using Application.Cards.Queries.GetFullCardInfo;
 using Domain.DTOs.Cards;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.Cards;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 
 public class CardsController : AuthorizedContoller
 {
@@ -61,6 +63,7 @@ public class CardsController : AuthorizedContoller
     }
     
     [HttpPost]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateCardRequest request, 
         CancellationToken cancellationToken)
@@ -84,6 +87,7 @@ public class CardsController : AuthorizedContoller
     }
     
     [HttpPut("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> UpdateAsync(
         [FromBody] UpdateCardRequest request,
         [FromRoute] int id,
@@ -112,6 +116,7 @@ public class CardsController : AuthorizedContoller
     }
     
     [HttpPut("{id}/status")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> UpdateStatusAsync(
         [FromBody] UpdateCardStatusRequest request,
         [FromRoute] int id,
@@ -158,6 +163,7 @@ public class CardsController : AuthorizedContoller
     }
     
     [HttpPut("{id}/deadline")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> UpdateDeadlineAsync(
         [FromBody] UpdateCardDeadlineRequest request,
         [FromRoute] int id,
@@ -182,6 +188,7 @@ public class CardsController : AuthorizedContoller
     }
     
     [HttpDelete("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

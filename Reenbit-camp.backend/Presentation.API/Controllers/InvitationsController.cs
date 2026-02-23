@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Application.Invitations.Commands.AcceptInvitation;
 using Application.Invitations.Commands.CreateInvitation;
 using Application.Invitations.Commands.DeclinedInvitation;
@@ -7,13 +6,14 @@ using Application.Invitations.Queries.GetInvitationsByBoard;
 using Application.Invitations.Queries.GetUserInvitations;
 using Domain.Constants.HubConstants;
 using Domain.DTOs.Invitations;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.Invitations;
 using Presentation.API.Hubs;
 
@@ -50,12 +50,12 @@ public class InvitationsController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpGet("board/{id}")]
+    [HttpGet("board/{boardId}")]
     public async Task<IActionResult> GetByBoardAsync(
-        [FromRoute] int id, 
+        [FromRoute] int boardId, 
         CancellationToken cancellationToken)
     {
-        var query = new GetInvitationsByBoardQuery(id);
+        var query = new GetInvitationsByBoardQuery(boardId);
         
         Result<List<InvitationDto>> result = await Sender.Send(query, cancellationToken);
         
@@ -67,7 +67,8 @@ public class InvitationsController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpPost]
+    [HttpPost("board/{boardId}")]
+    [RequireBoardRole(BoardRole.Admin)]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateInvitationRequest request, 
         CancellationToken cancellationToken)
@@ -158,7 +159,8 @@ public class InvitationsController : AuthorizedContoller
         return Ok();
     }
     
-    [HttpDelete("{id}")]
+    [HttpDelete("board/{boardId}/invitation/{id}")]
+    [RequireBoardRole(BoardRole.Admin)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

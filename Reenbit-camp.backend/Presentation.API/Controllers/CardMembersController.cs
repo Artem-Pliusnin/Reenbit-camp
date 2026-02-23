@@ -2,15 +2,17 @@ using Application.CardMembers.Commands.CreateCardMember;
 using Application.CardMembers.Commands.DeleteCardMember;
 using Application.CardMembers.Queries.GetCardMembers;
 using Domain.DTOs.CardMembers;
+using Domain.Enums;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
+using Presentation.API.Attributes;
 using Presentation.API.Contracts.CardMembers;
 
 namespace Presentation.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Board/{boardId}/[controller]")]
 public class CardMembersController : AuthorizedContoller
 {
     public CardMembersController(ISender sender) 
@@ -35,6 +37,7 @@ public class CardMembersController : AuthorizedContoller
     }
     
     [HttpPost]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> CreateAsync(
         [FromBody] CreateCardMemberRequest request, 
         CancellationToken cancellationToken)
@@ -52,6 +55,7 @@ public class CardMembersController : AuthorizedContoller
     }
     
     [HttpDelete("{id}")]
+    [RequireBoardRole(BoardRole.Member)]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] int id,
         CancellationToken cancellationToken)

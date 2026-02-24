@@ -76,6 +76,38 @@ public class StripeService : IStripeService
         return session.Url;
     }
 
+    public async Task UpdateSubscriptionWithProrationAsync(
+        string subscriptionId,
+        string newPriceId,
+        CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService();
+        
+        var subscription = await service.GetAsync(
+            subscriptionId,
+            cancellationToken: cancellationToken);
+
+        var currentItemId = subscription.Items.Data[0].Id;
+        
+        var options = new SubscriptionUpdateOptions
+        {
+            Items = new List<SubscriptionItemOptions>
+            {
+                new()
+                {
+                    Id = currentItemId,
+                    Price = newPriceId,
+                }
+            },
+            ProrationBehavior = "always_invoice",
+        };
+
+        await service.UpdateAsync(
+            subscriptionId,
+            options,
+            cancellationToken: cancellationToken);
+    }
+
     public async Task CancelSubscriptionAsync(
         string subscriptionId, 
         CancellationToken cancellationToken = default)
@@ -91,6 +123,23 @@ public class StripeService : IStripeService
             options, 
             null, 
             cancellationToken);
+    }
+    
+    public async Task ResumeSubscriptionAsync(
+        string subscriptionId,
+        CancellationToken cancellationToken = default)
+    {
+        var service = new SubscriptionService();
+
+        var options = new SubscriptionUpdateOptions
+        {
+            CancelAtPeriodEnd = false
+        };
+
+        await service.UpdateAsync(
+            subscriptionId,
+            options,
+            cancellationToken: cancellationToken);
     }
     
     public async Task CancelSubscriptionImmediatelyAsync(

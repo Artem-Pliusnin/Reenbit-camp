@@ -14,8 +14,17 @@ public interface IStripeService
         string cancelUrl,
         Dictionary<string, string> metadata,
         CancellationToken cancellationToken = default);
+    
+    Task UpdateSubscriptionWithProrationAsync(
+        string subscriptionId,
+        string newPriceId,
+        CancellationToken cancellationToken = default);
 
     Task CancelSubscriptionAsync(
+        string subscriptionId,
+        CancellationToken cancellationToken = default);
+
+    Task ResumeSubscriptionAsync(
         string subscriptionId,
         CancellationToken cancellationToken = default);
 

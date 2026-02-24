@@ -31,14 +31,14 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
             return Result.Failure(SubscriptionErrors.UserDataNotFound);
         }
         
-        string? oldSubscriptionId = String.Empty;
+        /*string? oldSubscriptionId = String.Empty;
         
         if (!string.IsNullOrEmpty(subscription.StripeSubscriptionId) &&
             subscription.StripeSubscriptionId != request.SubscriptionId &&
             subscription.SubscriptionStatus == SubscriptionStatus.Active)
         {
             oldSubscriptionId = subscription.StripeSubscriptionId;
-        }
+        }*/
         
         subscription.SubscriptionPlanId = request.PlanId;
         subscription.StripeSubscriptionId = request.SubscriptionId;
@@ -48,7 +48,7 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if(string.IsNullOrEmpty(oldSubscriptionId))
+        /*if(string.IsNullOrEmpty(oldSubscriptionId))
         {
             return Result.Success();
         }
@@ -62,7 +62,7 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
         catch(Exception ex)
         {
             Console.WriteLine($"Error cancelling subscription {ex.Message}");
-        }
+        }*/
         
         return Result.Success();
     }

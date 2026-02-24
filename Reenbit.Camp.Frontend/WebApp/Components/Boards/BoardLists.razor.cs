@@ -69,7 +69,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         }
         
         var result = await CardsService
-            .CreateAsync(new CreateCardRequest(listId, title));
+            .CreateAsync(Board.Id, new CreateCardRequest(listId, title));
 
         if (result.IsFailure || result.Value == null)
         {
@@ -96,7 +96,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         }
         
         var result = await ListsService
-            .CreateAsync(new CreateListRequest(Board.Id, NewListTitle));
+            .CreateAsync(Board.Id, new CreateListRequest(Board.Id, NewListTitle));
 
         if (result.IsSuccess)
         {
@@ -228,7 +228,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         
         foreach (var request in requests)
         { 
-            await CardsService.UpdatePositionAsync(request.CardId, request);
+            await CardsService.UpdatePositionAsync(Board.Id, request.CardId, request);
         }
     }
     
@@ -237,6 +237,7 @@ public partial class BoardLists : ComponentBase, IDisposable
         await MoveListOnBoard(moveListModel);
         
         await ListsService.UpdatePositionAsync(
+            Board.Id, 
             moveListModel.ListId,
             new UpdateListPositionRequest(
                 moveListModel.ListId,

@@ -52,6 +52,7 @@ public partial class SimpleCard : ComponentBase, IDisposable
     private async Task OnChangeStatus()
     {
         await CardsService.UpdateStatusAsync(
+            Board.Id,
             Card.Id, 
             new UpdateCardStatusRequest(
                 Card.Id, 
@@ -95,7 +96,7 @@ public partial class SimpleCard : ComponentBase, IDisposable
         
         IsCardOpen = false;
         
-        var result = await CardsService.DeleteAsync(Card.Id);
+        var result = await CardsService.DeleteAsync(Board.Id, Card.Id);
 
         if (result.IsSuccess)
         {

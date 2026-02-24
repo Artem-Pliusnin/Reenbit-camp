@@ -6,13 +6,14 @@ namespace Services.API;
 
 public interface ICardLabelsApi
 {
-    [Get("/CardLabels/card/{id}")]
-    Task<ApiResponse<List<CardLabelDto>>> GetByCardAsync(int id);
+    [Get("/Board/{boardId}/CardLabels/card/{id}")]
+    Task<ApiResponse<List<CardLabelDto>>> GetByCardAsync(int boardId, int id);
 
-    [Post("/CardLabels")]
+    [Post("/Board/{boardId}/CardLabels")]
     Task<ApiResponse<CardLabelDto>> CreateAsync(
+        int boardId,
         [Body] CreateCardLabelRequest request);
     
-    [Delete("/CardLabels/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    [Delete("/Board/{boardId}/CardLabels/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int boardId, int id);
 }

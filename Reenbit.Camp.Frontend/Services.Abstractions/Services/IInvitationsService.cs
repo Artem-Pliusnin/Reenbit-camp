@@ -6,7 +6,7 @@ namespace Services.Abstractions.Services;
 
 public interface IInvitationsService
 {
-    Task<Result<InvitationModel>> CreateAsync(CreateInvitationRequest request);
+    Task<Result<InvitationModel>> CreateAsync(int boardId, CreateInvitationRequest request);
     
     Task<Result<List<InvitationModel>>> GetByUserAsync();
     
@@ -16,5 +16,5 @@ public interface IInvitationsService
     
     Task<Result<object>> DeclineInvitationAsync(int id);
     
-    Task<Result<object>> DeleteAsync(int id);
+    Task<Result<object>> DeleteAsync(int boardId, int id);
 }

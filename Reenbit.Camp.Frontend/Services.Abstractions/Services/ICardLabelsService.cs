@@ -6,9 +6,9 @@ namespace Services.Abstractions.Services;
 
 public interface ICardLabelsService
 {
-    Task<Result<List<CardLabelModel>>> GetByCardAsync(int cardId);
+    Task<Result<List<CardLabelModel>>> GetByCardAsync(int boardId, int cardId);
     
-    Task<Result<CardLabelModel>> CreateAsync(CreateCardLabelRequest request);
+    Task<Result<CardLabelModel>> CreateAsync(int boardId, CreateCardLabelRequest request);
     
-    Task<Result<object>> DeleteAsync(int id);
+    Task<Result<object>> DeleteAsync(int boardId, int id);
 }

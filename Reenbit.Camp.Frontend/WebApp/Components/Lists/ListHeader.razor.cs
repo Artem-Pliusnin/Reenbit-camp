@@ -83,6 +83,7 @@ public partial class ListHeader : ComponentBase
             List.Title = TitleInput;
 
             var result = await ListsService.UpdateAsync(
+                BoardInfo.Id,
                 List.Id, 
                 new UpdateListRequest(List.Id, TitleInput));
 
@@ -177,7 +178,7 @@ public partial class ListHeader : ComponentBase
     {
         IsDeleteConfirmOpen = false;
         
-        var result = await ListsService.DeleteAsync(List.Id);
+        var result = await ListsService.DeleteAsync(BoardInfo.Id, List.Id);
 
         if (result.IsSuccess)
         {

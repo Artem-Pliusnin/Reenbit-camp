@@ -98,6 +98,7 @@ public partial class BoardInviteForm : ComponentBase, IDisposable
     private async Task Invite(int userId)
     {
         var result = await InvitationsService.CreateAsync(
+            BoardId,
             new CreateInvitationRequest(BoardId, userId));
 
         if (result.IsSuccess)
@@ -137,7 +138,7 @@ public partial class BoardInviteForm : ComponentBase, IDisposable
     
     private async Task RemoveInvitation(InvitationModel invitation)
     {
-        var result = await InvitationsService.DeleteAsync(invitation.Id);
+        var result = await InvitationsService.DeleteAsync(BoardId, invitation.Id);
 
         if (result.IsSuccess)
         {

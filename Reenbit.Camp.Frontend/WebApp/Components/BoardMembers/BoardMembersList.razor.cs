@@ -143,6 +143,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
     private async Task OnRoleChanged(BoardMemberModel member)
     {
         var result = await BoardMembersService.UpdateRoleAsync(
+            BoardId,
             member.Id,
             new UpdateBoardMemberRoleRequest(
                 member.Id, 
@@ -163,7 +164,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
 
     private async Task RemoveMember(BoardMemberModel member)
     {
-        var result = await BoardMembersService.DeleteAsync(member.Id);
+        var result = await BoardMembersService.DeleteAsync(BoardId, member.Id);
 
         if (result.IsSuccess)
         {
@@ -179,7 +180,7 @@ public partial class BoardMembersList : ComponentBase, IDisposable
 
     private async Task LeaveBoard()
     {
-        var result = await BoardMembersService.DeleteAsync(CurrentUser.Id);
+        var result = await BoardMembersService.DeleteAsync(BoardId, CurrentUser.Id);
 
         if (result.IsSuccess)
         {

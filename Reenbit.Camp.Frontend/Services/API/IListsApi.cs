@@ -6,23 +6,26 @@ namespace Services.API;
 
 public interface IListsApi
 {
-    [Get("/Lists/board/{id}")]
-    Task<ApiResponse<List<ListDto>>> GetByBoardAsync(int id);
+    [Get("/Board/{boardId}/Lists")]
+    Task<ApiResponse<List<ListDto>>> GetByBoardAsync(int boardId);
 
-    [Post("/Lists")]
+    [Post("/Board/{boardId}/Lists")]
     Task<ApiResponse<ListDto>> CreateAsync(
-        [Body] CreateListRequest request);
+        [Body] CreateListRequest request,
+        int boardId);
 
-    [Put("/Lists/{id}")]
+    [Put("/Board/{boardId}/Lists/{id}")]
     Task<ApiResponse<object>> UpdateAsync(
         [Body] UpdateListRequest request,
+        int boardId,
         int id);
     
-    [Put("/Lists/{id}/position")]
+    [Put("/Board/{boardId}/Lists/{id}/position")]
     Task<ApiResponse<object>> UpdatePositionAsync(
         [Body] UpdateListPositionRequest request,
+        int boardId,
         int id);
     
-    [Delete("/Lists/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    [Delete("/Board/{boardId}/Lists/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int boardId, int id);
 }

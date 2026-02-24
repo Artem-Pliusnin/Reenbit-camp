@@ -19,9 +19,9 @@ public class ListsService : IListsService
         _mapper = mapper;
     }
     
-    public async Task<Result<ListModel>> CreateAsync(CreateListRequest request)
+    public async Task<Result<ListModel>> CreateAsync(int boardId, CreateListRequest request)
     {
-        var response = await _listsApi.CreateAsync(request);
+        var response = await _listsApi.CreateAsync(request, boardId);
         
         return response.HandleResultWithMapping(content 
             => _mapper.Map<ListModel>(content));
@@ -35,23 +35,23 @@ public class ListsService : IListsService
             => _mapper.Map<List<ListModel>>(content));
     }
 
-    public async Task<Result<object>> UpdateAsync(int id, UpdateListRequest request)
+    public async Task<Result<object>> UpdateAsync(int boardId, int id, UpdateListRequest request)
     {
-        var response = await _listsApi.UpdateAsync(request, id);
+        var response = await _listsApi.UpdateAsync(request, boardId, id);
 
         return response.HandleResult();
     }
 
-    public async Task<Result<object>> UpdatePositionAsync(int id, UpdateListPositionRequest request)
+    public async Task<Result<object>> UpdatePositionAsync(int boardId, int id, UpdateListPositionRequest request)
     {
-        var response = await _listsApi.UpdatePositionAsync(request, id);
+        var response = await _listsApi.UpdatePositionAsync(request, boardId, id);
 
         return response.HandleResult();
     }
 
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<object>> DeleteAsync(int boardId, int id)
     {
-        var response = await _listsApi.DeleteAsync(id);
+        var response = await _listsApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

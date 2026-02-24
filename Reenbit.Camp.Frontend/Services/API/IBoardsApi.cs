@@ -16,23 +16,23 @@ public interface IBoardsApi
     Task<ApiResponse<PaginationDto<BoardDto>>> GetByUserAsync(
         [Query] BoardsFilterModel filter);
     
-    [Get("/Boards/{id}")]
-    Task<ApiResponse<BoardInfoDto>> GetInfoAsync(int id);
+    [Get("/Boards/{boardId}")]
+    Task<ApiResponse<BoardInfoDto>> GetInfoAsync(int boardId);
 
-    [Put("/Boards/{id}")]
+    [Put("/Boards/{boardId}")]
     Task<ApiResponse<object>> UpdateAsync(
-        int id,
+        int boardId,
         [Body] UpdateBoardRequest request);
     
     [Get("/Boards/archived")]
     Task<ApiResponse<PaginationDto<BoardDto>>> GetArchivedByUserAsync(
         [Query] ArchivedBoardsFilter filter);
     
-    [Post("/Boards/{id}/archive")]
-    Task<ApiResponse<object>> ArchiveBoard(int id);
+    [Post("/Boards/{boardId}/archive")]
+    Task<ApiResponse<object>> ArchiveBoard(int boardId);
     
-    [Post("/Boards/{id}/restore")]
-    Task<ApiResponse<object>> RestoreBoard(int id);
+    [Post("/Boards/{boardId}/restore")]
+    Task<ApiResponse<object>> RestoreBoard(int boardId);
 
     [Get("/Boards/can-create")]
     Task<ApiResponse<bool>> CanCreateBoardAsync();

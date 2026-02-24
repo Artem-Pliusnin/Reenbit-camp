@@ -34,9 +34,9 @@ else
             {
                 <input class="form-control form-control-sm task-title-input"
                        @bind=@InputTitle
-                                              @bind:event="oninput"
+                       @bind:event="oninput"
                        @onblur=@SaveTitle                   
-                                              @onkeydown=@OnTitleKeyDown
+                       @onkeydown=@OnTitleKeyDown
                        maxlength=50
                        autofocus/>
             }

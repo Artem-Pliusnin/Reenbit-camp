@@ -10,11 +10,12 @@ public interface IInvitationApi
     [Get("/Invitations")]
     Task<ApiResponse<List<InvitationDto>>> GetByUserAsync();
     
-    [Get("/Invitations/board/{id}")]
-    Task<ApiResponse<List<InvitationDto>>> GetByBoardAsync(int id);
+    [Get("/Invitations/board/{boardId}")]
+    Task<ApiResponse<List<InvitationDto>>> GetByBoardAsync(int boardId);
 
-    [Post("/Invitations")]
+    [Post("/Invitations/board/{boardId}")]
     Task<ApiResponse<InvitationDto>> CreateAsync(
+        int boardId,
         [Body] CreateInvitationRequest request);
     
     [Put("/Invitations/{id}/accept")]
@@ -23,6 +24,6 @@ public interface IInvitationApi
     [Put("/Invitations/{id}/decline")]
     Task<ApiResponse<object>> DeclineInvitationAsync(int id);
     
-    [Delete("/Invitations/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    [Delete("/Invitations/board/{boardId}/invitation/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int boardId, int id);
 }

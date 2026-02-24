@@ -6,19 +6,21 @@ namespace Services.API;
 
 public interface ICommentsApi
 {
-    [Get("/Comments/card/{id}")]
-    Task<ApiResponse<List<CommentDto>>> GetByCardAsync(int id);
+    [Get("/Board/{boardId}/Comments/card/{id}")]
+    Task<ApiResponse<List<CommentDto>>> GetByCardAsync(int boardId, int id);
 
-    [Post("/Comments")]
+    [Post("/Board/{boardId}/Comments")]
     Task<ApiResponse<CommentDto>> CreateAsync(
-        [Body] CreateCommentRequest request);
+        [Body] CreateCommentRequest request,
+        int boardId);
     
-    [Put("/Comments/{id}")]
+    [Put("/Board/{boardId}/Comments/{id}")]
     Task<ApiResponse<object>> UpdateAsync(
         [Body] UpdateCommentRequest request,
+        int boardId,
         int id);
     
-    [Delete("/Comments/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    [Delete("/Board/{boardId}/Comments/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int boardId, int id);
 }
 

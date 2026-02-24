@@ -28,32 +28,32 @@ public class LabelsService : ILabelsService
             => _mapper.Map<List<LabelModel>>(content));
     }
 
-    public async Task<Result<List<LabelModel>>> GetNotConnectedAsync(int cardId)
+    public async Task<Result<List<LabelModel>>> GetNotConnectedAsync(int boardId, int cardId)
     {
-        var response = await _labelsApi.GetNotConnectedAsync(cardId);
+        var response = await _labelsApi.GetNotConnectedAsync(boardId, cardId);
 
         return response.HandleResultWithMapping(content 
             => _mapper.Map<List<LabelModel>>(content));
     }
 
-    public async Task<Result<LabelModel>> CreateAsync(CreateLabelRequest request)
+    public async Task<Result<LabelModel>> CreateAsync(int boardId, CreateLabelRequest request)
     {
-        var response = await _labelsApi.CreateAsync(request);
+        var response = await _labelsApi.CreateAsync(request, boardId);
         
         return response.HandleResultWithMapping(content 
             => _mapper.Map<LabelModel>(content));
     }
 
-    public async Task<Result<object>> UpdateAsync(int id, UpdateLabelRequest request)
+    public async Task<Result<object>> UpdateAsync(int boardId, int id, UpdateLabelRequest request)
     {
-        var response = await _labelsApi.UpdateAsync(request, id);
+        var response = await _labelsApi.UpdateAsync(request, boardId, id);
 
         return response.HandleResult();
     }
 
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<object>> DeleteAsync(int boardId, int id)
     {
-        var response = await _labelsApi.DeleteAsync(id);
+        var response = await _labelsApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

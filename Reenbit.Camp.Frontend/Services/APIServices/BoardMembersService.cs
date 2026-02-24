@@ -36,16 +36,16 @@ public class BoardMembersService : IBoardMembersService
             => _mapper.Map<BoardMemberModel>(content));
     }
 
-    public async Task<Result<object>> UpdateRoleAsync(int id, UpdateBoardMemberRoleRequest request)
+    public async Task<Result<object>> UpdateRoleAsync(int boardId, int id, UpdateBoardMemberRoleRequest request)
     {
-        var response = await _boardMembersApi.UpdateRoleAsync(id, request);
+        var response = await _boardMembersApi.UpdateRoleAsync(boardId, id, request);
 
         return response.HandleResult();
     }
     
-    public async Task<Result<DeleteBoardMemberDto>> DeleteAsync(int id)
+    public async Task<Result<DeleteBoardMemberDto>> DeleteAsync(int boardId, int id)
     {
-        var response = await _boardMembersApi.DeleteAsync(id);
+        var response = await _boardMembersApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

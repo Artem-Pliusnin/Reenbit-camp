@@ -4,6 +4,7 @@ using Domain.Constants.HubConstants;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.Models.BoardMembers;
+using Domain.Models.Boards;
 using Domain.Models.CardAttachments;
 using Domain.Models.Labels;
 using Domain.Responses.CardAttachments;
@@ -20,6 +21,9 @@ namespace WebApp.Components.Attachments;
 
 public partial class AttachmentsSection : ComponentBase, IDisposable
 {
+    [CascadingParameter(Name="Board")]
+    public BoardInfoModel Board { get; set; } = default!;
+    
     [CascadingParameter(Name="CurrentUser")]
     public BoardMemberModel CurrentUser { get; set; } = default!;
     
@@ -50,7 +54,7 @@ public partial class AttachmentsSection : ComponentBase, IDisposable
         TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
         
         var result = await CardAttachmentService
-            .GetByCardAsync(CardId);
+            .GetByCardAsync(Board.Id, CardId);
 
         if (result.IsSuccess)
         {
@@ -103,7 +107,7 @@ public partial class AttachmentsSection : ComponentBase, IDisposable
         var file = new StreamPart(stream, SelectedFile.Name, SelectedFile.ContentType);
         
         var result = await CardAttachmentService
-            .CreateAsync(CardId, file);
+            .CreateAsync(Board.Id, CardId, file);
 
         if (result.IsSuccess)
         {
@@ -122,7 +126,7 @@ public partial class AttachmentsSection : ComponentBase, IDisposable
     
     private async Task DeleteAttachment(CardAttachmentModel attachment)
     {
-        var result = await CardAttachmentService.DeleteAsync(attachment.Id);
+        var result = await CardAttachmentService.DeleteAsync(Board.Id, attachment.Id);
 
         if (result.IsSuccess)
         {

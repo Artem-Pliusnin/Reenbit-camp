@@ -66,7 +66,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
         TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
         
         var availableLabelsResult = await LabelsService
-            .GetNotConnectedAsync(CardId);
+            .GetNotConnectedAsync(Board.Id, CardId);
 
         if (availableLabelsResult.IsSuccess)
         {
@@ -74,7 +74,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
         }
         
         var cardLabelsResult = await CardLabelsService
-            .GetByCardAsync(CardId);
+            .GetByCardAsync(Board.Id, CardId);
 
         if (cardLabelsResult.IsSuccess)
         {
@@ -156,7 +156,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
     private async Task DeleteCardLabel(CardLabelModel cardLabel)
     {
         var result = await CardLabelsService
-            .DeleteAsync(cardLabel.Id);
+            .DeleteAsync(Board.Id, cardLabel.Id);
 
         if (result.IsSuccess)
         {
@@ -177,7 +177,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
     private async Task AddLabel(LabelModel label)
     {
         var result = await CardLabelsService
-            .CreateAsync(new CreateCardLabelRequest(CardId, label.Id));
+            .CreateAsync(Board.Id, new CreateCardLabelRequest(CardId, label.Id));
 
         if (result.IsSuccess)
         {
@@ -198,7 +198,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
     private async Task CreateLabel()
     { 
         var result = await LabelsService
-            .CreateAsync(new CreateLabelRequest(Board.Id, NewLabelText, NewLabelColor));
+            .CreateAsync(Board.Id, new CreateLabelRequest(Board.Id, NewLabelText, NewLabelColor));
 
         if (result.IsSuccess)
         {
@@ -220,6 +220,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
     private async Task SaveEditedLabel()
     {
         var result = await LabelsService.UpdateAsync(
+            Board.Id,
             EditLabel.Id, 
             new UpdateLabelRequest(
                 EditLabel.Id, 
@@ -250,7 +251,7 @@ public partial class CardLabelsSection : ComponentBase, IDisposable
     
     private async Task DeleteLabel()
     {
-        var result = await LabelsService.DeleteAsync(EditLabel.Id);
+        var result = await LabelsService.DeleteAsync(Board.Id, EditLabel.Id);
 
         if (result.IsSuccess)
         {

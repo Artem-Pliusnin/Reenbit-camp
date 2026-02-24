@@ -49,9 +49,9 @@ public class BoardsService : IBoardsService
         ));
     }
 
-    public async Task<Result<object>> UpdateAsync(int id, UpdateBoardRequest request)
+    public async Task<Result<object>> UpdateAsync(int boardId, UpdateBoardRequest request)
     {
-        var response = await _boardsApi.UpdateAsync(id, request);
+        var response = await _boardsApi.UpdateAsync(boardId, request);
 
         return response.HandleResult();
     }

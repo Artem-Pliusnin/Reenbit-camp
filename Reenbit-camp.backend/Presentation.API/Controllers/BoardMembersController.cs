@@ -40,7 +40,7 @@ public class BoardMembersController : AuthorizedContoller
         return Ok(result.Value);
     }
     
-    [HttpGet("/current")]
+    [HttpGet("current")]
     public async Task<IActionResult> GetCurrentAsync(
         [FromRoute] int boardId,
         CancellationToken cancellationToken)

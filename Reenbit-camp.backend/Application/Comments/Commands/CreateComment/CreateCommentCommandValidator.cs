@@ -18,7 +18,7 @@ internal class CreateCommentCommandValidator
         
         RuleFor(x => x.Text)
             .MinimumLength(CommentValidationConstants.CommentMinLength)
-            .MaximumLength(CommentValidationConstants.CommentMinLength)
+            .MaximumLength(CommentValidationConstants.CommentMaxLength)
             .NotEmpty();
     }
 }

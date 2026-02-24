@@ -21,4 +21,7 @@ public interface ISubscriptionsApi
     
     [Post("/Subscriptions/cancel")]
     Task<ApiResponse<object>> CancelSubscriptionAsync();
+    
+    [Post("/Subscriptions/resume")]
+    Task<ApiResponse<object>> ResumeSubscriptionAsync();
 }

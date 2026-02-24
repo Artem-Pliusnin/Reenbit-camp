@@ -14,4 +14,6 @@ public interface ISubscriptionsService
     Task<Result<string>> CreateCheckoutSessionAsync(CreateCheckoutRequest request);
     
     Task<Result<object>> CancelSubscriptionAsync();
+    
+    Task<Result<object>> ResumeSubscriptionAsync();
 }

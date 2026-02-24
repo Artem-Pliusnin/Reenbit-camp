@@ -33,7 +33,8 @@ public partial class SubscriptionPlanCard : ComponentBase
                 new CreateCheckoutRequest(
                     SubscriptionPlan.Id,
                     Navigation.ToAbsoluteUri("payment-success").ToString(),
-                    Navigation.BaseUri
+                    Navigation.BaseUri,
+                    Navigation.ToAbsoluteUri("subscription-change-success").ToString()
                 ));
 
         if (result.IsSuccess)
@@ -45,7 +46,8 @@ public partial class SubscriptionPlanCard : ComponentBase
     private async void OnCancelPlan()
     {
         if (UserSubscription.SubscriptionPlan.Id != SubscriptionPlan.Id
-            || IsFree)
+            || IsFree
+            || UserSubscription.CancelAtPeriodEnd)
         {
             return;
         }
@@ -56,6 +58,25 @@ public partial class SubscriptionPlanCard : ComponentBase
         if (result.IsSuccess)
         {
             UserSubscription.CancelAtPeriodEnd = true;
+            StateHasChanged();
+        }
+    }
+    
+    private async void OnResumePlan()
+    {
+        if (UserSubscription.SubscriptionPlan.Id != SubscriptionPlan.Id
+            || IsFree
+            || !UserSubscription.CancelAtPeriodEnd)
+        {
+            return;
+        }
+        
+        var result = await SubscriptionsService
+            .ResumeSubscriptionAsync();
+
+        if (result.IsSuccess)
+        {
+            UserSubscription.CancelAtPeriodEnd = false;
             StateHasChanged();
         }
     }

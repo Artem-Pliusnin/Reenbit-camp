@@ -61,7 +61,7 @@ public partial class CardMembersSection : ComponentBase
         TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
         
         var cardMemberResult = await CardMembersService
-            .GetByCardAsync(CardId);
+            .GetByCardAsync(Board.Id, CardId);
 
         if (cardMemberResult.IsSuccess)
         {
@@ -106,7 +106,7 @@ public partial class CardMembersSection : ComponentBase
     private async Task RemoveMember(CardMemberModel member)
     {
         var result = await CardMembersService
-            .DeleteAsync(member.Id);
+            .DeleteAsync(Board.Id, member.Id);
 
         if (result.IsSuccess)
         {
@@ -127,7 +127,7 @@ public partial class CardMembersSection : ComponentBase
     private async Task AddMember(UserModel user)
     {
         var result = await CardMembersService
-            .CreateAsync(new CreateCardMemberRequest(CardId, user.Id));
+            .CreateAsync(Board.Id, new CreateCardMemberRequest(CardId, user.Id));
 
         if (result.IsSuccess)
         {

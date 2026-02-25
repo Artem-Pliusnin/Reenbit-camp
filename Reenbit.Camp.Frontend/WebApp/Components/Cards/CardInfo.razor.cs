@@ -95,7 +95,7 @@ public partial class CardInfo : ComponentBase, IDisposable
         HomeHubConnection = HubConnectionManager.Get(HubType.HomeHub);
         TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
         
-        var result = await CardsService.GetInfoAsync(CardId);
+        var result = await CardsService.GetInfoAsync(Board.Id, CardId);
 
         if (result.IsSuccess)
         {
@@ -140,6 +140,7 @@ public partial class CardInfo : ComponentBase, IDisposable
             Card.Title = InputTitle;
 
             await CardsService.UpdateAsync(
+                Board.Id, 
                 CardId, 
                 new UpdateCardRequest(
                     Card.Id, 
@@ -184,6 +185,7 @@ public partial class CardInfo : ComponentBase, IDisposable
     private async Task OnChangeStatus()
     {
         await CardsService.UpdateStatusAsync(
+            Board.Id, 
             Card.Id, 
             new UpdateCardStatusRequest(
                 Card.Id, 
@@ -218,6 +220,7 @@ public partial class CardInfo : ComponentBase, IDisposable
         Card.Description = InputDescription;
         
         await CardsService.UpdateAsync(
+            Board.Id,
             CardId, 
             new UpdateCardRequest(
                 Card.Id, 
@@ -298,6 +301,7 @@ public partial class CardInfo : ComponentBase, IDisposable
     private async Task UpdateDates()
     {
         await CardsService.UpdateDeadlineAsync(
+            Board.Id,
             CardId,
             new UpdateCardDeadlineRequest(
                 Card.Id,

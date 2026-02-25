@@ -49,4 +49,11 @@ public class SubscriptionsService : ISubscriptionsService
 
         return response.HandleResult();
     }
+
+    public async Task<Result<object>> ResumeSubscriptionAsync()
+    {
+        var response = await _subscriptionsApi.ResumeSubscriptionAsync();
+
+        return response.HandleResult();
+    }
 }

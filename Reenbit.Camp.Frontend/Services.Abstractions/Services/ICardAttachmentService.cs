@@ -6,9 +6,9 @@ namespace Services.Abstractions.Services;
 
 public interface ICardAttachmentService
 {
-    Task<Result<List<CardAttachmentModel>>> GetByCardAsync(int cardId);
+    Task<Result<List<CardAttachmentModel>>> GetByCardAsync(int boardId, int cardId);
     
-    Task<Result<CardAttachmentModel>> CreateAsync(int cardId, StreamPart file);
+    Task<Result<CardAttachmentModel>> CreateAsync(int boardId, int cardId, StreamPart file);
     
-    Task<Result<object>> DeleteAsync(int id);
+    Task<Result<object>> DeleteAsync(int boardId, int id);
 }

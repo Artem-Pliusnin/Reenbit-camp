@@ -7,13 +7,14 @@ namespace Services.API;
 
 public interface ICardMembersApi
 {
-    [Get("/CardMembers/card/{id}")]
-    Task<ApiResponse<List<CardMemberDto>>> GetByCardAsync(int id);
+    [Get("/Board/{boardId}/CardMembers/card/{id}")]
+    Task<ApiResponse<List<CardMemberDto>>> GetByCardAsync(int boardId, int id);
 
-    [Post("/CardMembers")]
+    [Post("/Board/{boardId}/CardMembers")]
     Task<ApiResponse<CardMemberDto>> CreateAsync(
+        int boardId,
         [Body] CreateCardMemberRequest request);
     
-    [Delete("/CardMembers/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    [Delete("/Board/{boardId}/CardMembers/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int boardId, int id);
 }

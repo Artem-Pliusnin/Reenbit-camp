@@ -339,6 +339,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     { 
         var result = await LabelsService
             .CreateAsync(
+                BoardId,
                 new CreateLabelRequest(
                     Board.Id, 
                     NewLabelText, 
@@ -360,6 +361,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     private async Task SaveEditedLabel()
     {
         var result = await LabelsService.UpdateAsync(
+            BoardId,
             EditLabel.Id, 
             new UpdateLabelRequest(
                 EditLabel.Id, 
@@ -383,7 +385,7 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     
     private async Task DeleteLabel()
     {
-        var result = await LabelsService.DeleteAsync(EditLabel.Id);
+        var result = await LabelsService.DeleteAsync(BoardId, EditLabel.Id);
 
         if (result.IsSuccess)
         {

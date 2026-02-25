@@ -21,25 +21,25 @@ public class CardMembersService : ICardMembersService
         _mapper = mapper; 
     }
     
-    public async Task<Result<List<CardMemberModel>>> GetByCardAsync(int cardId)
+    public async Task<Result<List<CardMemberModel>>> GetByCardAsync(int boardId, int cardId)
     {
-        var response = await _cardMemnbersApi.GetByCardAsync(cardId);
+        var response = await _cardMemnbersApi.GetByCardAsync(boardId, cardId);
 
         return response.HandleResultWithMapping(content 
             => _mapper.Map<List<CardMemberModel>>(content));
     }
 
-    public async Task<Result<CardMemberModel>> CreateAsync(CreateCardMemberRequest request)
+    public async Task<Result<CardMemberModel>> CreateAsync(int boardId, CreateCardMemberRequest request)
     {
-        var response = await _cardMemnbersApi.CreateAsync(request);
+        var response = await _cardMemnbersApi.CreateAsync(boardId, request);
         
         return response.HandleResultWithMapping(content 
             => _mapper.Map<CardMemberModel>(content));
     }
 
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<object>> DeleteAsync(int boardId, int id)
     {
-        var response = await _cardMemnbersApi.DeleteAsync(id);
+        var response = await _cardMemnbersApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

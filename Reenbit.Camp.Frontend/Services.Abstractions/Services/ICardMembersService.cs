@@ -6,9 +6,9 @@ namespace Services.Abstractions.Services;
 
 public interface ICardMembersService
 {
-    Task<Result<List<CardMemberModel>>> GetByCardAsync(int cardId);
+    Task<Result<List<CardMemberModel>>> GetByCardAsync(int boardId, int cardId);
     
-    Task<Result<CardMemberModel>> CreateAsync(CreateCardMemberRequest request);
+    Task<Result<CardMemberModel>> CreateAsync(int boardId, CreateCardMemberRequest request);
     
-    Task<Result<object>> DeleteAsync(int id);
+    Task<Result<object>> DeleteAsync(int boardId, int id);
 }

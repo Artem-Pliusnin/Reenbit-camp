@@ -21,3 +21,71 @@
         </div>
     </div>
 </div>
+
+<TelerikDialog @bind-Visible=@IsDialogOpen
+               Width="24rem"
+               Class="upgrade-dialog">
+
+    <DialogTitle>
+        <div class="upgrade-title">
+            <TelerikSvgIcon Icon=@Telerik.SvgIcons.SvgIcon.Star
+                            Class="upgrade-crown" />
+            <span>Upgrade to continue</span>
+        </div>
+    </DialogTitle>
+
+    <DialogContent>
+        <div class="upgrade-content">
+            <p class="mb-2">
+                You have reached the maximum number of boards
+                available in your current plan.
+            </p>
+
+            <p class="mb-0 text-muted">
+                Upgrade your subscription to restore the board
+                and unlock additional features.
+            </p>
+        </div>
+    </DialogContent>
+
+    <DialogButtons>
+        <TelerikButton OnClick=@(() => IsDialogOpen = false)
+                       FillMode="ButtonFillMode.Flat"
+                       ThemeColor=@ThemeConstants.Button.ThemeColor.Base>
+            Later
+        </TelerikButton>
+
+        <TelerikButton OnClick=@NavigateToPlans
+                       ThemeColor=@ThemeConstants.Button.ThemeColor.Primary>
+            Upgrade Plan
+        </TelerikButton>
+    </DialogButtons>
+
+</TelerikDialog>
+
+<style>
+    .upgrade-dialog .upgrade-content {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.5rem 0;
+    }
+
+    .upgrade-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+    }
+
+    .upgrade-crown {
+        width: 2rem;
+        height: 2rem;
+        color: #E6A700;
+    }
+    
+    .upgrade-dialog p {
+        font-size: 0.95rem;
+    }
+</style>

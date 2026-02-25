@@ -2,6 +2,7 @@ using AutoMapper;
 using Domain.Constants.HubConstants;
 using Domain.DTOs.Cards;
 using Domain.Models.BoardMembers;
+using Domain.Models.Boards;
 using Domain.Models.Comments;
 using Domain.Models.Users;
 using Domain.Requests.Comments;
@@ -17,6 +18,9 @@ namespace WebApp.Components.Cards;
 
 public partial class CardComments : ComponentBase, IDisposable
 {
+    [CascadingParameter(Name="Board")]
+    public BoardInfoModel Board { get; set; } = default!;
+    
     [CascadingParameter(Name="CurrentUser")]
     public BoardMemberModel CurrentUser { get; set; } = default!;
     
@@ -49,7 +53,7 @@ public partial class CardComments : ComponentBase, IDisposable
         TaskHubConnection = HubConnectionManager.Get(HubType.TaskHub);
         
         var commentsResult = await CommentsService
-            .GetByCardAsync(CardId);
+            .GetByCardAsync(Board.Id, CardId);
 
         if (commentsResult.IsSuccess)
         {
@@ -82,7 +86,7 @@ public partial class CardComments : ComponentBase, IDisposable
         if (!string.IsNullOrWhiteSpace(InputComment))
         {
             var result = await CommentsService
-                .CreateAsync(new CreateCommentRequest(CardId, InputComment));
+                .CreateAsync(Board.Id, new CreateCommentRequest(CardId, InputComment));
 
             if (result.IsSuccess)
             {

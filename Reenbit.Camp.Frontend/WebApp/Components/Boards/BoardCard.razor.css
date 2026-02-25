@@ -4,6 +4,7 @@
     min-height: 120px;
     cursor: pointer;
     transition: transform .1s ease, box-shadow .1s ease;
+    position: relative;
 }
 
 .board-card-blue {
@@ -37,4 +38,35 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.board-overlay-full {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: rgba(40, 40, 40, 0.4);
+    backdrop-filter: blur(1px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.overlay-content {
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+
+.overlay-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.overlay-subtitle {
+    width: 100%;
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 0.3rem;
+    background-color: darkorange;
 }

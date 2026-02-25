@@ -50,6 +50,10 @@
                             Ends on
                             <strong>@UserSubscription.CurrentPeriodEnd?.ToLocalTime().ToString("dd.MM.yyyy")</strong>
                         </div>
+                        <TelerikButton Class="plan-button cancel-btn"
+                                       OnClick=@OnResumePlan>
+                            Resume plan
+                        </TelerikButton>
                     }
                     else
                     {

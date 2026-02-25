@@ -19,9 +19,11 @@ public class InvitationsService : IInvitationsService
         _mapper = mapper; 
     }
     
-    public async Task<Result<InvitationModel>> CreateAsync(CreateInvitationRequest request)
+    public async Task<Result<InvitationModel>> CreateAsync(
+        int boardId, 
+        CreateInvitationRequest request)
     {
-        var response = await _invitationApi.CreateAsync(request);
+        var response = await _invitationApi.CreateAsync(boardId, request);
         
         return response.HandleResultWithMapping(content 
             => _mapper.Map<InvitationModel>(content));
@@ -57,9 +59,9 @@ public class InvitationsService : IInvitationsService
         return response.HandleResult();
     }
     
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<object>> DeleteAsync(int boardId, int id)
     {
-        var response = await _invitationApi.DeleteAsync(id);
+        var response = await _invitationApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

@@ -19,32 +19,32 @@ public class CommentsService : ICommentsService
         _mapper = mapper;
     }
     
-    public async Task<Result<List<CommentModel>>> GetByCardAsync(int cardId)
+    public async Task<Result<List<CommentModel>>> GetByCardAsync(int boardId, int cardId)
     {
-        var response = await _commentsApi.GetByCardAsync(cardId);
+        var response = await _commentsApi.GetByCardAsync(boardId, cardId);
 
         return response.HandleResultWithMapping(content 
             => _mapper.Map<List<CommentModel>>(content));
     }
 
-    public async Task<Result<CommentModel>> CreateAsync(CreateCommentRequest request)
+    public async Task<Result<CommentModel>> CreateAsync(int boardId, CreateCommentRequest request)
     {
-        var response = await _commentsApi.CreateAsync(request);
+        var response = await _commentsApi.CreateAsync(request, boardId);
         
         return response.HandleResultWithMapping(content 
             => _mapper.Map<CommentModel>(content));
     }
 
-    public async Task<Result<object>> UpdateAsync(int id, UpdateCommentRequest request)
+    public async Task<Result<object>> UpdateAsync(int boardId, int id, UpdateCommentRequest request)
     {
-        var response = await _commentsApi.UpdateAsync(request, id);
+        var response = await _commentsApi.UpdateAsync(request, boardId, id);
 
         return response.HandleResult();
     }
 
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<object>> DeleteAsync(int boardId, int id)
     {
-        var response = await _commentsApi.DeleteAsync(id);
+        var response = await _commentsApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Constants.HubConstants;
 using Domain.Models.BoardMembers;
+using Domain.Models.Boards;
 using Domain.Models.Comments;
 using Domain.Requests.Comments;
 using Domain.Responses.Comments;
@@ -15,6 +16,9 @@ namespace WebApp.Components.Comments;
 
 public partial class CommentRow : ComponentBase
 {
+    [CascadingParameter(Name="Board")]
+    public BoardInfoModel Board { get; set; } = default!;
+    
     [CascadingParameter(Name="CurrentUser")]
     public BoardMemberModel CurrentUser { get; set; } = default!;
     
@@ -60,7 +64,10 @@ public partial class CommentRow : ComponentBase
         if (!string.IsNullOrWhiteSpace(InputComment))
         {
             var result = await CommentsService
-                .UpdateAsync(Comment.Id, new UpdateCommentRequest(Comment.Id, InputComment));
+                .UpdateAsync(
+                    Board.Id, 
+                    Comment.Id, 
+                    new UpdateCommentRequest(Comment.Id, InputComment));
 
             if (result.IsSuccess)
             {
@@ -102,7 +109,7 @@ public partial class CommentRow : ComponentBase
 
     private async Task DeleteComment()
     {
-        var result = await CommentsService.DeleteAsync(Comment.Id);
+        var result = await CommentsService.DeleteAsync(Board.Id, Comment.Id);
 
         if (result.IsSuccess)
         {

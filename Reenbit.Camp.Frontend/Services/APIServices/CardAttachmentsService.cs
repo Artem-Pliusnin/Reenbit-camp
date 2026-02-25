@@ -19,25 +19,25 @@ public class CardAttachmentsService : ICardAttachmentService
         _mapper = mapper; 
     }
     
-    public async Task<Result<List<CardAttachmentModel>>> GetByCardAsync(int cardId)
+    public async Task<Result<List<CardAttachmentModel>>> GetByCardAsync(int boardId, int cardId)
     {
-        var response = await _cardAttachmentsApi.GetByCardAsync(cardId);
+        var response = await _cardAttachmentsApi.GetByCardAsync(boardId, cardId);
 
         return response.HandleResultWithMapping(content 
             => _mapper.Map<List<CardAttachmentModel>>(content));
     }
 
-    public async Task<Result<CardAttachmentModel>> CreateAsync(int cardId, StreamPart file)
+    public async Task<Result<CardAttachmentModel>> CreateAsync(int boardId, int cardId, StreamPart file)
     {
-        var response = await _cardAttachmentsApi.CreateAsync(cardId, file);
+        var response = await _cardAttachmentsApi.CreateAsync(boardId, cardId, file);
         
         return response.HandleResultWithMapping(content 
             => _mapper.Map<CardAttachmentModel>(content));
     }
 
-    public async Task<Result<object>> DeleteAsync(int id)
+    public async Task<Result<object>> DeleteAsync(int boardId, int id)
     {
-        var response = await _cardAttachmentsApi.DeleteAsync(id);
+        var response = await _cardAttachmentsApi.DeleteAsync(boardId, id);
 
         return response.HandleResult();
     }

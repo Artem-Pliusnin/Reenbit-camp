@@ -6,15 +6,16 @@ namespace Services.API;
 
 public interface ICardAttachmentsApi
 {
-    [Get("/CardAttachments/card/{id}")]
-    Task<ApiResponse<List<CardAttachmentDto>>> GetByCardAsync(int id);
+    [Get("/Board/{boardId}/CardAttachments/card/{id}")]
+    Task<ApiResponse<List<CardAttachmentDto>>> GetByCardAsync(int boardId, int id);
 
     [Multipart]
-    [Post("/CardAttachments")]
+    [Post("/Board/{boardId}/CardAttachments")]
     Task<ApiResponse<CardAttachmentDto>> CreateAsync(
+        int boardId,
         [AliasAs("cardId")] int cardId,
         [AliasAs("file")] StreamPart file);
     
-    [Delete("/CardAttachments/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(int id);
+    [Delete("/Board/{boardId}/CardAttachments/{id}")]
+    Task<ApiResponse<object>> DeleteAsync(int boardId, int id);
 }

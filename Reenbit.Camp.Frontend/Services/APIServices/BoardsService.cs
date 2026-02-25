@@ -1,4 +1,6 @@
+using System.Text.Json;
 using AutoMapper;
+using Domain.DTOs.Boards;
 using Domain.Models.Boards;
 using Domain.Requests.Boards;
 using Domain.Responses.Boards;
@@ -21,12 +23,12 @@ public class BoardsService : IBoardsService
         _mapper = mapper;
     }
     
-    public async Task<Result<BoardModel>> CreateAsync(CreateBoardRequest request)
+    public async Task<Result<BoardCardModel>> CreateAsync(CreateBoardRequest request)
     {
         var response = await _boardsApi.CreateAsync(request);
         
         return response.HandleResultWithMapping(content 
-            => _mapper.Map<BoardModel>(content));
+            => _mapper.Map<BoardCardModel>(content));
     }
     
     public async Task<Result<BoardInfoModel>> GetInfoAsync(int boardId)
@@ -37,21 +39,21 @@ public class BoardsService : IBoardsService
             => _mapper.Map<BoardInfoModel>(content));
     }
 
-    public async Task<Result<PaginationDto<BoardModel>>> GetByUserAsync(BoardsFilterModel filter)
+    public async Task<Result<PaginationDto<BoardCardModel>>> GetByUserAsync(BoardsFilterModel filter)
     {
         var response = await _boardsApi.GetByUserAsync(filter);
 
         return response.HandleResultWithMapping(content 
-            => new PaginationDto<BoardModel>(
-            _mapper.Map<List<BoardModel>>(content.Dtos),
+            => new PaginationDto<BoardCardModel>(
+            _mapper.Map<List<BoardCardModel>>(content.Dtos),
             content.CurrentPage,
             content.TotalPages
         ));
     }
 
-    public async Task<Result<object>> UpdateAsync(int id, UpdateBoardRequest request)
+    public async Task<Result<object>> UpdateAsync(int boardId, UpdateBoardRequest request)
     {
-        var response = await _boardsApi.UpdateAsync(id, request);
+        var response = await _boardsApi.UpdateAsync(boardId, request);
 
         return response.HandleResult();
     }

@@ -14,8 +14,10 @@
                     </header>
 
                     <main>
-                        <CascadingValue Name="NavMenu" Value=@navMenuRef>
-                            @Body
+                        <CascadingValue Name="UserId" Value=@GetUserId(context.User)>
+                            <CascadingValue Name="NavMenu" Value=@navMenuRef>
+                                @Body
+                            </CascadingValue>
                         </CascadingValue>
                     </main>
                 </TelerikRootComponent>

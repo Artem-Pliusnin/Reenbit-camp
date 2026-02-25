@@ -120,8 +120,10 @@
                     </div>
 
                     <div class="col-12 col-lg-5 p-0 window-section">
-                        <CascadingValue Name="CurrentUser" Value=@CurrentUser>
-                            <CardComments CardId=@Card.Id></CardComments>
+                        <CascadingValue Name="Board" Value=@Board>
+                            <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                                <CardComments CardId=@Card.Id></CardComments>
+                            </CascadingValue>
                         </CascadingValue>
                     </div>
                 </div>

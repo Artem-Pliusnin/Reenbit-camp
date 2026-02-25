@@ -113,12 +113,28 @@ window.webrtc = {
         await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     },
 
-    getUserMedia: async () => {
-        let stream =  await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        });
-        
+    getMediaDevices: async () => {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        return devices.map(device => ({
+            deviceId: device.deviceId,
+            kind: device.kind,
+            label: device.label || `${device.kind} ${device.deviceId.substring(0, 5)}`,
+            groupId: device.groupId
+        }));
+    },
+
+    getUserMedia: async (videoDeviceId = null, audioDeviceId = null) => {
+        const constraints = {
+            video: videoDeviceId
+                ? { deviceId: { exact: videoDeviceId } }
+                : true,
+            audio: audioDeviceId
+                ? { deviceId: { exact: audioDeviceId } }
+                : true
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
         return stream;
     },
 
@@ -128,6 +144,52 @@ window.webrtc = {
         video.playsInline = true;
         
         video.srcObject = stream;
+    },
+
+    getVideoTrack: async (deviceId) => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: deviceId } }
+        });
+        return stream.getVideoTracks()[0];
+    },
+
+    getAudioTrack: async (deviceId) => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { deviceId: { exact: deviceId } }
+        });
+        return stream.getAudioTracks()[0];
+    },
+
+    replaceVideoTrack:  (stream, newTrack) => {
+        const oldTrack = stream.getVideoTracks()[0];
+        if (oldTrack) {
+            stream.removeTrack(oldTrack);
+            oldTrack.stop();
+        }
+        stream.addTrack(newTrack);
+        
+        const localVideo = document.getElementById('localVideo');
+        if (localVideo) {
+            localVideo.srcObject = stream;
+        }
+    },
+    
+    replaceAudioTrack: (stream, newTrack) => {
+        const oldTrack = stream.getAudioTracks()[0];
+        if (oldTrack) {
+            stream.removeTrack(oldTrack);
+            oldTrack.stop();
+        }
+        stream.addTrack(newTrack);
+    },
+    
+    replaceTrackInPeer:(peerConnection, newTrack) => {
+        const sender = peerConnection.getSenders()
+            .find(s => s.track && s.track.kind === newTrack.kind);
+
+        if (sender) {
+            sender.replaceTrack(newTrack);
+        }
     },
 
     toggleLocalVideo: (stream, enabled) => {

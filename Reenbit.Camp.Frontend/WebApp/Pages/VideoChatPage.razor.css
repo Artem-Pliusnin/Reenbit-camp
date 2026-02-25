@@ -114,3 +114,39 @@
     background: rgba(255,255,255,0.3);
     border-radius: 0.2rem;
 }
+
+.device-settings-popup-content {
+    width: 100%;
+    background: rgba(255,255,255,0.3);
+    font-family: inherit;
+}
+
+.device-settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.device-settings-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #1f2937;
+}
+
+.device-settings-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+

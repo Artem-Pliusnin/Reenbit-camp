@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Services.Abstractions.Services;
 using Services.HubServices;
+using Telerik.Blazor.Components;
 
 namespace WebApp.Pages;
 
@@ -54,6 +55,16 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
 
     private bool IsLoading;
     
+    private List<MediaDeviceInfoModel> _videoDevices = new();
+    
+    private List<MediaDeviceInfoModel> _audioDevices = new();
+    
+    private string? _selectedVideoDeviceId;
+    
+    private string? _selectedAudioDeviceId;
+    
+    private TelerikPopover? PopoverRef { get; set; }
+    
     private string ScreenOwnerName
     {
         get
@@ -84,6 +95,8 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
         
         RegisterHubHandlers();
         
+        await LoadDevices();
+        
         await InitLocalMedia();
         
         await VideoChatHubConnection
@@ -106,7 +119,92 @@ public partial class VideoChatPage : ComponentBase, IAsyncDisposable
     private async Task InitLocalMedia()
     {
         _localStream = await JsRuntime.InvokeAsync<IJSObjectReference>(
-            "webrtc.getUserMedia");
+            "webrtc.getUserMedia", 
+            _selectedVideoDeviceId, 
+            _selectedAudioDeviceId);
+    }
+    
+    private async Task LoadDevices()
+    {
+        try
+        {
+            var devices = await JsRuntime
+                .InvokeAsync<MediaDeviceInfoModel[]>("webrtc.getMediaDevices");
+            
+            _videoDevices = devices.Where(d => d.Kind == "videoinput").ToList();
+            _audioDevices = devices.Where(d => d.Kind == "audioinput").ToList();
+            
+            _selectedVideoDeviceId = _videoDevices.FirstOrDefault()?.DeviceId;
+            _selectedAudioDeviceId = _audioDevices.FirstOrDefault()?.DeviceId;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load devices: {ex.Message}");
+        }
+    }
+
+    private async Task OnChangeVideoDevice(string deviceId)
+    {
+        if (_selectedVideoDeviceId == deviceId)
+            return;
+
+        try
+        {
+            _selectedVideoDeviceId = deviceId;
+            
+            var newVideoTrack = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "webrtc.getVideoTrack", 
+                deviceId
+            );
+            
+            await JsRuntime.InvokeVoidAsync(
+                "webrtc.replaceVideoTrack", 
+                _localStream, 
+                newVideoTrack);
+            
+            foreach (var peer in _peers.Values)
+            {
+                await JsRuntime.InvokeVoidAsync(
+                    "webrtc.replaceTrackInPeer", 
+                    peer, 
+                    newVideoTrack);
+            }
+            
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error changing video device: {ex.Message}");
+        }
+    }
+    
+    private async Task OnChangeAudioDevice(string deviceId)
+    {
+        if (_selectedAudioDeviceId == deviceId)
+            return;
+
+        try
+        {
+            _selectedAudioDeviceId = deviceId;
+            
+            var newAudioTrack = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "webrtc.getAudioTrack", 
+                deviceId
+            );
+            
+            await JsRuntime.InvokeVoidAsync("webrtc.replaceAudioTrack", _localStream, newAudioTrack);
+            
+            foreach (var peer in _peers.Values)
+            {
+                await JsRuntime.InvokeVoidAsync("webrtc.replaceTrackInPeer", peer, newAudioTrack);
+            }
+            
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error changing audio device: {ex.Message}");
+        }
     }
     
     private async Task ToggleVideo()

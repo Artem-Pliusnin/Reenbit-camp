@@ -31,44 +31,45 @@ else
                        maxlength=50
                        autofocus />
             }
-            <TelerikDropDownButton
-                Class="dropdown-btn"
-                FillMode=@ThemeConstants.DropDownButton.FillMode.Flat>
-                <DropDownButtonContent>...</DropDownButtonContent>
+            <div class="d-flex flex-row gap-2 align-items-center">
+                <TelerikButton Icon=@SvgIcon.Whatsapp
+                               Class="meeting-btn"
+                               OnClick=@RedirectToMeeting>
+                    Meeting
+                </TelerikButton>
+                
+                <TelerikDropDownButton
+                    Class="dropdown-btn"
+                    FillMode=@ThemeConstants.DropDownButton.FillMode.Flat>
+                    <DropDownButtonContent>...</DropDownButtonContent>
 
-                <DropDownButtonItems>
-                    <DropDownButtonItem
-                        Icon=@Telerik.SvgIcons.SvgIcon.User
-                        OnClick=@OpenMembersDialog>
-                        Members
-                    </DropDownButtonItem>
-                    
-                    @if(CheckManageLabelsPermision())
-                    {
+                    <DropDownButtonItems>
                         <DropDownButtonItem
-                            Icon=@Telerik.SvgIcons.SvgIcon.Highlight
-                            OnClick=@OpenLabelsMenu>
-                            Labels
+                            Icon=@Telerik.SvgIcons.SvgIcon.User
+                            OnClick=@OpenMembersDialog>
+                            Members
                         </DropDownButtonItem>
-                    }
-                    <DropDownButtonItem
-                        Icon=@Telerik.SvgIcons.SvgIcon.Whatsapp
-                        OnClick=@RedirectToMeeting>
-                        Meeting
-                    </DropDownButtonItem>
-                    @if (CheckArchiveBoardPermision())
-                    {
-                        <DropDownButtonItem
-                            Icon=@Telerik.SvgIcons.SvgIcon.FileZip
-                            OnClick=@ArchiveBoard
-                            Class="btn-danger">
-                            Archive
-                        </DropDownButtonItem>
-                    }
-
-                </DropDownButtonItems>
-
-            </TelerikDropDownButton>
+                        
+                        @if(CheckManageLabelsPermision())
+                        {
+                            <DropDownButtonItem
+                                Icon=@Telerik.SvgIcons.SvgIcon.Highlight
+                                OnClick=@OpenLabelsMenu>
+                                Labels
+                            </DropDownButtonItem>
+                        }
+                        @if (CheckArchiveBoardPermision())
+                        {
+                            <DropDownButtonItem
+                                Icon=@Telerik.SvgIcons.SvgIcon.FileZip
+                                OnClick=@ArchiveBoard
+                                Class="btn-danger">
+                                Archive
+                            </DropDownButtonItem>
+                        }
+                    </DropDownButtonItems>
+                </TelerikDropDownButton>
+            </div>
         </div>
 
         <div class="board-content">
@@ -363,5 +364,17 @@ else
 
     .label-btn:hover{
         background-color: rgb(240, 240, 240);
+    }
+
+    .meeting-btn{
+        background-color: white;
+        color: #176B87;
+        border: 1px solid #176B87;
+        font-weight: 500;
+    }
+
+    .meeting-btn:hover{
+        background-color: #176B87;
+        color: white;
     }
 </style>

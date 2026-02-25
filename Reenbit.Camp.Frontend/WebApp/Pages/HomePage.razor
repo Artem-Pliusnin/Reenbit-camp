@@ -17,7 +17,7 @@
                 <div class="row g-3">
                     @foreach (var board in Boards)
                     {
-                        <BoardCard Board=@board IsNew=@(CreatedBoards.Contains(board.Id)) />
+                        <BoardCard Board=@board IsNew=@(CreatedBoards.Contains(board.Id)) CurrentUserId=@UserId />
                     }
                 </div>
             }

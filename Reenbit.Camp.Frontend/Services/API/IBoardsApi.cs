@@ -1,3 +1,4 @@
+using Domain.DTOs.Boards;
 using Domain.Models.Boards;
 using Domain.Requests.Boards;
 using Domain.Responses.Boards;
@@ -9,11 +10,11 @@ namespace Services.API;
 public interface IBoardsApi
 {
     [Post("/Boards")]
-    Task<ApiResponse<BoardDto>> CreateAsync(
+    Task<ApiResponse<BoardCardDto>> CreateAsync(
         [Body] CreateBoardRequest request);
 
     [Get("/Boards")]
-    Task<ApiResponse<PaginationDto<BoardDto>>> GetByUserAsync(
+    Task<ApiResponse<PaginationDto<BoardCardDto>>> GetByUserAsync(
         [Query] BoardsFilterModel filter);
     
     [Get("/Boards/{boardId}")]

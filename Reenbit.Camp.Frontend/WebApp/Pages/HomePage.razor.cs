@@ -9,6 +9,9 @@ namespace WebApp.Pages;
 
 public partial class HomePage : ComponentBase, IDisposable
 {
+    [CascadingParameter(Name="UserId")]
+    public int UserId { get; set; }
+    
     private NewBoardModel newBoard = new();
     
     private BoardsFilterModel filter = new();
@@ -21,7 +24,7 @@ public partial class HomePage : ComponentBase, IDisposable
     [Inject]
     public NavigationManager Navigation { get; set; } = default!;
 
-    private List<BoardModel> Boards = new List<BoardModel>();
+    private List<BoardCardModel> Boards = new List<BoardCardModel>();
     
     private List<int> CreatedBoards = new List<int>();
     
@@ -95,8 +98,9 @@ public partial class HomePage : ComponentBase, IDisposable
     {
         var result = await BoardsService.CanCreateBoardAsync();
 
-        if (result.IsSuccess)
+        if(result.IsSuccess)
         {
+            Console.WriteLine(result.Value);
             CanCreateBoard = result.Value;
         }
         else

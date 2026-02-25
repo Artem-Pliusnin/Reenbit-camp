@@ -37,7 +37,6 @@ public partial class NavMenu
         if (result.IsSuccess)
         { 
             CurrentUser = result.Value;
-            Console.WriteLine(JsonSerializer.Serialize(CurrentUser));
             isLoadinUser = false;
         }
     }

@@ -6,4 +6,4 @@ namespace Application.Boards.Commands.CreateBoard;
 public sealed record CreateBoardCommand(
     int UserId,
     string Title) 
-    : ICommand<BoardDto>;
+    : ICommand<BoardCardDto>;

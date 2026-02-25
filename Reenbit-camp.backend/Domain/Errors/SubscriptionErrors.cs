@@ -28,4 +28,8 @@ public static class SubscriptionErrors
     public static readonly Error BoardsLimitReached = new(
         "Subscription.BoardsLimitReached",
         "User reached the limit of board.");
+    
+    public static readonly Error UpgradeFailed = new(
+        "Subscription.UpgradeFailed",
+        "Failed to upgrade the subscription.");
 }

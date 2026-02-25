@@ -25,7 +25,7 @@ public class BoardRepository :
     {
         var query = _dbSet
             .Include(b => b.Members)
-            .Where(b => (b.Status == BoardStatus.Active) 
+            .Where(b => (b.Status == BoardStatus.Active || b.Status == BoardStatus.Blocked) 
                         && (b.Members.Any(m => m.UserId == userId)));
 
         if (!string.IsNullOrWhiteSpace(filter.Title))
@@ -36,7 +36,10 @@ public class BoardRepository :
 
         if (filter.OnlyMyBoards)
         {
-            query = query.Where(b => b.CreatedBy == userId);
+            query = query.Where(b => 
+                b.Members.Any(bm => 
+                    bm.UserId == userId 
+                    && bm.Role == BoardRole.Owner));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -137,12 +140,25 @@ public class BoardRepository :
             .ToListAsync(cancellationToken);
     }
 
-    public Task<int> CountUserOwnedBoardsAsync(
+    public async Task<int> CountActiveUserOwnedBoardsAsync(
         int userId, 
         CancellationToken cancellationToken = default)
     {
-        return _dbSet.CountAsync(b => 
-            b.Members.Any(m => m.UserId == userId && m.Role == BoardRole.Owner),
+        return await _dbSet.CountAsync(b => 
+            b.Members.Any(m => m.UserId == userId && m.Role == BoardRole.Owner) 
+             && b.Status == BoardStatus.Active,
             cancellationToken);
+    }
+
+    public async Task<List<Board>> GetUserBoardsForStatusChangeAsync(
+        int userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Where(b => 
+            b.Members.Any(m => m.UserId == userId && m.Role == BoardRole.Owner) 
+            && (b.Status == BoardStatus.Active || b.Status == BoardStatus.Blocked))
+            .OrderBy(b => b.CreationDate)
+            .ThenBy(b => b.Id)
+            .ToListAsync(cancellationToken);
     }
 }

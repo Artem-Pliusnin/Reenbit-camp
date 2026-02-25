@@ -14,8 +14,5 @@ internal class UpdateCardStatusCommandValidator
         RuleFor(x => x.UserId)
             .GreaterThan(0)
             .NotEmpty();
-        
-        RuleFor(x => x.IsCompleted)
-            .NotEmpty();
     }
 }

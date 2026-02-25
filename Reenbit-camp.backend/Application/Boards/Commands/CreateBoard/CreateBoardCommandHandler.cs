@@ -8,7 +8,7 @@ using Domain.Shared;
 
 namespace Application.Boards.Commands.CreateBoard;
 
-internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, BoardDto>
+internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, BoardCardDto>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, B
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<BoardDto>> Handle(
+    public async Task<Result<BoardCardDto>> Handle(
         CreateBoardCommand request,
         CancellationToken cancellationToken)
     {
@@ -28,19 +28,19 @@ internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, B
             var userSubscriptionRepository = _unitOfWork.GetRepository<IUserSubscriptionsRepository>();
             
             var userBoardsCount = await boardRepository
-                .CountUserOwnedBoardsAsync(request.UserId, cancellationToken);
+                .CountActiveUserOwnedBoardsAsync(request.UserId, cancellationToken);
             
             var userSubscription = await userSubscriptionRepository
                 .GetUserSubscription(request.UserId, cancellationToken);
 
             if (userSubscription == null)
             {
-                return Result.Failure<BoardDto>(SubscriptionErrors.UserDataNotFound);
+                return Result.Failure<BoardCardDto>(SubscriptionErrors.UserDataNotFound);
             }
 
             if (userBoardsCount >= userSubscription.SubscriptionPlan.BoardsLimit)
             {
-                return Result.Failure<BoardDto>(SubscriptionErrors.BoardsLimitReached);
+                return Result.Failure<BoardCardDto>(SubscriptionErrors.BoardsLimitReached);
             }
 
             var board = new Board()
@@ -61,10 +61,12 @@ internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, B
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var response = new BoardDto()
+            var response = new BoardCardDto()
             {
                 Id = board.Id,
                 Title = board.Title,
+                Status = board.Status,
+                OwnerId = request.UserId
             };
 
             return response;
@@ -72,7 +74,7 @@ internal class CreateBoardCommandHandler : ICommandHandler<CreateBoardCommand, B
         }
         catch
         {
-            return Result.Failure<BoardDto>(BoardErrors.CreateBoardError);
+            return Result.Failure<BoardCardDto>(BoardErrors.CreateBoardError);
         }
     }
 }

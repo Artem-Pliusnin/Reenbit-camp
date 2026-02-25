@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Application.Subscriptions.Commands.CancelSubscription;
 using Application.Subscriptions.Commands.CreateCheckoutSession;
+using Application.Subscriptions.Commands.ResumeSubscription;
 using Application.Subscriptions.Queries.GetSubscriptionPlans;
 using Application.Subscriptions.Queries.GetUserSubscription;
 using Domain.DTOs.Comments;
@@ -74,7 +75,8 @@ public class SubscriptionsController : AuthorizedContoller
             userId,
             request.PlanId,
             request.SuccessUrl,
-            request.CancelUrl);
+            request.CancelUrl,
+            request.ChangeUrl);
 
         var result = await Sender.Send(command);
 
@@ -96,6 +98,26 @@ public class SubscriptionsController : AuthorizedContoller
         }
 
         var result = await Sender.Send(new CancelSubscriptionCommand(userId));
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+
+        }
+
+        return Ok();
+    }
+    
+    [HttpPost("resume")]
+    public async Task<IActionResult> ResumeSubscriptionAsync()
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+
+        var result = await Sender.Send(new ResumeSubscriptionCommand(userId));
 
         if (result.IsFailure)
         {

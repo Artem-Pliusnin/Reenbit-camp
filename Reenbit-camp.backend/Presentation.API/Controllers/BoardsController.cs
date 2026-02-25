@@ -50,7 +50,7 @@ public class BoardsController : AuthorizedContoller
 
         var command = new CreateBoardCommand(userId, request.Title);
         
-        Result<BoardDto> result = await Sender.Send(command, cancellationToken);
+        Result<BoardCardDto> result = await Sender.Send(command, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -79,7 +79,7 @@ public class BoardsController : AuthorizedContoller
                 queryParameters.Page,
                 queryParameters.PageSize));
         
-        Result<PaginationDto<BoardDto>> result = await Sender.Send(query, cancellationToken);
+        Result<PaginationDto<BoardCardDto>> result = await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -187,7 +187,13 @@ public class BoardsController : AuthorizedContoller
         [FromRoute] int boardId,
         CancellationToken cancellationToken)
     {
-        var command = new RestoreBoardCommand(boardId);
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var command = new RestoreBoardCommand(boardId, userId);
         
         Result result = await Sender.Send(command, cancellationToken);
         
@@ -218,6 +224,6 @@ public class BoardsController : AuthorizedContoller
             return HandleFailure(result);
         }
         
-        return Ok();
+        return Ok(result.Value);
     }
 }

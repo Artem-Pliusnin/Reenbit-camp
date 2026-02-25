@@ -1,6 +1,7 @@
 using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
 using Application.Behaviors;
-using Application.Mapping;
+using Application.InternalServices;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +38,8 @@ public static class DependencyInjection
             .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<,>)))
             .AsImplementedInterfaces()
             .WithScopedLifetime());
+        
+        services.AddScoped<IBoardsStatusesService, BoardsStatusesService>();
         
         return services;
     }

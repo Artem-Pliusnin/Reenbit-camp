@@ -1,6 +1,7 @@
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
@@ -57,6 +58,27 @@ internal class CreateCheckoutSessionCommandHandler
         {
             return Result.Failure<string>(SubscriptionErrors.AlreadyOnThisPlan);
         }
+        
+        if (!string.IsNullOrEmpty(currentSubscription.StripeSubscriptionId) &&
+            currentSubscription.SubscriptionStatus == SubscriptionStatus.Active)
+        {
+            try
+            {
+                await _stripeService.UpdateSubscriptionWithProrationAsync(
+                    currentSubscription.StripeSubscriptionId,
+                    plan.StripePriceId!,
+                    cancellationToken);
+                
+                currentSubscription.SubscriptionPlanId = plan.Id;
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                
+                return request.ChangeUrl;
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<string>(SubscriptionErrors.UpgradeFailed);
+            }
+        }
 
         var customerId = currentSubscription.StripeCustomerId;
         if (string.IsNullOrEmpty(customerId))
@@ -73,7 +95,7 @@ internal class CreateCheckoutSessionCommandHandler
         
         var sessionUrl = await _stripeService.CreateCheckoutSessionAsync(
             customerId,
-            plan.StripePriceId,
+            plan.StripePriceId!,
             request.SuccessUrl,
             request.CancelUrl,
             new Dictionary<string, string>

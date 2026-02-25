@@ -34,7 +34,7 @@ internal class CanCreateBoardQueryHandler : IQueryHandler<CanCreateBoardQuery, b
         }
 
         var userBoardsCount = await boardsRepository
-            .CountUserOwnedBoardsAsync(request.UserId, cancellationToken);
+            .CountActiveUserOwnedBoardsAsync(request.UserId, cancellationToken);
         
         return userSubscription.SubscriptionPlan.BoardsLimit > userBoardsCount;
     }

@@ -28,6 +28,24 @@ public class RestoreBoardCommandHandler : ICommandHandler<RestoreBoardCommand>
         try
         {
             var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
+            var boardMemberRepository = _unitOfWork.GetRepository<IBoardMemberRepository>();
+            var userSubscriptionRepository = _unitOfWork.GetRepository<IUserSubscriptionsRepository>();
+            
+            var userBoardsCount = await boardRepository
+                .CountActiveUserOwnedBoardsAsync(request.UserId, cancellationToken);
+            
+            var userSubscription = await userSubscriptionRepository
+                .GetUserSubscription(request.UserId, cancellationToken);
+
+            if (userSubscription == null)
+            {
+                return Result.Failure(SubscriptionErrors.UserDataNotFound);
+            }
+
+            if (userBoardsCount >= userSubscription.SubscriptionPlan.BoardsLimit)
+            {
+                return Result.Failure(SubscriptionErrors.BoardsLimitReached);
+            }
 
             var board = await boardRepository
                 .GetByIdAsync(request.BoardId, cancellationToken);

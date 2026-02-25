@@ -6,5 +6,6 @@ public sealed record CreateCheckoutSessionCommand(
     int UserId,
     int SubscriptionPlanId,
     string SuccessUrl,
-    string CancelUrl
+    string CancelUrl,
+    string ChangeUrl
 ) : ICommand<string>;

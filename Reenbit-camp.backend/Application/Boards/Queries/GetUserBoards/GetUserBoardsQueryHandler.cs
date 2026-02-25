@@ -7,7 +7,8 @@ using Domain.Shared;
 
 namespace Application.Boards.Queries.GetUserBoards;
 
-internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, PaginationDto<BoardDto>>
+internal class GetUserBoardsQueryHandlerv 
+    : IQueryHandler<GetUserBoardsQuery, PaginationDto<BoardCardDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -18,7 +19,7 @@ internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, Pa
         _mapper = mapper;
     }
 
-    public async Task<Result<PaginationDto<BoardDto>>> Handle(
+    public async Task<Result<PaginationDto<BoardCardDto>>> Handle(
         GetUserBoardsQuery request, 
         CancellationToken cancellationToken)
     {
@@ -27,9 +28,9 @@ internal class GetUserBoardsQueryHandlerv : IQueryHandler<GetUserBoardsQuery, Pa
         var paginationDto = await boardRepository
             .GetByUserIdAsync(request.UserId, request.Filter, cancellationToken);
 
-        var boards = _mapper.Map<List<BoardDto>>(paginationDto.Dtos);
+        var boards = _mapper.Map<List<BoardCardDto>>(paginationDto.Dtos);
         
-        return new PaginationDto<BoardDto>()
+        return new PaginationDto<BoardCardDto>()
         {
             Dtos = boards,
             CurrentPage = paginationDto.CurrentPage,

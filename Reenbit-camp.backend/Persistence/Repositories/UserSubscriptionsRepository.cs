@@ -26,9 +26,10 @@ public class UserSubscriptionsRepository :
         string SubscriptionId, 
         CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(
-            us => us.StripeSubscriptionId == SubscriptionId, 
-            cancellationToken); 
+        return await _dbSet.Include(us => us.SubscriptionPlan)
+            .FirstOrDefaultAsync(
+                us => us.StripeSubscriptionId == SubscriptionId,
+                cancellationToken); 
     }
 
     public async Task<List<UserSubscription>> GetExpiredSubscriptionsAsync(

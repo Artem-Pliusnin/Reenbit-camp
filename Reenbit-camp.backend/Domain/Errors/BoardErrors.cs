@@ -8,6 +8,10 @@ public static class BoardErrors
         "Board.UpdateError",
         "Error occured while updating the board.");
     
+    public static readonly Error BoardIsNotActive = new(
+        "Board.BoardIsNotActive",
+        "Board with given Id is not active.");
+    
     public static readonly Error ArchiveBoardError = new(
         "Board.ArchiveBoard",
         "Error occured while archiving the board.");

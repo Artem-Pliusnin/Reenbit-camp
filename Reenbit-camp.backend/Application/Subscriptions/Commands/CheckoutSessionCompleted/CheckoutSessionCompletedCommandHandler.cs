@@ -10,19 +10,22 @@ namespace Application.Subscriptions.Commands.CheckoutSessionCompleted;
 internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<CheckoutSessionCompletedCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IStripeService _stripeService;
+    
+    private readonly IBoardsStatusesService _boardsStatusesService;
 
     public CheckoutSessionCompletedCommandHandler(
         IUnitOfWork unitOfWork, 
-        IStripeService stripeService)
+        IBoardsStatusesService boardsStatusesService)
     {
         _unitOfWork = unitOfWork;
-        _stripeService = stripeService;
+        _boardsStatusesService = boardsStatusesService;
     }
     
     public async Task<Result> Handle(CheckoutSessionCompletedCommand request, CancellationToken cancellationToken)
     {
         var userSubscriptionsRepository = _unitOfWork.GetRepository<IUserSubscriptionsRepository>();
+        var subscriptionsPlanRepository = _unitOfWork.GetRepository<ISubscriptionPlansRepository>();
+        
         var subscription = await userSubscriptionsRepository
             .GetUserSubscription(request.UserId, cancellationToken);
 
@@ -31,14 +34,10 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
             return Result.Failure(SubscriptionErrors.UserDataNotFound);
         }
         
-        /*string? oldSubscriptionId = String.Empty;
-        
-        if (!string.IsNullOrEmpty(subscription.StripeSubscriptionId) &&
-            subscription.StripeSubscriptionId != request.SubscriptionId &&
-            subscription.SubscriptionStatus == SubscriptionStatus.Active)
-        {
-            oldSubscriptionId = subscription.StripeSubscriptionId;
-        }*/
+        var newSubscription = await subscriptionsPlanRepository
+            .GetByIdAsync(
+                request.PlanId, 
+                cancellationToken);
         
         subscription.SubscriptionPlanId = request.PlanId;
         subscription.StripeSubscriptionId = request.SubscriptionId;
@@ -47,22 +46,11 @@ internal class CheckoutSessionCompletedCommandHandler : ICommandHandler<Checkout
         subscription.CurrentPeriodEnd = request.SubscriptionPeriodEnd;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        /*if(string.IsNullOrEmpty(oldSubscriptionId))
-        {
-            return Result.Success();
-        }
-
-        try
-        {
-            await _stripeService.CancelSubscriptionImmediatelyAsync(
-                oldSubscriptionId,
-                cancellationToken);
-        }
-        catch(Exception ex)
-        {
-            Console.WriteLine($"Error cancelling subscription {ex.Message}");
-        }*/
+        
+        await _boardsStatusesService
+            .UpdateUserBoardsStatuses(
+                request.UserId, 
+                newSubscription.BoardsLimit);
         
         return Result.Success();
     }

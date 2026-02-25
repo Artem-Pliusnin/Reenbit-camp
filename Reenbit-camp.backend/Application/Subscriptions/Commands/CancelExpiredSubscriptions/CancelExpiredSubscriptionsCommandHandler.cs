@@ -1,4 +1,5 @@
 using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
 using Domain.Enums;
 using Domain.Repositories;
 using Domain.Shared;
@@ -8,10 +9,14 @@ namespace Application.Subscriptions.Commands.CancelExpiredSubscriptions;
 internal class CancelExpiredSubscriptionsCommandHandler : ICommandHandler<CancelExpiredSubscriptionsCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBoardsStatusesService _boardsStatusesService;
 
-    public CancelExpiredSubscriptionsCommandHandler(IUnitOfWork unitOfWork)
+    public CancelExpiredSubscriptionsCommandHandler(
+        IUnitOfWork unitOfWork, 
+        IBoardsStatusesService boardsStatusesService)
     {
         _unitOfWork = unitOfWork;
+        _boardsStatusesService = boardsStatusesService;
     }
 
     public async Task<Result> Handle(CancelExpiredSubscriptionsCommand request, CancellationToken cancellationToken)
@@ -27,13 +32,16 @@ internal class CancelExpiredSubscriptionsCommandHandler : ICommandHandler<Cancel
         
         foreach (var subscription in userSubscriptions)
         {
-            subscription.SubscriptionPlanId = freePlan?.Id ?? 1;
+            subscription.SubscriptionPlanId = freePlan!.Id;
             subscription.SubscriptionStatus = SubscriptionStatus.Active;
             subscription.StripeSubscriptionId = null;
             subscription.CancelAtPeriodEnd = false;
             subscription.CurrentPeriodEnd = null;
             
             userSubscriptionsRepository.Update(subscription);
+            await _boardsStatusesService.UpdateUserBoardsStatuses(
+                subscription.UserId, 
+                freePlan.BoardsLimit);
         }
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);

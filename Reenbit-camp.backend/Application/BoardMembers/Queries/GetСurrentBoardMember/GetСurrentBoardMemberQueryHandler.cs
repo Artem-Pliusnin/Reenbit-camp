@@ -1,6 +1,8 @@
 using Application.Abstractions.Messaging;
 using AutoMapper;
 using Domain.DTOs.BoardMembers;
+using Domain.Enums;
+using Domain.Errors;
 using Domain.Repositories;
 using Domain.Shared;
 
@@ -22,6 +24,16 @@ internal class GetСurrentBoardMemberQueryHandler
         GetСurrentBoardMemberQuery request, 
         CancellationToken cancellationToken)
     {
+        var boardRepository = _unitOfWork.GetRepository<IBoardRepository>();
+        
+        var board = await boardRepository
+            .GetByIdAsync(request.BoardId, cancellationToken);
+
+        if (board.Status != BoardStatus.Active)
+        {
+            return Result.Failure<BoardMemberDto>(BoardErrors.BoardIsNotActive);
+        }
+        
         var boardMemberRepository = _unitOfWork.GetRepository<IBoardMemberRepository>();
         
         var boardMember = await boardMemberRepository

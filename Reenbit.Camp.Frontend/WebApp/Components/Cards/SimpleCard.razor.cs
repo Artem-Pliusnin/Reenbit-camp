@@ -27,6 +27,9 @@ public partial class SimpleCard : ComponentBase, IDisposable
     
     [Parameter, EditorRequired]
     public EventCallback<CardModel> OnDeleteCard { get; set; }
+    
+    [Parameter, EditorRequired]
+    public EventCallback<CardModel> OnUpdateCard { get; set; }
 
     [Inject] 
     private ICardsService CardsService { get; set; } = default!;
@@ -65,6 +68,8 @@ public partial class SimpleCard : ComponentBase, IDisposable
                     Card.Id,
                     Card.IsCompleted), 
                 Board.Id);
+        
+        await OnUpdateCard.InvokeAsync(Card);
     }
 
     private void OpenCard()
@@ -114,6 +119,8 @@ public partial class SimpleCard : ComponentBase, IDisposable
         Card.DueDate = updateCardModel.DueDate;
         Card.Labels = updateCardModel.Labels;
         Card.Members = updateCardModel.Members;
+        
+        await OnUpdateCard.InvokeAsync(Card);
 
         await InvokeAsync(StateHasChanged);
     }

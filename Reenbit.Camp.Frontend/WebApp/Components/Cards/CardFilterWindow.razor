@@ -1,0 +1,63 @@
+<div class="filter-panel">
+    <div class="card">
+        <EditForm Model=@filter class="card-body">
+            <h6 class="fw-semibold mb-2">
+                Card Filters
+                <i class="bi bi-funnel"></i>
+            </h6>
+
+            <input class="form-control mb-2"
+                   placeholder="Card title"
+                   @bind=@filter.Title
+                   @bind:event="oninput"
+                   @onkeyup=@ResetTimer />
+
+            <div class="form-check mb-2">
+                <InputCheckbox class="form-check-input"
+                               id="onlyMine"
+                               @bind-Value=@filter.OnlyAssignedToUser
+                               @bind-Value:after=@OnOnlyMineChanged />
+                <label class="form-check-label" for="onlyMine">
+                    Assigned to me
+                </label>
+            </div>
+
+            <TelerikMultiSelect Data=@AllLabels                                 
+                                @bind-Value=@SelectedLabels
+                                @bind-Value:after=@(() => OnLabelsChanged())
+                                ValueField="Id"
+                                Placeholder="Select labels..."
+                                AutoClose="false"
+                                Width="100%">
+                <ItemTemplate Context="label">
+                    <span class="label-row" style="background-color: @label.Color">@label.Text</span>
+                </ItemTemplate>
+                <TagTemplate Context="label">
+                    <span class="chosen-label-row" style="background-color: @label.Color">@label.Text</span>
+                </TagTemplate>
+            </TelerikMultiSelect>
+            
+        </EditForm>
+    </div>
+
+    <div class="cards-container"
+         @ref=@_scrollRef
+         @onscroll=@HandleScroll>
+
+        @foreach (var card in Cards)
+        {
+            <SimpleCard 
+                @key=@card.Id 
+                Card=@card 
+                OnDeleteCard=@RemoveCard 
+                OnUpdateCard=@UpdateCard></SimpleCard>
+        }
+
+        @if (isLoading)
+        {
+            <div class="w-100 h-100 d-flex justify-content-center align-items-center"> 
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        }
+    </div>
+</div>

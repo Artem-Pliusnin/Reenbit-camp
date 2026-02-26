@@ -27,6 +27,12 @@ public partial class BoardLists : ComponentBase, IDisposable
     [CascadingParameter(Name="CurrentUser")]
     public BoardMemberModel CurrentUser { get; set; } = default!;
     
+    [Parameter] 
+    public EventCallback<CardModel> OnCardUpdated { get; set; }
+    
+    [Parameter] 
+    public EventCallback<int> OnCardDeleted { get; set; }
+    
     [Inject] 
     public IListsService ListsService { get; set; } = default!;
     
@@ -337,7 +343,7 @@ public partial class BoardLists : ComponentBase, IDisposable
     }
 
     
-    private void RemoveCard(CardModel card)
+    private async Task RemoveCard(CardModel card)
     {
         var list = Board.Lists
             .FirstOrDefault(l => l.Cards.Any(c => c.Id == card.Id));
@@ -350,11 +356,13 @@ public partial class BoardLists : ComponentBase, IDisposable
         list.Cards.Remove(card);
         
         ListBoxRefs[list.Id].Rebind();
+        
+        await OnCardDeleted.InvokeAsync(card.Id);
 
         StateHasChanged();
     }
     
-    private void HandelRemovingCard(int cardId)
+    public void HandelRemovingCard(int cardId)
     {
         var list = Board.Lists
             .FirstOrDefault(l => l.Cards.Any(c => c.Id == cardId));
@@ -437,6 +445,24 @@ public partial class BoardLists : ComponentBase, IDisposable
         var cardMemberModels = Mapper.Map<List<CardMemberModel>>(dto.Members);
 
         card.Members = cardMemberModels;
+        
+        StateHasChanged();
+    }
+    
+    private async Task UpdateCard(CardModel card)
+    {
+        await OnCardUpdated.InvokeAsync(card);
+    }
+    public void RefreshCard(CardModel updatedCard)
+    {
+        var card = FindCard(updatedCard.Id);
+        
+        card.Title = updatedCard.Title;
+        card.IsCompleted = updatedCard.IsCompleted;
+        card.StartDate = updatedCard.StartDate;
+        card.DueDate = updatedCard.DueDate;
+        card.Labels = updatedCard.Labels;
+        card.Members = updatedCard.Members;
         
         StateHasChanged();
     }

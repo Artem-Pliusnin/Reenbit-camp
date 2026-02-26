@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Models.Cards;
 using Domain.Requests.Cards;
+using Domain.Responses.Shared;
 using Domain.Shared;
 using Services.Abstractions.Services;
 using Services.API;
@@ -42,6 +43,20 @@ public class CardsService : ICardsService
 
         return response.HandleResultWithMapping(content 
             => _mapper.Map<CardInfoModel>(content));
+    }
+
+    public async Task<Result<InfiniteScrollDto<CardModel>>> GetFilteredCardsAsync(
+        int boardId, 
+        CardsFilterModel filter,
+        List<int>? labels)
+    {
+        var response = await _cardsApi.GetFilteredCardsAsync(boardId, filter, labels);
+
+        return response.HandleResultWithMapping(content 
+            => new InfiniteScrollDto<CardModel>(
+                _mapper.Map<List<CardModel>>(content.Dtos),
+                content.HasMore
+            ));
     }
 
     public async Task<Result<object>> UpdateAsync(int boardId, int id, UpdateCardRequest request)

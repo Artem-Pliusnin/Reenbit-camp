@@ -1,7 +1,9 @@
+using Domain.Models.Cards;
 using Domain.Requests.Cards;
 using Domain.Requests.Lists;
 using Domain.Responses.Cards;
 using Domain.Responses.Lists;
+using Domain.Responses.Shared;
 using Refit;
 
 namespace Services.API;
@@ -13,6 +15,12 @@ public interface ICardsApi
     
     [Get("/Board/{boardId}/Cards/{id}")]
     Task<ApiResponse<CardInfoDto>> GetInfoAsync(int boardId, int id);
+    
+    [Get("/Board/{boardId}/Cards")]
+    Task<ApiResponse<InfiniteScrollDto<CardDto>>> GetFilteredCardsAsync(
+        int boardId,
+        [Query] CardsFilterModel filter,
+        [Query(CollectionFormat.Multi)] List<int>? labels);
 
     [Post("/Board/{boardId}/Cards")]
     Task<ApiResponse<CardDto>> CreateAsync(

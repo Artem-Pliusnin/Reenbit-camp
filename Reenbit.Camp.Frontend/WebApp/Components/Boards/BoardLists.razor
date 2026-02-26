@@ -27,7 +27,11 @@
                             => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
 
                 <ItemTemplate>
-                    <SimpleCard @key=@context.Id Card=@context OnDeleteCard=@RemoveCard></SimpleCard>
+                    <SimpleCard 
+                        @key=@context.Id 
+                        Card=@context 
+                        OnDeleteCard=@RemoveCard 
+                        OnUpdateCard=@UpdateCard></SimpleCard>
                 </ItemTemplate>
 
                 <NoDataTemplate>
@@ -77,9 +81,8 @@
 <style>
     .k-listbox{
         flex: 1;
-        min-height: 0;
-        height: fit-content;
-        overflow-y: scroll;
+        height: auto !important;
+        overflow: visible !important;
     }
     
     .k-listbox .k-list-item {

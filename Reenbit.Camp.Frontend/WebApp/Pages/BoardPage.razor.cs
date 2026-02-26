@@ -4,6 +4,7 @@ using Domain.Enums;
 using Domain.Extensions;
 using Domain.Models.BoardMembers;
 using Domain.Models.Boards;
+using Domain.Models.Cards;
 using Domain.Models.Labels;
 using Domain.Requests.Boards;
 using Domain.Requests.Labels;
@@ -15,6 +16,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Services.Abstractions.Services;
 using Services.HubServices;
 using Telerik.Blazor.Components;
+using WebApp.Components.Boards;
+using WebApp.Components.Cards;
 
 namespace WebApp.Pages;
 
@@ -67,6 +70,12 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     
     private bool IsEditMode = false;
     private LabelModel EditLabel;
+    
+    private CardFilterWindow filterWindow;
+    
+    private BoardLists boardLists;
+    
+    private bool IsFilterVisible = false;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -168,6 +177,11 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
     private bool CheckArchiveBoardPermision()
     {
         return CurrentBoardMember.Role.HasAtLeast(BoardRole.Owner);
+    }
+    
+    private void ToggleFilter()
+    {
+        IsFilterVisible = !IsFilterVisible;
     }
     
     private void OpenMembersDialog()
@@ -397,6 +411,18 @@ public partial class BoardPage : ComponentBase, IAsyncDisposable
         ChangeToBaseMode();
         PopoverRef?.Refresh();
         await LoadBoardData();
+    }
+    
+    private void HandleCardUpdated(CardModel updatedCard)
+    {
+        filterWindow.RefreshCard(updatedCard);
+        boardLists.RefreshCard(updatedCard);
+    }
+    
+    private void HandleCardDeleted(int deletedCardId)
+    {
+        filterWindow.HandelRemovingCard(deletedCardId);
+        boardLists.HandelRemovingCard(deletedCardId);
     }
 
     public async ValueTask DisposeAsync()

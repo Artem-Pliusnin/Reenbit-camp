@@ -67,6 +67,11 @@ else
                            Class="meeting-btn"
                            OnClick=@ToggleScreenShare/>
 
+            <TelerikButton Icon=@SvgIcon.Gear
+                           ThemeColor="secondary"
+                           Class="meeting-btn setting-btn"
+                           OnClick=@PopoverRef!.Show/>
+
             <TelerikButton Icon=@SvgIcon.Logout
                            ThemeColor="error"
                            Class="meeting-btn"
@@ -96,6 +101,66 @@ else
         </TelerikCard>
     </div>
 }
+
+<TelerikPopover @ref=@PopoverRef
+                AnchorSelector=".setting-btn"
+                AnimationDuration="100"
+                AnimationType=@AnimationType.SlideUp
+                ShowCallout=@false
+                Width="20rem"
+                Height="fit-content"
+                Position=@PopoverPosition.Top
+                Collision=@PopoverCollision.Fit
+                Offset="1">
+    <PopoverContent>
+        <div class="device-settings-popup-content">
+            <div class="device-settings-header">
+                <h3 class="device-settings-title">
+                    <TelerikSvgIcon Icon=@SvgIcon.Gear Class="setting-icon"/>
+                    Device Settings
+                </h3>
+                <TelerikButton Icon=@SvgIcon.X
+                               FillMode=@ThemeConstants.Button.FillMode.Flat
+                               OnClick=@PopoverRef!.Hide
+                               Size=@ThemeConstants.Button.Size.Small />
+            </div>
+
+            <div class="device-settings-body">
+                <div class="setting-row">
+                    <TelerikSvgIcon Icon=@SvgIcon.Camera Class="setting-icon" />
+
+                    <TelerikDropDownList Data=@_videoDevices
+                                         Value=@_selectedVideoDeviceId
+                                         ValueChanged=@( (string value) => OnChangeVideoDevice(value) )
+                                         TextField="Label"
+                                         ValueField="DeviceId"
+                                         Class="setting-dropdown"
+                                         Width="100%">
+                        <DropDownListSettings>
+                            <DropDownListPopupSettings Height="auto" MaxHeight="20rem" />
+                        </DropDownListSettings>
+                    </TelerikDropDownList>
+                </div>
+                
+                <div class="setting-row">
+                    <TelerikSvgIcon Icon=@SvgIcon.MicrophoneOutline Class="setting-icon" />
+                    
+                    <TelerikDropDownList Data=@_audioDevices
+                                         Value=@_selectedAudioDeviceId
+                                         ValueChanged=@( (string value) => OnChangeAudioDevice(value) )
+                                         TextField="Label"
+                                         ValueField="DeviceId"
+                                         Class="setting-dropdown"
+                                         Width="100%">
+                        <DropDownListSettings>
+                            <DropDownListPopupSettings Height="auto" MaxHeight="20rem" />
+                        </DropDownListSettings>
+                    </TelerikDropDownList>
+                </div>
+            </div>
+        </div>
+    </PopoverContent>
+</TelerikPopover>
 
 <style>
     .k-loader-custom-color .k-loader-segment {
@@ -139,5 +204,19 @@ else
         height: 80%;
         fill: currentColor;
     }
+    
+    .setting-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    
+    .setting-dropdown {
+        flex: 1;
+    }
 
+    .k-picker-solid:focus-within{
+        box-shadow: none;
+        border: none;
+    }
 </style>

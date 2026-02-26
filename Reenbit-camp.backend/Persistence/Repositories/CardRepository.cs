@@ -1,4 +1,6 @@
+using Domain.DTOs.Shared;
 using Domain.Entities;
+using Domain.Models;
 using Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
@@ -73,5 +75,59 @@ public class CardRepository :
             cardId,
             listId
         );
+    }
+
+    public async Task<InfiniteScrollDto<Card>> GetFilteredAsync(
+        int userId, 
+        CardsFilterModel filter, 
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbSet
+            .Where(c => c.List.BoardId == filter.BoardId);
+
+        if (!string.IsNullOrWhiteSpace(filter.Title))
+        {
+            var search = filter.Title.ToLowerInvariant();
+            query = query.Where(c => c.Title.ToLower().Contains(search));
+        }
+
+        if (filter.OnlyAssignedToUser)
+        {
+            query = query.Where(c => 
+                c.Members.Any(cm => cm.UserId == userId));
+        }
+
+        if (filter.Labels is not null && filter.Labels.Count > 0)
+        {
+            query = query.Where(c =>
+                c.Labels.Count(l => filter.Labels.Contains(l.LabelId)) == filter.Labels.Count
+            );
+        }
+
+        var currentPage = filter.Page < 1 ? 1 : filter.Page;
+
+        var items = await query
+            .OrderByDescending(c => c.Id)
+            .Include(c => c.Members)
+                .ThenInclude(cm => cm.User)
+                    .ThenInclude(u => u.Avatar)
+            .Include(c => c.Labels)
+                .ThenInclude(l => l.Label)
+            .Skip((currentPage - 1) * filter.PageSize)
+            .Take(filter.PageSize + 1)
+            .ToListAsync(cancellationToken);
+
+        var hasMore = items.Count > filter.PageSize;
+
+        if (hasMore)
+        {
+            items.RemoveAt(items.Count - 1);
+        }
+
+        return new InfiniteScrollDto<Card>
+        {
+            Dtos = items,
+            HasMore = hasMore
+        };
     }
 }

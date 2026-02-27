@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Application.Auth.Commands.GoogleLogin;
 using Application.Auth.Commands.LoginUser;
 using Application.Auth.Commands.LogoutUser;
 using Application.Auth.Commands.RefreshTokens;
@@ -7,6 +8,8 @@ using Domain.DTOs.Authorization;
 using Domain.Errors;
 using Domain.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.API.Abstractions;
@@ -108,4 +111,65 @@ public class AuthController : ApiController
         
         return Ok(result.Value);
     }
+    
+    [HttpGet("login/google")]
+    public IActionResult GoogleLogin([FromQuery] string returnUrl)
+    {
+        var redirectUrl = Url.Action(
+            nameof(GoogleCallback), 
+            "Auth", 
+            new { returnUrl });
+        
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    }
+    
+    [HttpGet("google-callback")]
+    public async Task<IActionResult> GoogleCallback(
+        [FromQuery] string returnUrl,
+        CancellationToken cancellationToken = default)
+    {
+        var authResult = await HttpContext.AuthenticateAsync(
+            GoogleDefaults.AuthenticationScheme);
+
+        if (!authResult.Succeeded)
+        {
+            return HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized)
+                );
+        }
+
+        var email = authResult.Principal
+            .FindFirst(ClaimTypes.Email)?.Value;
+        
+        var firstName = authResult.Principal
+            .FindFirst(ClaimTypes.GivenName)?.Value ?? string.Empty;
+        
+        var lastName = authResult.Principal
+            .FindFirst(ClaimTypes.Surname)?.Value ?? string.Empty;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            return HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized)
+                );
+        }
+
+        var command = new GoogleLoginCommand(email, firstName, lastName);
+        
+        var result = await Sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
+        return Redirect(
+            $"{returnUrl}?accessToken={result.Value.AccessToken}" +
+            $"&refreshToken={result.Value.RefreshToken}" +
+            $"&accessTokenExpiresAt={result.Value.AccessTokenExpiresAt:O}" +
+            $"&refreshTokenExpiresAt={result.Value.RefreshTokenExpiresAt:O}");
+    }
+
 }

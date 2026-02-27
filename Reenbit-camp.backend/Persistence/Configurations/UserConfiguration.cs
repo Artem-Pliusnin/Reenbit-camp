@@ -35,8 +35,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Password)
             .HasColumnName("password")
-            .HasMaxLength(255)
-            .IsRequired();
+            .HasMaxLength(255);
         
         builder.Property(u => u.Role)
             .HasColumnName("roleid")

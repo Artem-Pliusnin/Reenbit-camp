@@ -1,0 +1,27 @@
+@page "/subscription/plans"
+
+@using WebApp.Components.Subscriptions
+
+@if(isLoading)
+{
+    <div class="d-flex justify-content-center align-items-center w-100" 
+         style="height: 80vh">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else
+{
+    
+    <div class="page-container">
+        <CascadingValue Name="UserSubscription" Value=@UserSubscription>
+            <div class="plans-layout">
+
+                @foreach (var plan in SubscriptionPlans)
+                {
+                    <SubscriptionPlanCard SubscriptionPlan=@plan></SubscriptionPlanCard>
+                }
+
+            </div>
+        </CascadingValue>
+    </div> 
+}

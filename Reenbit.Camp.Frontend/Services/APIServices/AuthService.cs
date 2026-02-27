@@ -20,22 +20,16 @@ public class AuthService : IAuthService
         _localStorage = localStorage;
     }
     
-    public async Task<Result<TokensResponse>> LoginAsync(LoginRequest request)
+    public async Task<Result<TokensResponseDto>> LoginAsync(LoginRequest request)
     {
         var response = await _authApi.LoginAsync(request);
 
-        if (response.IsSuccessStatusCode && response.Content != null)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<TokensResponse>(error);
+        return response.HandleResult();
     }
     
     public async Task<Result> LogOutAsync()
     {
-        var session = await _localStorage.GetItemAsync<TokensResponse>("Session");
+        var session = await _localStorage.GetItemAsync<TokensResponseDto>("Session");
         
         if (session == null || string.IsNullOrEmpty(session.AccessToken))
         {
@@ -50,12 +44,7 @@ public class AuthService : IAuthService
         
         var response =  await _authApi.LogoutAsync(session.AccessToken);
             
-        if (response.IsSuccessStatusCode) 
-        {
-            return Result.Success();
-        }
-            
-        return Result.Failure(response.GetApiErrorAsync());
+        return response.HandleResult();
     }
 
     
@@ -63,25 +52,13 @@ public class AuthService : IAuthService
     {
         var response = await _authApi.RegisterAsync(request);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<bool>(error);
+        return response.HandleResult();
     }
     
-    public async Task<Result<TokensResponse>> RefreshTokensAsync(RefreshRequest request)
+    public async Task<Result<TokensResponseDto>> RefreshTokensAsync(RefreshRequest request)
     {
         var response = await _authApi.RefreshAsync(request);
         
-        if (response.IsSuccessStatusCode && response.Content != null)
-        {
-            return response.Content;
-        }
-        
-        var error = response.GetApiErrorAsync();
-        return Result.Failure<TokensResponse>(error);
+        return response.HandleResult();
     }
 }

@@ -1,0 +1,5 @@
+.members-list{
+    height: fit-content;
+    max-height: 36rem;
+    overflow-y: scroll;
+}

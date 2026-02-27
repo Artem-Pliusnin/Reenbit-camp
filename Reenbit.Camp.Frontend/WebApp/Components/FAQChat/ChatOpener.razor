@@ -1,0 +1,68 @@
+@using Telerik.SvgIcons
+
+
+<TelerikButton
+    Icon=@SvgIcon.Comment
+    Class="faq-chat-btn"
+    OnClick=@ToggleChat>
+</TelerikButton>
+
+@if (IsOpen)
+{
+    <div class="faq-chat-panel">
+        <div class="faq-chat-header">
+            <h4>AI Assistant</h4>
+            <TelerikButton
+                Icon=@SvgIcon.X
+                Class="close-chat-btn"
+                OnClick=@ToggleChat>
+            </TelerikButton>
+        </div>
+        <div class="faq-chat">
+            <FAQChat></FAQChat>
+        </div>
+    </div>
+}
+
+
+<style>
+    .faq-chat-btn {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 3rem;
+        height: 3rem;
+        background-color: #176B87;
+        color: #EEF5FF;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 1000;
+    }
+
+    .faq-chat-btn:hover {
+        background-color: #1B8AAF;
+    }
+
+    .k-button:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .close-chat-btn{
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: #176B87;
+        color: #EEF5FF;
+        border-radius: 0.5rem;
+        border: 1px solid #EEF5FF;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .close-chat-btn:hover {
+        background-color: #1B8AAF;
+    }
+    
+</style>

@@ -1,0 +1,92 @@
+@using Domain.Enums
+@if (CurrentUser.Role == BoardRole.Owner ||
+     CurrentUser.Role == BoardRole.Admin)
+{
+    <div class="d-flex flex-column mb-2">
+        <h6>Invite users</h6>
+
+        <input class="form-control mb-3"
+               placeholder="Username or email"
+               @bind=@InputUser
+               @bind:event="oninput"
+               @onkeyup=@ResetTimer/>
+
+        @if (Suggestions.Any())
+        {
+            <div class="mt-2 recommended-list">
+                @foreach (var user in Suggestions)
+                {
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <strong class=@(user.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")>@user.UserName</strong>
+                            <div class="text-muted small">@user.Email</div>
+                        </div>   
+
+                        <TelerikButton Size="ButtonSize.Small"
+                                       OnClick=@(() => Invite(user.Id))>
+                            Invite
+                        </TelerikButton>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+<div class="invitations-list">
+    <h6>Pending invitations</h6>
+
+    @if (IsInvitationsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center"> 
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else if (!PendingInvitations.Any())
+    {
+        <div class="text-muted small">
+            No pending invitations
+        </div>
+    }
+    else
+    {
+        @foreach (var invitation in PendingInvitations)
+        {
+            <div class="d-flex flex-row justify-content-between">
+                <div class="d-flex flex-column mb-2">
+                    <strong class=@(invitation.InvitedUser.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")>@invitation.InvitedUser.UserName</strong>
+                    <div class="text-muted small">@invitation.InvitedUser.Email</div>
+                </div>
+                
+                @if (CanRemove())
+                {
+                    <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Trash
+                                   Class="delete-button"
+                                   Size="ButtonSize.Small"
+                                   OnClick=@(() => RemoveInvitation(invitation))/>
+                }
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .delete-button {
+        background-color: transparent;
+        height: fit-content;
+        width: fit-content;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .delete-button:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .delete-button:focus {
+        box-shadow: none;
+    }
+    
+</style>

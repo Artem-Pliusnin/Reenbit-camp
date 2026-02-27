@@ -1,0 +1,150 @@
+using System.Timers;
+using Domain.Models.Boards;
+using Domain.Requests.Boards;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Services.Abstractions.Services;
+
+namespace WebApp.Pages;
+
+public partial class HomePage : ComponentBase, IDisposable
+{
+    [CascadingParameter(Name="UserId")]
+    public int UserId { get; set; }
+    
+    private NewBoardModel newBoard = new();
+    
+    private BoardsFilterModel filter = new();
+    
+    private bool isLoading = false;
+    
+    [Inject] 
+    public IBoardsService BoardsService { get; set; } = default!;
+    
+    [Inject]
+    public NavigationManager Navigation { get; set; } = default!;
+
+    private List<BoardCardModel> Boards = new List<BoardCardModel>();
+    
+    private List<int> CreatedBoards = new List<int>();
+    
+    private bool CanCreateBoard;
+    
+    private bool IsDialogOpen = false;
+    
+    private System.Timers.Timer aTimer = default!;
+
+    private int TotalPages;
+    
+    private IEnumerable<int> VisiblePages
+    {
+        get
+        {
+            const int maxPagesToShow = 5;
+
+            var start = Math.Max(1, filter.Page - 2);
+            var end = Math.Min(TotalPages, start + maxPagesToShow - 1);
+            
+            start = Math.Max(1, end - maxPagesToShow + 1);
+
+            return Enumerable.Range(start, end - start + 1);
+        }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        await CheckBoardCreationLimit();
+        
+        await LoadBoardsAsync();
+        aTimer = new System.Timers.Timer(300);
+        aTimer.Elapsed += OnTimerElapsed;
+        aTimer.AutoReset = false;
+    }
+
+    private void ResetTimer(KeyboardEventArgs e)
+    {
+        aTimer.Stop();
+        aTimer.Start();
+    }
+    
+    private async void OnTimerElapsed(Object? source, ElapsedEventArgs e)
+    {
+        await LoadBoardsAsync();
+    }
+
+    private async void OnOnlyMyBoardsChanged()
+    {
+        await LoadBoardsAsync();
+    }
+    
+    private async Task LoadBoardsAsync()
+    {
+        isLoading = true;
+        var result = await BoardsService.GetByUserAsync(filter);
+
+        if (result.IsSuccess)
+        {
+            Boards = result.Value.Dtos;
+            filter.Page =  result.Value.CurrentPage;
+            TotalPages = result.Value.TotalPages;
+            
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task CheckBoardCreationLimit()
+    {
+        var result = await BoardsService.CanCreateBoardAsync();
+
+        if(result.IsSuccess)
+        {
+            Console.WriteLine(result.Value);
+            CanCreateBoard = result.Value;
+        }
+        else
+        {
+            CanCreateBoard = false;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CreateBoardAsync()
+    {
+        if (!CanCreateBoard)
+        {
+            IsDialogOpen = true;
+            return;
+        }
+        
+        var result = await BoardsService
+            .CreateAsync(new CreateBoardRequest(newBoard.Title));
+        
+        if (result.IsSuccess)
+        {
+            CreatedBoards.Add(result.Value.Id);
+        }
+        
+        newBoard.Title = "";
+        await LoadBoardsAsync();
+        await CheckBoardCreationLimit();
+    }
+    
+    private async Task ChangePage(int page)
+    {
+        if (page < 1 || page > TotalPages)
+            return;
+
+        filter.Page = page;
+        await LoadBoardsAsync();
+    }
+
+    private void NavigateToPlans()
+    {
+        Navigation.NavigateTo("/subscription/plans");
+    }
+    
+    void IDisposable.Dispose()
+        => aTimer?.Dispose(); 
+}

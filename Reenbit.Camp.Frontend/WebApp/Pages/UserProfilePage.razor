@@ -1,0 +1,179 @@
+@page "/userProfile/{userId:int}"
+
+@using WebApp.Components.Subscriptions
+
+<div class="d-flex flex-column w-100 h-100">
+    <h3 class="text-center fw-semibold py-3 border-bottom" style="box-sizing: border-box">My Profile</h3>
+    @if(isPageLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center w-100"
+             style="height: 80vh">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else
+    {
+        <div class="profile-wrapper">
+            <div class="container profile-container">
+                <div @onclick=@OpenAvatarWindow>
+                    @if (userProfile.Avatar is null)
+                    {
+                        <TelerikAvatar Class="profile-page-avatar"
+                                       Type=@AvatarType.Text
+                                       ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                            @(userProfile.FirstName[0])
+                        </TelerikAvatar>
+                    }
+                    else
+                    {
+                        <TelerikAvatar Class="profile-page-avatar" Type=@AvatarType.Image>
+                            <img src=@userProfile.Avatar.FileUrl/>
+                        </TelerikAvatar>
+                    }
+                </div>
+
+                <div class="name-row">
+                    <div class="input-block name-input-block">
+                        <label class="input-label">First name</label>
+
+                        <TelerikTextBox @bind-Value=@enteredFirstName
+                                        Placeholder="First name"
+                                        Width="100%"/>
+                    </div>
+
+                    <div class="input-block name-input-block">
+                        <label class="input-label">Last name</label>
+
+                        <TelerikTextBox @bind-Value=@enteredLastName
+                                        Placeholder="Last name"
+                                        Width="100%"/>
+                    </div>
+                </div>
+
+                <div class="input-block">
+                    <label class="input-label">Email</label>
+
+                    <TelerikTextBox @bind-Value=@userProfile.Email
+                                    
+                                    ReadOnly="true"
+                                    Width="100%"
+                                    Class="text-muted"/>
+                </div>
+                
+                <div class="save-button-wrapper">
+                    <TelerikButton OnClick=@SaveName
+                                   ThemeColor="primary"
+                                   Enabled=@CanSaveProfile()
+                                   Class="btn-primary save-btn">
+                        Save profile
+                    </TelerikButton>
+                </div>
+            </div>
+            
+            <div class="container subscription-container">
+                <SubscriptionInfo Subscription=@userProfile.Subscription></SubscriptionInfo>
+            </div>
+        </div>
+    }
+</div>
+
+<TelerikDialog @bind-Visible=@IsAvatarWindowOpen 
+               ShowCloseButton=@false
+               @ref=@DialogRef
+               Width="fit-content"
+               Title="Upload avatar">
+
+    <DialogTitle>
+        <div class="w-100 d-flex flex-row justify-content-between">
+            <h4>Update avatar</h4>
+            <div class="d-flex flex-row gap-1">
+                <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.X
+                               FillMode="ButtonFillMode.Flat"
+                               Class="dialog-icon-button"
+                               OnClick=@CloseAvatarWindow/>
+            </div>
+        </div>
+    </DialogTitle>
+
+    <DialogContent>
+        <div class="avatar-upload-container">
+            <div class="avatar-container">
+                <div class="avatar-preview">
+                    @if (isFileLoading)
+                    {
+                        <div class="d-flex justify-content-center align-items-center h-100 w-100">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    }
+                    else if (previewImageUrl != null)
+                    {
+                        <img src=@previewImageUrl
+                             alt="Avatar preview"
+                             class="preview-image"/>
+                    }
+                    else
+                    {
+                        <TelerikAvatar Type=@AvatarType.Text
+                                       ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse
+                                       Class="preview-avatar">
+                            @(userProfile.FirstName[0])
+                        </TelerikAvatar>
+                    }
+                </div>
+                
+                <InputFile OnChange=@OnFileSelected
+                           accept="image/*"
+                           class="file-input"
+                           id="avatarInput" />
+
+                <label for="avatarInput" class="file-input-label">
+                    Choose image
+                </label>
+            </div>
+
+            <div class="save-button-wrapper">
+                <TelerikButton OnClick=@SaveAvatar
+                               ThemeColor="primary"
+                               Enabled=@(selectedFile != null)
+                               Class="btn-primary save-btn">
+                    Save avatar
+                </TelerikButton>
+            </div>
+        </div>
+    </DialogContent>
+</TelerikDialog>
+
+<style>
+    .profile-page-avatar{
+        width: 8rem;
+        height: 8rem;
+        flex-basis: 8rem;
+        cursor: pointer;
+        border: 2px solid #176B87;
+    }
+
+    .profile-page-avatar .k-avatar-text{
+        font-size: 3.2rem;
+        font-weight: bold;
+    }
+
+    .preview-avatar {
+        width: 100%;
+        height: 100%;
+        flex-basis: 100%;
+    }
+
+    .preview-avatar .k-avatar-text {
+        font-size: 6rem;
+        font-weight: bold;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .save-btn {
+        width: 12rem;
+    }
+</style>
+

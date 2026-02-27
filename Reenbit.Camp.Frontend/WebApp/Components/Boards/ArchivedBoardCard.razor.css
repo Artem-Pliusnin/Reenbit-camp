@@ -1,0 +1,17 @@
+.board-card {
+    border: none;
+    border-radius: 8px;
+    min-height: 120px;
+    cursor: pointer;
+    transition: transform .1s ease, box-shadow .1s ease;
+}
+
+.board-title{
+    color: rgba(0, 0, 0, .7);
+    font-size: 1.2rem;
+    font-weight: 400;
+    width:100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

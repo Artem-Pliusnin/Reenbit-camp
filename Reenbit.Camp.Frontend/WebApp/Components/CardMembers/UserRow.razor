@@ -1,0 +1,22 @@
+<div class="member-info d-flex align-items-center gap-2"
+     @onclick=@AddMember>
+    
+    @if (User.Avatar is null)
+    {
+        <TelerikAvatar
+            Type=@AvatarType.Text
+            ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+            @User.UserName[0]
+        </TelerikAvatar>
+    }
+    else
+    {
+        <TelerikAvatar Type=@AvatarType.Image>
+            <img src=@User.Avatar.FileUrl/>
+        </TelerikAvatar>
+    }
+
+    <span class="username @(User.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")">
+        @User.UserName
+    </span>
+</div>

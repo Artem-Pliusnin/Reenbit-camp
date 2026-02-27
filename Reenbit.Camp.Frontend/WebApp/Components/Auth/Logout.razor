@@ -1,3 +1,27 @@
-<button class="btn btn-link p-0" @onclick=@OnLogOut>
-    Log Out
-</button>
+<TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Logout
+               Class="logout-btn"
+               OnClick=@OnLogOut />
+               
+<style>
+    .logout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: #176B87;
+        color: #EEF5FF;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .logout-btn:hover {
+        background-color: #1B8AAF;
+    }
+
+    .logout-btn:focus {
+        outline: none;
+        box-shadow: none;
+    }
+</style>

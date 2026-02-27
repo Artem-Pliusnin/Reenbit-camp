@@ -10,6 +10,11 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.10" PrivateAssets="all"/>
     </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Refit" Version="8.0.0" />
+        <PackageReference Include="Telerik.UI.for.Blazor" Version="12.0.0" PrivateAssets="none" />
+    </ItemGroup>
 
     <ItemGroup>
       <AdditionalFiles Include="Components\Auth\LogIn.razor" />
@@ -25,6 +30,10 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\Shared\" />
     </ItemGroup>
 
 </Project>

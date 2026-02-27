@@ -29,7 +29,7 @@ public class TokenHandler : DelegatingHandler
         CancellationToken cancellationToken)
     {
         var session = await _localStorage
-            .GetItemAsync<TokensResponse>("Session");
+            .GetItemAsync<TokensResponseDto>("Session");
         
         var now = DateTime.UtcNow;
         
@@ -47,7 +47,6 @@ public class TokenHandler : DelegatingHandler
             }
             else
             {
-                await _localStorage.RemoveItemAsync("Session");
                 _navigationManager.NavigateTo("/auth");
             }
         }
@@ -65,11 +64,11 @@ public class TokenHandler : DelegatingHandler
         return await base.SendAsync(request, cancellationToken);
     }
 
-    private static bool IsAccessTokenExpiring(TokensResponse session, DateTime now)
+    private static bool IsAccessTokenExpiring(TokensResponseDto session, DateTime now)
         => (session.AccessTokenExpiresAt - now).TotalSeconds <= 
            (session.AccessTokenExpiresAt - now).TotalSeconds / 2;
 
-    private static bool IsRefreshTokenExpiring(TokensResponse session, DateTime now)
+    private static bool IsRefreshTokenExpiring(TokensResponseDto session, DateTime now)
         => (session.RefreshTokenExpiresAt - now).TotalSeconds <= 
            (session.RefreshTokenExpiresAt - now).TotalSeconds / 2;
 }

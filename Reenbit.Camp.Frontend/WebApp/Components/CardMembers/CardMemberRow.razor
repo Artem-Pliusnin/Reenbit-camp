@@ -1,0 +1,43 @@
+@using Telerik.SvgIcons
+
+<div class="member-row d-flex align-items-center gap-2">
+    <div class="member-info d-flex align-items-center gap-2">
+        @if (CardMember.User.Avatar is null)
+        {
+            <TelerikAvatar
+                Type=@AvatarType.Text
+                ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                @CardMember.User.UserName[0]
+            </TelerikAvatar>
+        }
+        else
+        {
+            <TelerikAvatar Type=@AvatarType.Image>
+                <img src=@CardMember.User.Avatar.FileUrl/>
+            </TelerikAvatar>
+        }
+
+        <span class="username @(CardMember.User.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")">
+            @CardMember.User.UserName
+        </span>
+    </div>
+    
+    <TelerikButton Icon=@SvgIcon.X
+                   Class="label-btn"
+                   OnClick=@DeletMember />
+</div>
+
+
+<style>
+    .label-btn{
+        width: 2rem;
+        height: 2rem;
+        border-radius: 10%;
+        background-color: rgb(250, 250, 250);
+        border: none;
+    }
+
+    .label-btn:hover{
+        background-color: rgb(240, 240, 240);
+    }
+</style>

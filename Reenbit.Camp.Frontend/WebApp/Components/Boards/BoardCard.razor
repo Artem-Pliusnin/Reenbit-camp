@@ -1,0 +1,66 @@
+@using Domain.Enums
+<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+    <div class="card board-card h-100 overflow-hidden @(IsNew ? "board-card-green" : "board-card-blue")"
+         @onclick=@GoToBoard>
+
+        @if (CurrentUserId == Board.OwnerId)
+        {
+            <TelerikSvgIcon Icon=@Telerik.SvgIcons.SvgIcon.AwardStarSolid
+                            Class="owner-icon"/>
+        }
+
+        <img src="Shared/common_board_background.jpeg"
+             class="card-img-top board-image"
+             alt="Board background"/>
+
+        <div class="card-footer board-title">
+            @Board.Title
+        </div>
+
+        @if (Board.Status == BoardStatus.Blocked)
+        {
+            <div class="board-overlay-full">
+                <div class="overlay-content">
+                    <TelerikSvgIcon Icon=@Telerik.SvgIcons.SvgIcon.Lock
+                                    Class="lock-icon"/>
+
+                    <div class="overlay-title">
+                        Board is locked
+                    </div>
+
+                    @if (CurrentUserId == Board.OwnerId)
+                    {
+                        <div class="overlay-subtitle">
+                            Upgrade plan to unlock board
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="overlay-subtitle">
+                            Ask board owner to upgrade plan
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<style>
+    .lock-icon {
+        height: 2.5rem;
+        width: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .owner-icon{
+        color:  white;
+        height: 2rem;
+        width: 2rem;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+</style>

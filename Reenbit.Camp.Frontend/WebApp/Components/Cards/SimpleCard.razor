@@ -1,0 +1,192 @@
+@using static Telerik.Blazor.ThemeConstants
+@using WebApp.Components.Shared
+
+<div class="card simple-card bg-light" @onclick=@OpenCard>
+    <div class="card-body simple-card-body d-flex flex-column gap-2">
+        @if (Card.Labels?.Any() == true)
+        {
+            <div class="w-100 card-labels d-flex flex-wrap gap-1">
+                <TelerikTooltip TargetSelector=".card-label-color"
+                                Position=@TooltipPosition.Top/>
+                
+                @foreach (var label in Card.Labels)
+                {
+                    <div class="card-label-color"
+                         style="background:@label.Label.Color"
+                         title=@label.Label.Text
+                         @onclick:stopPropagation>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="simple-card-title">
+            @Card.Title
+        </div>
+
+        <div class="m2 d-flex flex-row gap-1" @onclick:stopPropagation>
+            <TelerikCheckBox
+                Class=""
+                Id="IsCompleted"
+                @bind-Value=@Card.IsCompleted
+                Enabled=@CheckCardUpdatePermision()
+                Rounded=@CheckBox.Rounded.Large
+                Size=@CheckBox.Size.Large
+                OnChange=@OnChangeStatus/>
+
+            <label for="IsCompleted">
+                @(Card.IsCompleted ? "Completed" : "In progress")
+            </label>
+        </div>
+
+        @if (Card.Members.Any())
+        {
+            <div class="my-1 d-flex flex-wrap gap-1">
+                <TelerikTooltip TargetSelector=".avatar-wrapper"
+                                Position=@TooltipPosition.Top/>
+                
+                @foreach (var member in Card.Members)
+                {
+                    <div class="avatar-wrapper" title=@member.User.UserName>
+                        @if (member.User.Avatar is null)
+                        {
+                            <TelerikAvatar
+                                Type=@AvatarType.Text
+                                ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+                                @member.User.UserName[0]
+                            </TelerikAvatar>
+                        }
+                        else
+                        {
+                            <TelerikAvatar Type=@AvatarType.Image>
+                                <img src=@member.User.Avatar.FileUrl/>
+                            </TelerikAvatar>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Card.DueDate.HasValue)
+        {
+            <div class="simple-card-footer">
+                <span class="badge simple-date-badge @DateBadgeClass">
+                    <TelerikSvgIcon
+                        Icon=@Telerik.SvgIcons.SvgIcon.Clock
+                        Size="SvgIconSize.Small"/>
+
+                    <span class="ms-1">
+                        @Card.DueDate.Value.ToString("dd MMM")
+                    </span>
+                </span>
+            </div>
+        }
+    </div>
+</div>
+
+<TelerikDialog @bind-Visible=@IsCardOpen ShowCloseButton=@false>
+    <DialogTitle>
+        <div class="w-100 d-flex flex-row justify-content-end">
+            <div class="d-flex flex-row gap-1">
+                @if (CheckCardDeletingPermision())
+                {
+                    <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.Trash"
+                                   FillMode="ButtonFillMode.Flat"
+                                   Class="dialog-icon-button"
+                                   OnClick=@OpenDeleteConfirm/>
+                }
+
+                <TelerikButton Icon="@Telerik.SvgIcons.SvgIcon.X"
+                               FillMode="ButtonFillMode.Flat"
+                               Class="dialog-icon-button"
+                               OnClick=@CloseCard/>
+            </div>
+        </div>
+    </DialogTitle>
+    <DialogContent>
+        <div class="container-fluid p-0 overflow-hidden"
+             style="box-sizing: border-box">
+            <TaskHubConnectionContext CardId=@Card.Id>
+                <div class="row g-3 dialog-content">
+                    <div class="col-12 col-lg-7 p-0 window-section">
+                        <CascadingValue Name="Board" Value=@Board>
+                            <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                                <CardInfo
+                                    @ref=@CardInfoRef
+                                    CardId=@Card.Id
+                                    OnCloseWindow=@HandleCardWindowClose></CardInfo>
+                            </CascadingValue>
+                        </CascadingValue>
+                    </div>
+
+                    <div class="col-12 col-lg-5 p-0 window-section">
+                        <CascadingValue Name="Board" Value=@Board>
+                            <CascadingValue Name="CurrentUser" Value=@CurrentUser>
+                                <CardComments CardId=@Card.Id></CardComments>
+                            </CascadingValue>
+                        </CascadingValue>
+                    </div>
+                </div>
+            </TaskHubConnectionContext>
+        </div>
+    </DialogContent>
+</TelerikDialog>
+
+<ConfirmDialog IsOpen=@IsDeleteConfirmOpen
+               Title="Delete catd?"
+               Text="This action cannot be undone."
+               OnCancel=@CancelDelete
+               OnConfirm=@ConfirmDelete>
+
+</ConfirmDialog>
+
+
+
+<style>
+    .k-checkbox:checked, .k-checkbox.k-checked {
+        border-color: limegreen;
+        color: white;
+        background-color: limegreen;
+    }
+
+    .k-dialog {
+        max-width: 90vw;        
+        width: 900px;
+        max-height: 90vh;
+        height: fit-content;
+        overflow-y: scroll;
+    }
+
+    .k-window-content:last-child{
+        padding: 0;
+    }
+
+    @@media (min-width: 1200px) {
+        .k-dialog {
+            width: 1100px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .k-dialog {
+            width: 95vw;
+        }
+    }
+
+    .dialog-icon-button {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: #f1f2f4;
+        border: none;
+        padding: 0;
+    }
+
+    .dialog-icon-button:hover {
+        background-color: #e4e6ea;
+    }
+
+    .dialog-icon-button:focus {
+        box-shadow: none;
+    }
+</style>

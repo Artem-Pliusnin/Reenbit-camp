@@ -1,0 +1,124 @@
+@using WebApp.Components.Shared
+
+<div class="w-100 d-flex flex-row gap-1 justify-content-between list-header">
+    @if (!IsEditingTitle)
+    {
+        <h4 class="list-title"
+            @onclick=@StartEditTitle>
+            @List.Title
+        </h4>
+    }
+    else
+    {
+        <input class="form-control form-control-sm list-title-input"
+               @bind=@TitleInput
+               @bind:event="oninput"
+               @onblur=@SaveTitle
+               @onkeydown=@OnTitleKeyDown
+               maxlength=50
+               autofocus />
+    }
+    
+    @if(CheckListManagingPermision())
+    {
+        <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.MoreHorizontal
+                       Class=@($"menu-button menu-button-{List.Id}")
+                       OnClick=@ToggleMenu/>
+    }
+</div>
+
+<TelerikPopup @ref=@PopupRef
+              AnchorSelector=@($".menu-button-{List.Id}")
+              AnimationType=@AnimationType.SlideDown
+              AnimationDuration="200"
+              AnchorHorizontalAlign=@PopupAnchorHorizontalAlign.Left
+              AnchorVerticalAlign=@PopupAnchorVerticalAlign.Bottom
+              HorizontalAlign=@PopupHorizontalAlign.Left
+              HorizontalCollision=@PopupCollision.Fit
+              VerticalAlign=@PopupVerticalAlign.Top
+              VerticalCollision=@PopupCollision.Fit
+              Width="10rem"
+              Class=@($"list-menu-popup-{List.Id}")>
+
+    <div class="list-menu">
+        <div class="list-menu">
+            <button class="list-menu-item"
+                    @onclick=@StartMove>
+                Move
+            </button>
+
+            <button class="list-menu-item text-danger"
+                    @onclick=@OpenDeleteConfirm>
+                Delete
+            </button>
+        </div>
+    </div>
+</TelerikPopup>
+
+<TelerikDialog @bind-Visible=@IsMoveMode
+               Width="15rem">
+    <DialogTitle>
+        Move list
+    </DialogTitle>
+
+    <DialogContent>
+        <div class="p-2">
+            <label class="form-label small mb-1">
+                Position
+            </label>
+
+            <TelerikDropDownList Data=@Positions
+                                 @bind-Value=@SelectedPosition
+                                 Width="100%"/>
+
+            <div class="d-flex gap-2 mt-3 justify-content-end">
+                <TelerikButton OnClick=@SubmitMove
+                               FillMode="ButtonFillMode.Flat">
+                    Move
+                </TelerikButton>
+
+                <TelerikButton OnClick=@CancelMove>
+                    Cancel
+                </TelerikButton>
+            </div>
+        </div>
+    </DialogContent>
+</TelerikDialog>
+
+<ConfirmDialog IsOpen=@IsDeleteConfirmOpen
+               Title="Delete list?"
+               Text="This action cannot be undone.
+                    All cards in this list will be deleted."
+               OnCancel=@CancelDelete
+               OnConfirm=@ConfirmDelete>
+
+</ConfirmDialog>
+
+
+
+
+<style>
+    .menu-button{
+        width: 2rem;
+        height: 2rem;
+        background-color: rgb(239, 239, 239);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .menu-button:hover{
+        background-color: rgb(220, 220, 220);
+        border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-button:focus{
+        box-shadow: none;
+    }
+
+    .k-list-container .k-list .k-list-content{
+        height: fit-content !important;
+    }
+
+    .k-popup{
+        height: fit-content !important;
+    }
+</style>

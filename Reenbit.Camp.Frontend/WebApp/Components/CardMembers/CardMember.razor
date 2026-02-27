@@ -1,0 +1,48 @@
+<div class="member-avatar-wrapper"
+     id=@($"member-{Member.Id}")
+     @onclick=@OpenPopover>
+    
+    @if (Member.User.Avatar is null)
+    {
+        <TelerikAvatar
+            Type=@AvatarType.Text
+            ThemeColor=@ThemeConstants.Avatar.ThemeColor.Inverse>
+            @Member.User.UserName[0]
+        </TelerikAvatar>
+    }
+    else
+    {
+        <TelerikAvatar Type=@AvatarType.Image>
+            <img src=@Member.User.Avatar.FileUrl/>
+        </TelerikAvatar>
+    }
+
+    <TelerikPopover
+        @ref=@PopoverRef
+        AnchorSelector=@($"#member-{Member.Id}")
+        Position="@PopoverPosition.Bottom"
+        Collision=@PopoverCollision.Fit
+        Offset="20"
+        Width="15rem">
+
+        <PopoverContent>
+            <div class="py-2">
+                <strong class="@(Member.User.Subscription.SubscriptionPlan.IsNameHighlighted ? "highlighted" : "")">@Member.User.UserName</strong>
+                <div class="text-muted small">@Member.User.Email</div>
+                
+                @if (CanDelete)
+                {
+                    <hr/>
+
+                    <TelerikButton
+                        OnClick=@DeletMember
+                        Class="btn-light btn-sm w-100">
+                        Remove from card
+                    </TelerikButton>
+                }
+            </div>
+        </PopoverContent>
+
+    </TelerikPopover>
+
+</div>

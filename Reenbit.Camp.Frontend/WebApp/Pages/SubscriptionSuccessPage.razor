@@ -1,0 +1,66 @@
+@page "/payment-success"
+@using Telerik.SvgIcons
+@layout EmptyLayout
+
+<div class="page-container">
+    <TelerikCard Class="success-wrapper">
+        <CardHeader Class="text-center">
+            <TelerikSvgIcon Icon=@SvgIcon.CheckCircle
+                            Class="success-icon" />
+            <h2 class="mt-3">Payment successful</h2>
+        </CardHeader>
+
+        <CardBody Class="text-center">
+            <p>
+                Thank you for your purchase! <br />
+                Your subscription has been activated.
+            </p>
+        </CardBody>
+
+        <CardActions Class="justify-content-center">
+            <TelerikButton Icon=@SvgIcon.ArrowLeft
+                           Class="back-btn"
+                           OnClick=@GoToBoards>
+                Go to Boards
+            </TelerikButton>
+        </CardActions>
+    </TelerikCard>
+</div>
+
+<style>
+    .success-wrapper {
+        max-width: 450px;
+        margin: 10vh auto;
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 3rem;
+        height: 3rem;
+        color: #2E7D32;
+    }
+
+    .success-wrapper h2 {
+        color: #2E7D32;
+        font-weight: 600;
+    }
+
+    .success-wrapper p {
+        color: #555;
+        font-size: 1rem;
+    }
+    
+    .back-btn{
+        color: white;
+        font-weight: 500;
+        padding: 0.5rem 0.5rem;
+        background-color: #176B87;
+        border: none;
+    }
+
+    .back-btn:hover{
+        background-color: #197797;
+    }
+</style>

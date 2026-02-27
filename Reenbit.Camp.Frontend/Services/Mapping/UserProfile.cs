@@ -1,0 +1,19 @@
+using AutoMapper;
+using Domain.Models.Users;
+using Domain.Responses.Users;
+
+namespace Services.Mapping;
+
+public class UserProfile: Profile
+{
+    public UserProfile()
+    {
+        CreateMap<UserDto, UserModel>().ReverseMap();
+        CreateMap<UserProfileDto, UserProfileModel>().ReverseMap();
+        CreateMap<UserProfileModel, UserModel>()
+            .ForMember(
+                dest => dest.UserName, 
+                opt => opt.MapFrom(src => src.FirstName + " " + src.LastName));
+
+    }
+}

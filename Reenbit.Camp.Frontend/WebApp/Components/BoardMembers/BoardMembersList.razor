@@ -1,0 +1,74 @@
+@using Domain.Enums
+@using Telerik.SvgIcons
+<div class="members-list">
+    @if (IsLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else
+    {
+        @foreach (var member in Members)
+        {
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                    <strong class=@(IsNameHighlighted(member) ? "highlighted" : "")>@member.User.UserName</strong>
+                    <div class="text-muted small">@member.User.Email</div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <TelerikDropDownList Data=@GetAvailableRoles(member)
+                                         @bind-Value=@member.Role
+                                         Enabled=@CanChangeRole(member)
+                                         OnChange=@(() => OnRoleChanged(member))
+                                         Width="8rem" />
+
+                    @if (CanRemove(member))
+                    {
+                    <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Trash
+                                   Class="delete-button"
+                                   Size="ButtonSize.Small"
+                                   OnClick=@(() => RemoveMember(member))/>
+                    }
+                    else if(member.Id == CurrentUser.Id)
+                    {
+                        <TelerikButton Icon=@Telerik.SvgIcons.SvgIcon.Logout
+                                       Class="delete-button"
+                                       Size="ButtonSize.Small"
+                                       OnClick=@LeaveBoard/>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .k-list-container .k-list .k-list-content{
+        height: fit-content !important;
+    }
+
+    .k-popup{
+        height: fit-content !important;
+    }
+
+    .delete-button {
+        background-color: transparent;
+        height: fit-content;
+        width: fit-content;
+        border: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .delete-button:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .delete-button:focus {
+        box-shadow: none;
+    }
+    
+</style>

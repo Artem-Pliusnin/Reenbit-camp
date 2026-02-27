@@ -1,0 +1,117 @@
+@using Domain.Models.Cards
+@using WebApp.Components.Cards
+@using WebApp.Components.Lists
+
+<div class="d-flex gap-3 board-lists">
+    @foreach (var list in Board.Lists)
+    {
+        <div class="d-flex flex-column gap-1 align-items-center list-container">
+            <ListHeader
+                @key=@list.Id
+                List=@list
+                OnMoveList=@HandleMoveList
+                OnDeleteList=@RemoveList>
+            </ListHeader>
+            <TelerikListBox Width="100%"
+                            Class="w-100"
+                            @ref=@ListBoxRefs[list.Id]
+                            @key=@list
+                            Data=@list.Cards
+                            TextField=@nameof(CardModel.Title)
+                            Id=@list.Id.ToString()
+                            SelectionMode=@ListBoxSelectionMode.Multiple
+                            @bind-SelectedItems=@ListBoxSelectedItems[list.Id]
+                            Draggable=@CheckCardMovingPermision()
+                            DropSources=@ListBoxDropSources
+                            OnDrop=@((ListBoxDropEventArgs<CardModel> args) 
+                            => OnListBoxDrop(args, list.Id.ToString(), list.Cards))>
+
+                <ItemTemplate>
+                    <SimpleCard 
+                        @key=@context.Id 
+                        Card=@context 
+                        OnDeleteCard=@RemoveCard 
+                        OnUpdateCard=@UpdateCard></SimpleCard>
+                </ItemTemplate>
+
+                <NoDataTemplate>
+                </NoDataTemplate>
+
+                <ListBoxToolBarSettings>
+                    <ListBoxToolBar Visible=@false/>
+                </ListBoxToolBarSettings>
+            </TelerikListBox>
+            
+            @if (CheckCardCreatingPermision())
+            {
+                <div class="add-card-footer d-flex align-items-center gap-2">
+                    <input class="form-control form-control-sm flex-grow-1"
+                           placeholder="Add a task..."
+                           maxlength=255
+                           @bind=@NewCardTitles[list.Id]
+                           @bind:event="oninput"/>
+
+                    <button class="btn btn-sm btn-outline-dark"
+                            disabled=@string.IsNullOrWhiteSpace(NewCardTitles[list.Id])
+                            @onclick=@(() => CreateCard(list.Id))>
+                        Add
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    @if (CheckListCreatingPermision())
+    {
+        <div class="d-flex flex-column gap-2 list-container">
+            <input class="form-control form-control-sm flex-grow-1"
+                   placeholder="List title ..."
+                   maxlength=50
+                   @bind=@NewListTitle
+                   @bind:event="oninput"/>
+
+            <button class="btn btn-sm btn-outline-dark"
+                    disabled=@string.IsNullOrWhiteSpace(NewListTitle)
+                    @onclick=@AddList>
+                Create list
+            </button>
+        </div>
+    }
+</div>
+
+<style>
+    .k-listbox{
+        flex: 1;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    
+    .k-listbox .k-list-item {
+        padding: 0;
+        background: transparent;
+        border-radius: 1rem;
+    }
+
+    .k-listbox .k-list-scroller{
+        background: none;
+        border: none;
+    }
+
+    .k-listbox .k-list-content .k-list-ul{
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .k-list-item.k-selected{
+        color: black;
+    }
+
+    .k-list-item.k-selected:hover{
+        color: black;
+    }
+
+    .k-nodata{
+        min-height: 4rem;
+    }
+    
+</style>

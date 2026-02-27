@@ -9,7 +9,7 @@ namespace Services.API;
 
 public interface ILabelsApi
 {
-    [Get("/Board/{boardId}/Labels}")]
+    [Get("/Board/{boardId}/Labels")]
     Task<ApiResponse<List<LabelDto>>> GetByBoardAsync(int boardId);
     
     [Get("/Board/{boardId}/Labels/not-connected/card/{id}")]

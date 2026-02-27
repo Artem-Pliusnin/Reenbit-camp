@@ -1,6 +1,9 @@
 using Domain.Models.Cards;
 using Domain.Requests.Cards;
+using Domain.Responses.Cards;
+using Domain.Responses.Shared;
 using Domain.Shared;
+using Refit;
 
 namespace Services.Abstractions.Services;
 
@@ -11,6 +14,11 @@ public interface ICardsService
     Task<Result<List<CardModel>>> GetByListAsync(int boardId, int listId);
     
     Task<Result<CardInfoModel>> GetInfoAsync(int boardId, int id);
+    
+    Task<Result<InfiniteScrollDto<CardModel>>> GetFilteredCardsAsync(
+        int boardId, 
+        CardsFilterModel filter,
+        List<int>? labels);
     
     Task<Result<object>> UpdateAsync(int boardId, int id, UpdateCardRequest request);
     

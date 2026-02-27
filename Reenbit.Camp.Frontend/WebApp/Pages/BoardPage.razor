@@ -2,6 +2,7 @@
 @using Telerik.SvgIcons
 @using WebApp.Components.Boards
 @using WebApp.Components.BoardMembers
+@using WebApp.Components.Cards
 
 @if(isLoading)
 {
@@ -32,12 +33,18 @@ else
                        autofocus />
             }
             <div class="d-flex flex-row gap-2 align-items-center">
+                <TelerikButton OnClick=@ToggleFilter
+                               Class="board-btn"
+                               Icon=@(IsFilterVisible ? SvgIcon.X : SvgIcon.Search)>
+                               @(IsFilterVisible ? "Close filter" : "Open filter")
+                </TelerikButton>
+                               
                 <TelerikButton Icon=@SvgIcon.Whatsapp
-                               Class="meeting-btn"
+                               Class="board-btn"
                                OnClick=@RedirectToMeeting>
                     Meeting
                 </TelerikButton>
-                
+
                 <TelerikDropDownButton
                     Class="dropdown-btn"
                     FillMode=@ThemeConstants.DropDownButton.FillMode.Flat>
@@ -49,8 +56,8 @@ else
                             OnClick=@OpenMembersDialog>
                             Members
                         </DropDownButtonItem>
-                        
-                        @if(CheckManageLabelsPermision())
+
+                        @if (CheckManageLabelsPermision())
                         {
                             <DropDownButtonItem
                                 Icon=@Telerik.SvgIcons.SvgIcon.Highlight
@@ -61,7 +68,7 @@ else
                         @if (CheckArchiveBoardPermision())
                         {
                             <DropDownButtonItem
-                                Icon=@Telerik.SvgIcons.SvgIcon.FileZip
+                                Icon=@SvgIcon.FileZip
                                 OnClick=@ArchiveBoard
                                 Class="btn-danger">
                                 Archive
@@ -72,10 +79,24 @@ else
             </div>
         </div>
 
-        <div class="board-content">
+        <div class="board-content d-flex flex-row gap-1">
             <CascadingValue Name="Board" Value=@Board>
                 <CascadingValue Name="CurrentUser" Value=@CurrentBoardMember>
-                    <BoardLists></BoardLists>
+                    @if (IsFilterVisible)
+                    {
+                        <CardFilterWindow
+                            @ref=@filterWindow
+                            OnCardUpdated=@HandleCardUpdated
+                            OnCardDeleted=@HandleCardDeleted
+                            BoardId=@BoardId>
+                        </CardFilterWindow>
+                    }
+
+                    <BoardLists
+                        @ref=@boardLists
+                        OnCardUpdated=@HandleCardUpdated
+                        OnCardDeleted=@HandleCardDeleted>
+                    </BoardLists>
                 </CascadingValue>
             </CascadingValue>
         </div>
@@ -366,14 +387,14 @@ else
         background-color: rgb(240, 240, 240);
     }
 
-    .meeting-btn{
+    .board-btn{
         background-color: white;
         color: #176B87;
         border: 1px solid #176B87;
         font-weight: 500;
     }
 
-    .meeting-btn:hover{
+    .board-btn:hover{
         background-color: #176B87;
         color: white;
     }

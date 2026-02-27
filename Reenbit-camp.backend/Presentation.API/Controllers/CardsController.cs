@@ -6,10 +6,13 @@ using Application.Cards.Commands.UpdateCardDeadline;
 using Application.Cards.Commands.UpdateCardPosition;
 using Application.Cards.Commands.UpdateCardStatus;
 using Application.Cards.Queries.GetCardsByList;
+using Application.Cards.Queries.GetFilteredCards;
 using Application.Cards.Queries.GetFullCardInfo;
 using Domain.DTOs.Cards;
+using Domain.DTOs.Shared;
 using Domain.Enums;
 using Domain.Errors;
+using Domain.Models;
 using Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -53,6 +56,38 @@ public class CardsController : AuthorizedContoller
         var query = new GetFullCardInfoQuery(id);
             
         Result<CardInfoDto> result = await Sender.Send(query, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetFilteredCardsAsync(
+        [FromQuery] GetCardsQueryParameters queryParameters,
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+        
+        var query = new GetFilteredCardsQuery(
+            userId,
+            new CardsFilterModel(
+                queryParameters.Title,
+                queryParameters.BoardId,
+                queryParameters.OnlyAssignedToUser,
+                queryParameters.Labels,
+                queryParameters.Page,
+                queryParameters.PageSize));
+        
+        Result<InfiniteScrollDto<CardDto>> result = 
+            await Sender.Send(query, cancellationToken);
         
         if (result.IsFailure)
         {

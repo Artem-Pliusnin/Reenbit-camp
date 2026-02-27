@@ -1,18 +1,40 @@
+using Domain.DTOs.Shared;
 using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Repositories;
 
 public interface ICardRepository : IRepository<Card, int>
 {
-    Task<Card?> GetByIdWithListAsync(int cardId, CancellationToken cancellationToken = default);
+    Task<Card?> GetByIdWithListAsync(
+        int cardId, 
+        CancellationToken cancellationToken = default);
     
-    Task<Card?> GetByIdWithAttachmentsAsync(int cardId, CancellationToken cancellationToken = default);
+    Task<Card?> GetByIdWithAttachmentsAsync(
+        int cardId, 
+        CancellationToken cancellationToken = default);
     
-    Task<List<Card>> GetByListIdAsync(int listId, CancellationToken cancellationToken = default);
+    Task<List<Card>> GetByListIdAsync(
+        int listId, 
+        CancellationToken cancellationToken = default);
     
-    Task<Card?> GetLastListsCard(int listId, CancellationToken cancellationToken = default);
+    Task<Card?> GetLastListsCard(
+        int listId, 
+        CancellationToken cancellationToken = default);
 
-    Task MoveCardAsync(int cardId, int newListId, int newPosition, CancellationToken cancellationToken = default);
+    Task MoveCardAsync(
+        int cardId, 
+        int newListId, 
+        int newPosition, 
+        CancellationToken cancellationToken = default);
     
-    Task DeleteCardAsync(int cardId, int listId, CancellationToken cancellationToken = default);
+    Task DeleteCardAsync(
+        int cardId, 
+        int listId, 
+        CancellationToken cancellationToken = default);
+    
+    Task<InfiniteScrollDto<Card>> GetFilteredAsync(
+        int userId, 
+        CardsFilterModel filter,
+        CancellationToken cancellationToken = default);
 }

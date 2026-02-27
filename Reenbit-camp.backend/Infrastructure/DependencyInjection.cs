@@ -89,6 +89,7 @@ public static class DependencyInjection
                 EndPoints = { $"{redisEndpoint}:{redisPort}" },
                 Password = redisPassword,
                 AbortOnConnectFail = false,
+                Ssl = true,
                 ConnectRetry = 5,
                 ConnectTimeout = 15000,
                 SyncTimeout = 15000,

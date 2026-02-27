@@ -27,7 +27,13 @@ builder.Services.AddApplication()
     .AddPresentation(builder.Configuration)
     .AddDatabase(builder.Configuration);
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddAzureSignalR(options =>
+    {
+        options.ConnectionString = builder.Configuration["Azure-SignalR:ConnectionString"];
+        options.InitialHubServerConnectionCount = 1;
+        options.MaxHubServerConnectionCount = 1;
+    });
 
 var app = builder.Build();
 

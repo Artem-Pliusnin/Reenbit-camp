@@ -3,6 +3,7 @@ using Services.Abstractions.Services;
 using Domain.Requests.Auth;
 using Domain.Responses.Auth;
 using Domain.Shared;
+using Microsoft.Extensions.Configuration;
 using Services.API;
 using Services.Extensions;
 
@@ -12,12 +13,15 @@ public class AuthService : IAuthService
 {
     private readonly IAuthApi _authApi;
     private readonly ILocalStorageService _localStorage;
+    private readonly string _apiBaseUrl;
 
     public AuthService(IAuthApi authApi, 
-        ILocalStorageService localStorage)
+        ILocalStorageService localStorage,
+        IConfiguration configuration)
     {
         _authApi = authApi;
         _localStorage = localStorage;
+        _apiBaseUrl = configuration["ApiUrls:ApiBaseUrl"]!;
     }
     
     public async Task<Result<TokensResponseDto>> LoginAsync(LoginRequest request)
@@ -60,5 +64,11 @@ public class AuthService : IAuthService
         var response = await _authApi.RefreshAsync(request);
         
         return response.HandleResult();
+    }
+
+    public string GenerateGoogleAuthUrl(string returnUrl)
+    {
+        var encodedReturnUrl = Uri.EscapeDataString(returnUrl);
+        return $"{_apiBaseUrl}/auth/login/google?returnUrl={encodedReturnUrl}";
     }
 }

@@ -13,4 +13,6 @@ public interface IAuthService
     Task<Result<bool>> RegisterAsync(RegisterRequest request);
     
     Task<Result<TokensResponseDto>> RefreshTokensAsync(RefreshRequest request);
+    
+    string GenerateGoogleAuthUrl(string returnUrl);
 }

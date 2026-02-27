@@ -1,3 +1,4 @@
+@using Telerik.SvgIcons
 <h3 class="text-center mb-4">Sign In</h3>
 
 <EditForm
@@ -39,3 +40,33 @@
 
     <button type="submit" class="btn submit-btn mt-3">Sign In</button>
 </EditForm>
+
+<div class="w-100 d-flex flex-column align-items-center">
+    <hr>
+    <TelerikButton
+        Icon=@SvgIcon.Google
+        OnClick=@OnGoogleLogin
+        Class="google-login-btn">
+        Login with Google
+    </TelerikButton>
+</div>
+
+<style>
+    .google-login-btn{
+        width: fit-content;
+        height: fit-content;
+        background-color: rgb(238, 245, 255);
+        color: #176B87;
+        border: 1px solid #176B87;
+        font-weight: 500;
+        padding: 0.7rem 2rem;
+        box-sizing: border-box;
+        border-radius: 0.5rem;
+    }
+
+    .google-login-btn:hover{
+        background-color: #176B87;
+        color: rgb(238, 245, 255);
+    }
+</style>
+

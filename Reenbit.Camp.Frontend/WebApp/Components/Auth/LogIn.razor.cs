@@ -43,4 +43,13 @@ public partial class LogIn : ComponentBase
             Navigation.NavigateTo("/");   
         }
     }
+    
+    private void OnGoogleLogin()
+    {
+        var returnUrl = Navigation.BaseUri + "auth/callback";
+            
+        var url = AuthService.GenerateGoogleAuthUrl(returnUrl);
+            
+        Navigation.NavigateTo(url, forceLoad: true);
+    }
 }

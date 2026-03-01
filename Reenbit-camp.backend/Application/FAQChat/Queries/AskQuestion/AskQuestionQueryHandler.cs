@@ -29,4 +29,4 @@ internal class AskQuestionQueryHandler : IQueryHandler<AskQuestionQuery, string>
             return Result.Failure<string>(FAQChatErrors.ResponseError);
         }
     }
-}
+} 

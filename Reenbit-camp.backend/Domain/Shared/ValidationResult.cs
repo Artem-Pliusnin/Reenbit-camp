@@ -1,5 +1,3 @@
-using Microsoft.IdentityModel.Tokens.Experimental;
-
 namespace Domain.Shared;
 
 public class ValidationResult : Result, IValidationResult

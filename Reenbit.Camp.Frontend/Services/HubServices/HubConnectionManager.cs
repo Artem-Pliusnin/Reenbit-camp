@@ -39,6 +39,7 @@ public class HubConnectionManager
                 options.AccessTokenProvider =
                     () => _tokenProvider.GetAccessTokenAsync();
             })
+            .WithAutomaticReconnect()
             .Build();
         
         _connections[type] = hub;

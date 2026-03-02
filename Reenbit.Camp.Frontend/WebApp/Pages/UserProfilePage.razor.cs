@@ -42,6 +42,12 @@ public partial class UserProfilePage : ComponentBase
     private IBrowserFile? selectedFile;
     
     private string? previewImageUrl;
+    
+    private string CurrentPassword = string.Empty;
+    
+    private string NewPassword = string.Empty;
+    
+    private bool isCurrentPasswordInvalid;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -129,6 +135,13 @@ public partial class UserProfilePage : ComponentBase
                && !string.IsNullOrWhiteSpace(enteredLastName); ;
     }
     
+    private bool CanChangePassword()
+    {
+        return (NewPassword.Length >= 8 && NewPassword.Length <= 255)
+               && (!userProfile.HasPassword ||
+                   (CurrentPassword.Length >= 8 && CurrentPassword.Length <= 255));
+    }
+    
     private async Task SaveName()
     {
         if (string.IsNullOrEmpty(enteredFirstName) || string.IsNullOrEmpty(enteredLastName))
@@ -150,6 +163,31 @@ public partial class UserProfilePage : ComponentBase
             var userModel = Mapper.Map<UserModel>(userProfile);
             NavMenuRef!.UpdateProfile(userModel);
         }
+        
+        StateHasChanged();
+    }
+    
+    private async Task ChangePassword()
+    {
+        if (!CanChangePassword())
+        {
+            return;
+        }
+        
+        var result = await UsersService.UpdateUserPasswordAsync(
+            new UpdateUserPasswordRequest(
+                CurrentPassword,
+                NewPassword),
+            UserId);
+
+        if (result.IsFailure)
+        {
+            isCurrentPasswordInvalid = true;
+            return;
+        }
+        
+        NewPassword = string.Empty;
+        CurrentPassword = string.Empty;
         
         StateHasChanged();
     }

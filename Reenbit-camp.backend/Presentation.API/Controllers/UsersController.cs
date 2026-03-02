@@ -3,6 +3,7 @@ using Application.Boards.Queries.GetUserBoards;
 using Application.CardMembers.Queries.GetNotConnectedToCard;
 using Application.Users.Commands.UpdateUserAvatar;
 using Application.Users.Commands.UpdateUserInfo;
+using Application.Users.Commands.UpdateUserPassword;
 using Application.Users.Queries.GetInviteSuggestionUsers;
 using Application.Users.Queries.GetUserInfo;
 using Application.Users.Queries.GetUserProfileInfo;
@@ -128,6 +129,41 @@ public class UsersController : AuthorizedContoller
         }
         
         return Ok(result.Value);
+    }
+    
+    [HttpPut("{id}/password")]
+    public async Task<IActionResult> UpdateUserPasswordAsync(
+        [FromRoute] int id,
+        [FromBody] UpdateUserPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return  HandleUnauthorized(
+                Result.Failure(UserErrors.UserUnauthorized));
+        }
+
+        if (id != userId)
+        {
+            return HandleFailure(
+                Result.Failure(PermissionErrors.InsufficientPermissions));
+        }
+
+        Console.WriteLine(request.Password);
+        Console.WriteLine(request.NewPassword);
+        var command = new UpdateUserPasswordCommand(
+            userId, 
+            request.Password,
+            request.NewPassword);
+        
+        var result = await Sender.Send(command, cancellationToken);
+        
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+        
+        return Ok();
     }
     
     [HttpGet("invitation/suggestions")]

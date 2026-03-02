@@ -52,6 +52,13 @@ public class UsersService : IUsersService
             => _mapper.Map<UserAvatarModel>(content));
     }
 
+    public async Task<Result<object>> UpdateUserPasswordAsync(UpdateUserPasswordRequest request, int userId)
+    {
+        var response = await _usersApi.UpdateUserPasswordAsync(request, userId);
+
+        return response.HandleResult();
+    }
+
     public async Task<Result<List<UserModel>>> GetInvitationSuggestionsAsync(GetInviteSuggestionRequest request)
     {
         var response = await _usersApi.GetInvitationSuggestionsAsync(request);

@@ -52,9 +52,13 @@ public partial class NavMenu
         isOpen = !isOpen;
     }
 
+    private void NavigateToHomePage()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    
     private void NavigateToProfile()
     {
         NavigationManager.NavigateTo($"/userProfile/{UserId}");
     }
-    
 }

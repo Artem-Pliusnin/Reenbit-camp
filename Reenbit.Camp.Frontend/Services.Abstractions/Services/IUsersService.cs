@@ -18,6 +18,8 @@ public interface IUsersService
     
     Task<Result<UserAvatarModel>> UpdateUserAvatarAsync(StreamPart file, int userId);
     
+    Task<Result<object>> UpdateUserPasswordAsync(UpdateUserPasswordRequest request, int userId);
+    
     Task<Result<List<UserModel>>> GetInvitationSuggestionsAsync(GetInviteSuggestionRequest request);
     
     Task<Result<List<UserModel>>> GetNotConnectedToCardAsync(int cardId);

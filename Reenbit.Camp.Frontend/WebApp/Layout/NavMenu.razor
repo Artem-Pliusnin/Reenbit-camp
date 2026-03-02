@@ -9,7 +9,7 @@
             Class="navbar-toggler"
             OnClick=@ToggleMenu/>
 
-        <span class="brand">Trello</span>
+        <span class="brand" @onclick=@NavigateToHomePage>Trello</span>
 
         <div class="navbar-links @(isOpen ? "open" : "")">
             <NavLink href="/" Match=@NavLinkMatch.All>Boards</NavLink>

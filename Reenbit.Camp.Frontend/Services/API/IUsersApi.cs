@@ -29,6 +29,11 @@ public interface IUsersApi
         [AliasAs("File")] StreamPart file,
         int id);
     
+    [Put("/Users/{id}/password")]
+    Task<ApiResponse<object>> UpdateUserPasswordAsync(
+        [Body] UpdateUserPasswordRequest request,
+        int id);
+    
     [Get("/Users/invitation/suggestions")]
     Task<ApiResponse<List<UserDto>>> GetInvitationSuggestionsAsync(
         [Query] GetInviteSuggestionRequest request);

@@ -19,8 +19,9 @@
 }
 
 .remote-strip-wrapper {
+    width: 100%;
     padding: 0.7rem;
-    overflow-x: auto;
+    overflow-x: scroll;
 }
 
 .remote-strip {
@@ -150,3 +151,8 @@
     margin-bottom: 0.5rem;
 }
 
+@media (max-width: 768px) {
+    .meeting-controls {
+        gap: 0.7rem;
+    }
+}

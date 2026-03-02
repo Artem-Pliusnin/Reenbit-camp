@@ -7,6 +7,7 @@ public record UserProfileDto(
     int Id,
     string FirstName,
     string LastName,
-    string Email,
+    string Email, 
+    bool HasPassword,
     UserAvatarDto? Avatar,
     UserSubscriptionDto Subscription);

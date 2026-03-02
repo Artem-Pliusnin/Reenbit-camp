@@ -13,6 +13,7 @@ public class UserProfile : Profile
                 dest => dest.UserName, 
                 opt => opt.MapFrom(src => src.FirstName + " " + src.LastName));
         
-        CreateMap<User, UserProfileDto>();
+        CreateMap<User, UserProfileDto>()
+            .ForMember(dest => dest.HasPassword, opt => opt.MapFrom(src => src.Password != null));
     }
 }

@@ -13,6 +13,8 @@ public class UserProfileDto
 
     public required string Email { get; set; }
     
+    public required bool HasPassword { get; set; }
+    
     public required UserAvatarDto? Avatar { get; set; }
     
     public required UserSubscriptionDto Subscription { get; set; }

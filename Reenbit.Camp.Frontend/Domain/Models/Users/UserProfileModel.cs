@@ -13,6 +13,8 @@ public class UserProfileModel
     
     public string Email { get; set; }
     
+    public bool HasPassword { get; set; }
+    
     public UserAvatarModel? Avatar { get; set; }
     
     public UserSubscriptionModel Subscription { get; set; }
